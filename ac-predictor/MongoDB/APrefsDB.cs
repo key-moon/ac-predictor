@@ -28,6 +28,12 @@ namespace ac_predictor.MongoDB
             database = client.GetDatabase(DBName);
             collection = database.GetCollection<APrefs>(TableName);
         }
+
+        public APrefs GetAPrefs(string contestName) => collection.Find(x => x.ContestID == contestName).First();
+
+        public void CreateAPrefs(APrefs aprefs) => collection.InsertOne(aprefs);
+
+        public void UpdateAPrefs(APrefs aprefs) => collection.UpdateOne(x => x.ContestID == aprefs.ContestID, new UpdateDefinitionBuilder<APrefs>().Set(x => x.APrefDic, aprefs.APrefDic));
     }
 
     public class APrefs
