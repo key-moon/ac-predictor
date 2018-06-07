@@ -33,21 +33,18 @@ namespace ac_predictor.MongoDB
     public class APrefs
     {
         [BsonRepresentation(BsonType.ObjectId)]
-        private string _id;
+        public string _id { get; set; }
         public string ContestID { get; set; }
-        private Dictionary<string, double> aPrefs;
 
-        public bool IsContainUsers(string userName) => aPrefs.ContainsKey(userName);
-        public double GetAPref(string userName) => aPrefs[userName];
-        public void AddAPref(string userName, double value) => aPrefs.Add(userName, value);
-        public void UpdateAPref(string userName, double value) => aPrefs[userName] = value;
+        private Dictionary<string, double> _aprefdic;
+        public Dictionary<string, double> APrefDic { get { return _aprefdic.ToDictionary(x => x.Key, x => x.Value); } set { _aprefdic = value.ToDictionary(x => x.Key, x => x.Value); } }
 
         [BsonConstructor]
-        public APrefs(string _id,string contestID, Dictionary<string, double> APrefs)
+        public APrefs(string _id,string contestID, Dictionary<string, double> aprefdic)
         {
             this._id = _id;
             ContestID = contestID;
-            aPrefs = APrefs;
+            APrefDic = aprefdic;
         }
     }
 }
