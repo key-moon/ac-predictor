@@ -21,12 +21,12 @@ namespace ac_predictor.MongoDB
 
         private MongoClient client;
         private IMongoDatabase database;
-        private IMongoCollection<Dictionary<string, double>> collection;
+        private IMongoCollection<APrefs> collection;
         public APrefsDB()
         {
             client = new MongoClient(connectionString);
             database = client.GetDatabase(DBName);
-            collection = database.GetCollection<Dictionary<string, double>>(TableName);
+            collection = database.GetCollection<APrefs>(TableName);
         }
     }
 
