@@ -22,6 +22,9 @@ namespace ac_predictor.MongoDB
         private MongoClient client;
         private IMongoDatabase database;
         private IMongoCollection<APrefs> collection;
+
+        public List<string> ContestIDs => collection.Find(new FilterDefinitionBuilder<APrefs>().Empty).Project(x => x.ContestID).ToList();
+
         public APrefsDB()
         {
             client = new MongoClient(connectionString);
