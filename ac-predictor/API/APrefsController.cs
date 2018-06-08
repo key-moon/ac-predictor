@@ -19,9 +19,12 @@ namespace ac_predictor.API
             return JsonConvert.SerializeObject(contestIDs);
         }
 
+        /// <summary>APerf一覧の取得</summary>
         public string Get(string id)
         {
-            return "value";
+            APrefsDB db = new APrefsDB();
+            APrefs aprefs = db.GetAPrefs(id);
+            return JsonConvert.SerializeObject(aprefs);
         }
     }
 }
