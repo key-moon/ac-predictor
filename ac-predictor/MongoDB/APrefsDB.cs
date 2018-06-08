@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Configuration;
+using Newtonsoft.Json;
 using MongoDB;
 using MongoDB.Driver;
 using MongoDB.Driver.Core;
 using MongoDB.Driver.Linq;
-
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -42,7 +42,9 @@ namespace ac_predictor.MongoDB
     public class APrefs
     {
         [BsonRepresentation(BsonType.ObjectId)]
+        [JsonIgnore]
         public string _id { get; set; }
+
         public string ContestID { get; set; }
 
         private Dictionary<string, double> _aprefdic;
