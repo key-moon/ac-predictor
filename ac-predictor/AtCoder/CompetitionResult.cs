@@ -32,11 +32,11 @@ namespace ac_predictor.AtCoder
         }
         public static CompetitionResult[] GetFromJson(string userName) => Scraping.GetCompetitionHistory(userName);
 
-        public static double CalcAPerf(CompetitionResult[] results) => CalcAPerf(results.Select(x => x.InnerPerfomance).ToArray());
+        public static double CalcAPerf(CompetitionResult[] results, double defaultValue) => CalcAPerf(results.Select(x => x.InnerPerfomance).ToArray(), defaultValue);
 
-        public static double CalcAPerf(int[] perfs)
+        public static double CalcAPerf(int[] perfs, double defalutValue)
         {
-            if (perfs == null || perfs.Length == 0) return -10000;
+            if (perfs == null || perfs.Length == 0) return defalutValue;
             double coefficient = 1;
             double denominator = 0;
             double numerator = 0;

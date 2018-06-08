@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using sys
 using Newtonsoft.Json;
 using ac_predictor.MongoDB;
 using ac_predictor.AtCoder;
@@ -31,12 +32,27 @@ namespace ac_predictor.API
         public void Post(string contestID)
         {
             APerfsDB db = new APerfsDB();
-            CompetitionResult[] results = CompetitionResult.GetFromJson(contestID);
-            APerfs aPerfs = new APerfs(contestID);
-            foreach (var result in results)
+
+            APerfs aPerfs = db.GetAPerfs(contestID);
+            bool isContainContest = aPerfs != null;
+            if (!isContainContest) aPerfs = new APerfs(contestID);
+
+            double defaultValue = contestID.Substring(0, 3) == "abc" ? 800 : 1600;
+
+            Standings standings = Standings.GetStandings(contestID);
+            Dictionary<string, double> dict = aPerfs.APerfDic;
+
+            foreach (var standing in standings.StandingsData)
             {
-                CompetitionResult.CalcAPerf(result.)
+                if (dict.ContainsKey(standing.UserScreenName)) continue;
+                CompetitionResult[] results = CompetitionResult.GetFromJson(standing.UserScreenName);
+                double aperf = CompetitionResult.CalcAPerf(results, defaultValue);
+                dict.Add(standing.UserScreenName, aperf);
             }
+
+            aPerfs.APerfDic = dict;
+            if (isContainContest) db.CreateAPerfs(aPerfs);
+            else db.UpdateAPerfs(aPerfs);
         }
     }
 }
