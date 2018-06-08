@@ -9,12 +9,12 @@ using ac_predictor.MongoDB;
 
 namespace ac_predictor.API
 {
-    public class APrefsController : ApiController
+    public class APerfsController : ApiController
     {
         /// <summary>DBに入ってるコンテスト一覧の取得</summary>
         public string Get()
         {
-            APrefsDB db = new APrefsDB();
+            APerfsDB db = new APerfsDB();
             string[] contestIDs = db.ContestIDs.ToArray();
             return JsonConvert.SerializeObject(contestIDs);
         }
@@ -22,9 +22,9 @@ namespace ac_predictor.API
         /// <summary>APerf一覧の取得</summary>
         public string Get(string id)
         {
-            APrefsDB db = new APrefsDB();
-            APrefs aprefs = db.GetAPrefs(id);
-            return JsonConvert.SerializeObject(aprefs);
+            APerfsDB db = new APerfsDB();
+            APerfs aperfs = db.GetAPerfs(id);
+            return JsonConvert.SerializeObject(aperfs);
         }
     }
 }
