@@ -204,6 +204,7 @@
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="AtCoder\CompetitionResult.cs" />
     <Compile Include="AtCoder\Scraping.cs" />
+    <Compile Include="AtCoder\Standing.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
     <Compile Include="Global.asax.cs">

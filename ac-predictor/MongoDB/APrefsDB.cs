@@ -50,6 +50,9 @@ namespace ac_predictor.MongoDB
         private Dictionary<string, double> _aperfdic;
         public Dictionary<string, double> APerfDic { get { return _aperfdic.ToDictionary(x => x.Key, x => x.Value); } set { _aperfdic = value.ToDictionary(x => x.Key, x => x.Value); } }
 
+
+        public APerfs(string contestID) : this(null, contestID, new Dictionary<string, double>()) { }
+
         [BsonConstructor]
         public APerfs(string _id,string contestID, Dictionary<string, double> aperfdic)
         {
