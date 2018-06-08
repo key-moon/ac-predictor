@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Configuration;
 using System.Web.Http;
 using Newtonsoft.Json;
 using ac_predictor.MongoDB;
@@ -28,11 +29,13 @@ namespace ac_predictor.API
             return JsonConvert.SerializeObject(aperfs);
         }
 
-        public void Post(string contestID)
+        public void Post(string contestID,string key)
         {
+            if (ConfigurationManager.AppSettings["ApiKey"] != key) return;
             APerfsDB db = new APerfsDB();
 
             APerfs aPerfs = db.GetAPerfs(contestID);
+
             bool isContainContest = aPerfs != null;
             if (!isContainContest) aPerfs = new APerfs(contestID);
 
