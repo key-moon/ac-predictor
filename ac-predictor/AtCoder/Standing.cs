@@ -24,7 +24,7 @@ namespace ac_predictor.AtCoder
             StandingsData = standingsData;
         }
 
-        static Standings GetStandings(string contestID) => Scraping.GetStandings(contestID);
+        public static Standings GetStandings(string contestID) => Scraping.GetStandings(contestID);
     }
     public class TaskInfo
     {
