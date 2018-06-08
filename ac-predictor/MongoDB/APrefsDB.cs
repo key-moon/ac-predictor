@@ -13,33 +13,33 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace ac_predictor.MongoDB
 {
-    public class APrefsDB
+    public class APerfsDB
     {
         private string connectionString => ConfigurationManager.AppSettings["MongoDBConnection"];
         private static string DBName = "Predictor";
-        private static string TableName = "APrefs";
+        private static string TableName = "APerfs";
 
         private MongoClient client;
         private IMongoDatabase database;
-        private IMongoCollection<APrefs> collection;
+        private IMongoCollection<APerfs> collection;
 
-        public List<string> ContestIDs => collection.Find(new FilterDefinitionBuilder<APrefs>().Empty).Project(x => x.ContestID).ToList();
+        public List<string> ContestIDs => collection.Find(new FilterDefinitionBuilder<APerfs>().Empty).Project(x => x.ContestID).ToList();
 
-        public APrefsDB()
+        public APerfsDB()
         {
             client = new MongoClient(connectionString);
             database = client.GetDatabase(DBName);
-            collection = database.GetCollection<APrefs>(TableName);
+            collection = database.GetCollection<APerfs>(TableName);
         }
 
-        public APrefs GetAPrefs(string contestName) => collection.Find(x => x.ContestID == contestName).First();
+        public APerfs GetAPerfs(string contestName) => collection.Find(x => x.ContestID == contestName).First();
 
-        public void CreateAPrefs(APrefs aprefs) => collection.InsertOne(aprefs);
+        public void CreateAPerfs(APerfs aperfs) => collection.InsertOne(aperfs);
 
-        public void UpdateAPrefs(APrefs aprefs) => collection.UpdateOne(x => x.ContestID == aprefs.ContestID, new UpdateDefinitionBuilder<APrefs>().Set(x => x.APrefDic, aprefs.APrefDic));
+        public void UpdateAPerfs(APerfs aperfs) => collection.UpdateOne(x => x.ContestID == aperfs.ContestID, new UpdateDefinitionBuilder<APerfs>().Set(x => x.APerfDic, aperfs.APerfDic));
     }
 
-    public class APrefs
+    public class APerfs
     {
         [BsonRepresentation(BsonType.ObjectId)]
         [JsonIgnore]
@@ -47,15 +47,15 @@ namespace ac_predictor.MongoDB
 
         public string ContestID { get; set; }
 
-        private Dictionary<string, double> _aprefdic;
-        public Dictionary<string, double> APrefDic { get { return _aprefdic.ToDictionary(x => x.Key, x => x.Value); } set { _aprefdic = value.ToDictionary(x => x.Key, x => x.Value); } }
+        private Dictionary<string, double> _aperfdic;
+        public Dictionary<string, double> APerfDic { get { return _aperfdic.ToDictionary(x => x.Key, x => x.Value); } set { _aperfdic = value.ToDictionary(x => x.Key, x => x.Value); } }
 
         [BsonConstructor]
-        public APrefs(string _id,string contestID, Dictionary<string, double> aprefdic)
+        public APerfs(string _id,string contestID, Dictionary<string, double> aperfdic)
         {
             this._id = _id;
             ContestID = contestID;
-            APrefDic = aprefdic;
+            APerfDic = aperfdic;
         }
     }
 }
