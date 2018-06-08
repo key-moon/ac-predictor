@@ -30,5 +30,6 @@ namespace ac_predictor.AtCoder
             InnerPerfomance = innerPerformance;
             NewRating = newRating;
         }
+        public static CompetitionResult[] GetFromJson(string userName) => Scraping.GetCompetitionHistory(userName);
     }
 }
