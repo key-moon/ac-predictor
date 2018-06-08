@@ -31,5 +31,22 @@ namespace ac_predictor.AtCoder
             NewRating = newRating;
         }
         public static CompetitionResult[] GetFromJson(string userName) => Scraping.GetCompetitionHistory(userName);
+
+        public static double CalcAPerf(CompetitionResult[] results) => CalcAPerf(results.Select(x => x.InnerPerfomance).ToArray());
+
+        public static double CalcAPerf(int[] perfs)
+        {
+            if (perfs == null || perfs.Length == 0) return -10000;
+            double coefficient = 1;
+            double denominator = 0;
+            double numerator = 0;
+            for (int i = 0; i < perfs.Length; i++)
+            {
+                coefficient *= 0.9d;
+                denominator += perfs[i] * coefficient;
+                numerator += coefficient;
+            }
+            return denominator / numerator;
+        }
     }
 }
