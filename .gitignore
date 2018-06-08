@@ -260,4 +260,4 @@ paket-files/
 __pycache__/
 *.pyc
 
-ac-predictor/Web.config
+/ac-predictor/Web.config
