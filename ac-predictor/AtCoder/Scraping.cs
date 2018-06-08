@@ -12,6 +12,13 @@ namespace ac_predictor.AtCoder
 {
     public static class Scraping
     {
+        public static Standings GetStandings(string contestID)
+        {
+            string HTML = getHTML($"https://beta.atcoder.jp/contests/{contestID}/standings/json");
+            var standings = JsonConvert.DeserializeObject<Standings>(HTML);
+            return standings;
+        }
+
         public static CompetitionResult[] GetCompetitionHistory(string userName)
         {
             string HTML = getHTML($"https://beta.atcoder.jp/users/{userName}/history/json");

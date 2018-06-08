@@ -23,6 +23,8 @@ namespace ac_predictor.AtCoder
             TaskInfo = taskInfo;
             StandingsData = standingsData;
         }
+
+        static Standings GetStandings(string contestID) => Scraping.GetStandings(contestID);
     }
     public class TaskInfo
     {

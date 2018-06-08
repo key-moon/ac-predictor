@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Newtonsoft.Json;
 using ac_predictor.MongoDB;
+using ac_predictor.AtCoder;
 
 namespace ac_predictor.API
 {
@@ -25,6 +26,17 @@ namespace ac_predictor.API
             APerfsDB db = new APerfsDB();
             APerfs aperfs = db.GetAPerfs(id);
             return JsonConvert.SerializeObject(aperfs);
+        }
+
+        public void Post(string contestID)
+        {
+            APerfsDB db = new APerfsDB();
+            CompetitionResult[] results = CompetitionResult.GetFromJson(contestID);
+            APerfs aPerfs = new APerfs(contestID);
+            foreach (var result in results)
+            {
+                CompetitionResult.CalcAPerf(result.)
+            }
         }
     }
 }
