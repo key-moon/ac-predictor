@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using sys
 using Newtonsoft.Json;
 using ac_predictor.MongoDB;
 using ac_predictor.AtCoder;
