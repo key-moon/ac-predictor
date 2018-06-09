@@ -3,7 +3,11 @@
     ViewBag.Title = "Index";
 }
 <h1>コンテストを選択してください</h1>
-<select class="selectpicker" id="contestselector"></select>
+<form action="/contestresult" method="get">
+    <select class="selectpicker" name="contestid" id="contestselector"></select>
+    <button class="btn btn-primary">確定</button>
+</form>
+
 
 @section Styles
 {
