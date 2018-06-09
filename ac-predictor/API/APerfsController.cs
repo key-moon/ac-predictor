@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Configuration;
 using System.Web.Http;
+using System.Web.Http.Results;
 using Newtonsoft.Json;
 using ac_predictor.MongoDB;
 using ac_predictor.AtCoder;
@@ -14,19 +15,19 @@ namespace ac_predictor.API
     public class APerfsController : ApiController
     {
         /// <summary>DBに入ってるコンテスト一覧の取得</summary>
-        public string Get()
+        public JsonResult<string[]> Get()
         {
             APerfsDB db = new APerfsDB();
             string[] contestIDs = db.ContestIDs.ToArray();
-            return JsonConvert.SerializeObject(contestIDs);
+            return Json(contestIDs);
         }
 
         /// <summary>APerf一覧の取得</summary>
-        public string Get(string id)
+        public JsonResult<APerfs> Get(string id)
         {
             APerfsDB db = new APerfsDB();
             APerfs aperfs = db.GetAPerfs(id);
-            return JsonConvert.SerializeObject(aperfs);
+            return Json(aperfs);
         }
 
         public void Post(string contestID,string key)
