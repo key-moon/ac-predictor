@@ -261,3 +261,4 @@ __pycache__/
 *.pyc
 
 /ac-predictor/Web.config
+/ac-predictor/Properties/PublishProfiles
