@@ -54,7 +54,7 @@ namespace ac_predictor.API
             }
 
             aPerfs.APerfDic = dict;
-            if (isContainContest) db.CreateAPerfs(aPerfs);
+            if (!isContainContest) db.CreateAPerfs(aPerfs);
             else db.UpdateAPerfs(aPerfs);
         }
     }
