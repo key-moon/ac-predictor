@@ -1,13 +1,9 @@
-﻿@{
+﻿
+@{
     ViewBag.Title = "Index";
 }
 <h1>コンテストを選択してください</h1>
-<select class="selectpicker">
-    <optgroup label="開催中">
-    </optgroup>
-    <optgroup label="終了">
-    </optgroup>
-</select>
+<select class="selectpicker" id="contestselector"></select>
 
 @section Styles
 {
@@ -15,5 +11,6 @@
 }
 @section Scripts
 {
-    @Scripts.Render("/Scripts/bootstrap-select.min.js")     
+    @Scripts.Render("/contestselector.js")
+    @Scripts.Render("/Scripts/bootstrap-select.min.js")
 }
