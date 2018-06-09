@@ -8,6 +8,8 @@ $.ajax({
 	async: false
 	}).responseText
 
+console.log(ContestJson)
+
 JSON.parse(ContestJson)
 	.forEach(
 	function (element) {
