@@ -23,11 +23,11 @@ namespace ac_predictor.API
         }
 
         /// <summary>APerf一覧の取得</summary>
-        public JsonResult<APerfs> Get(string id)
+        public JsonResult<Dictionary<string, double>> Get(string id)
         {
             APerfsDB db = new APerfsDB();
             APerfs aperfs = db.GetAPerfs(id);
-            return Json(aperfs);
+            return Json(aperfs.APerfDic);
         }
 
         public void Post(string contestID,string key)
