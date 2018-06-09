@@ -1,12 +1,14 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <title>@ViewBag.Title</title>
-    @Styles.Render("~/Content/css")
-    @Scripts.Render("~/bundles/modernizr")
+    @Styles.Render("/content/bootstrap.min.css")
+    @Styles.Render("/content/site.css")
+    @RenderSection("style", required: false)
+    @Scripts.Render("/scripts/modernizr-2.8.3.js")
 </head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 <body>
@@ -36,8 +38,8 @@
         </footer>
     </div>
 
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("/scripts/bootstrap.min.js")
+    @Scripts.Render("/scripts/jquery-3.3.1.min.js")
     @RenderSection("scripts", required: false)
 </body>
 </html>
