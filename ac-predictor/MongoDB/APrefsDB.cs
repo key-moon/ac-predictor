@@ -32,7 +32,7 @@ namespace ac_predictor.MongoDB
             collection = database.GetCollection<APerfs>(TableName);
         }
 
-        public APerfs GetAPerfs(string contestName) => collection.Find(x => x.ContestID == contestName).First();
+        public APerfs GetAPerfs(string contestName) => collection.Find(x => x.ContestID == contestName).FirstOrDefault();
 
         public void CreateAPerfs(APerfs aperfs) => collection.InsertOne(aperfs);
 
