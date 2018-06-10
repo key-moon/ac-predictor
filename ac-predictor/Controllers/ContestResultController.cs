@@ -14,7 +14,7 @@ namespace ac_predictor.Controllers
             return View();
         }
         
-        public ActionResult Result(string contestID)
+        public ActionResult Standings(string contestID)
         {
             return View();
         }

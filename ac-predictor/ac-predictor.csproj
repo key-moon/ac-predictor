@@ -277,7 +277,7 @@
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\ContestResult\Index.cshtml" />
-    <Content Include="Views\ContestResult\Result.cshtml" />
+    <Content Include="Views\ContestResult\Standings.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
