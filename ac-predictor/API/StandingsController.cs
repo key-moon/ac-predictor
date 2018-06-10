@@ -14,7 +14,7 @@ namespace ac_predictor.API
 {
     public class StandingsController : ApiController
     {
-        [Route("standings/{contestID}")]
+        [Route("api/standings/{contestID}")]
         public JsonResult<Standings> Get(string contestID)
         {
             Standings result = Standings.GetStandings(contestID);
