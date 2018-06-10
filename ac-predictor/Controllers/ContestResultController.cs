@@ -13,9 +13,8 @@ namespace ac_predictor.Controllers
         {
             return View();
         }
-
-        [Route("{controller}/{contestID}")]
-        public ActionResult Result(string contestID)
+        
+        public ActionResult Standings(string contestID)
         {
             return View();
         }
