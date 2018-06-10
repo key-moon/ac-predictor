@@ -1,6 +1,8 @@
-﻿var contestID = getParamator()["contestID"]
-var StandingsURL = `https://beta.atcoder.jp/contests/${contestID}/standings/json`
+﻿var contestID = getParamator()["contestid"]
+var StandingsURL = `http://ac-predictor.azurewebsites.net/api/standings/${contestID}`
 var APerfsURL = `http://ac-predictor.azurewebsites.net/api/aperfs/${contestID}`
+
+console.log(contestID)
 
 var table = document.getElementById('standings-body')
 
@@ -16,7 +18,8 @@ $.ajax({
 })
 .done(
 	(data) => {
-	Standings = JSON.parse(data).StandingsData
+	Standings = data.StandingsData
+	console.log(Standings)
 	loadDoneCount++;
 	if (loadDoneCount >= 2) DrawTable()
 })
@@ -28,7 +31,7 @@ $.ajax({
 })
 .done(
 	(data) => {
-	APerfs = JSON.parse(data)
+	APerfs = data
 	loadDoneCount++;
 	if (loadDoneCount >= 2) DrawTable()
 })
@@ -36,6 +39,16 @@ $.ajax({
 
 
 function DrawTable() {
+	console.log('draw')
+
+	var activePerf = []
+
+	Standings.forEach(function (element) {
+		if (!element.IsRated || element.TotalResult.Count == 0) activePerf.push(APerfs[element.UserScreenName])
+	})
+
+	console.log(activePerf)
+
 	var rank = 1;
 	var lastRank = 0;
 	var tiedList = []
@@ -47,7 +60,7 @@ function DrawTable() {
 			var fixRank = rank + (tiedList.length - 1) / 2
 			var perf = getPerf(fixRank)
 			var rate = getRating(element.Rating, perf, element.Competitions)
-			var node = genNode(rank, element.UserName, element.TotalResult / 100,perf,``)
+			var node = genNode(rank, element.UserScreenName, element.TotalResult.Score / 100,perf,``)
 			table.appendChild(node)
 			rank += tiedList.length;
 			tiedList = []
@@ -60,7 +73,7 @@ function DrawTable() {
 		var lower = -8192
 
 		while (upper - lower > 0.5) {
-			if (rank - 0.5 > getRank(lower + (upper - lower) / 2)) upper -= (upper - lower) / 2
+			if (rank - 0.5 > calcPerf(lower + (upper - lower) / 2)) upper -= (upper - lower) / 2
 			else lower += (upper - lower) / 2
 		}
 
@@ -68,8 +81,8 @@ function DrawTable() {
 
 		function calcPerf(X) {
 			var res = 0;
-			APerfs.forEach(function (APerf) {
-				res += 1.0 / (1.0 + Math.pow(6.0, ((perfomance - aperf) / 400.0)))
+			activePerf.forEach(function (APerf) {
+				res += 1.0 / (1.0 + Math.pow(6.0, ((X - APerf) / 400.0)))
 			})
 			return res;
 		}
@@ -105,4 +118,4 @@ function getParamator() {
 		arg[kv[0]] = kv[1];
 	}
 	return arg;
-}}9
+}
