@@ -1,3 +1,20 @@
 ﻿@{
     ViewBag.Title = "Result";
 }
+
+<table class="table table-bordered table-striped table-hover" id="standings">
+    <thead>
+        <tr>
+            <th>順位(Ratedない)</th>
+            <th>ユーザ</th>
+            <th>得点</th>
+            <th>推定パフォーマンス</th>
+            <th>レート変化</th>
+        </tr>
+    </thead>
+    <tbody id="standings-body"></tbody>
+</table>
+
+@section scripts{
+    @Scripts.Render("/scripts/drawcontesttable.js")
+}
