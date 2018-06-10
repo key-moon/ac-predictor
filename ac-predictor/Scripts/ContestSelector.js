@@ -1,5 +1,5 @@
 ﻿var selector = document.getElementById("contestselector")
-
+console.log(selector)
 var ContestJson = 
 $.ajax({
 	type: 'GET',
@@ -11,6 +11,11 @@ $.ajax({
 JSON.parse(ContestJson)
 	.forEach(
 	function (element) {
-		selector.appendChild(`<option>${element}</option>`);
+		var innerNode = document.createElement('option')
+		innerNode.appendChild(document.createTextNode(element))
+		console.log(innerNode)
+		selector.appendChild(innerNode)
 	}
 )
+
+console.log(document.getElementById("contestselector"))
