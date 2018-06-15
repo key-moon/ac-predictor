@@ -32,7 +32,7 @@ namespace ac_predictor.AtCoder
         }
         public static CompetitionResult[] GetFromJson(string userName) => Scraping.GetCompetitionHistory(userName);
 
-        public static double CalcAPerf(CompetitionResult[] results, double defaultValue) => CalcAPerf(results.Select(x => x.InnerPerfomance).ToArray(), defaultValue);
+        public static double CalcAPerf(CompetitionResult[] results, double defaultValue) => CalcAPerf(results.Where(x => x.IsRated).OrderByDescending(x => x.EndTime).Select(x => x.InnerPerfomance).ToArray(), defaultValue);
 
         public static double CalcAPerf(int[] perfs, double defalutValue)
         {
