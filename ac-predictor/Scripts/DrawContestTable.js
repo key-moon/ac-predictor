@@ -43,9 +43,11 @@
 	}
 
 	function draw() {
+		//テーブルをクリア
+		table.textContent = null
 
+		//Perf計算時に使うパフォ(Ratedオンリー)
 		var activePerf = []
-
 		Standings.forEach(function (element) {
 			if (!element.IsRated || element.TotalResult.Count == 0) activePerf.push(APerfs[element.UserScreenName])
 		})
@@ -53,8 +55,11 @@
 		var rank = 1
 		var maxPerf = (contestID.substr(0, 3) == "abc" ? 1600 : (contestID.substr(0, 3) == "arc" ? 3200 : 8192))
 		var lastRank = 0
+
+		//タイの人を入れる(順位が変わったら描画→リストを空に)
 		var tiedList = []
 
+		//全員回す
 		Standings.forEach(function (element) {
 			if (!element.IsRated || element.TotalResult.Count == 0) return;
 			if (lastRank != element.Rank) {
@@ -65,8 +70,10 @@
 			tiedList.push(element)
 			lastRank = element.Rank;
 		})
+		//最後に更新してあげる
 		addRow()
 
+		//タイリストの人全員分行追加
 		function addRow() {
 			tiedList.forEach(function (element) {
 				var oldRate = (isFixed ? element.OldRating : element.Rating)
@@ -77,13 +84,33 @@
 				var newRate = Math.round(getRating(oldRate, perf, matches))
 				var node = genNode(rank, element.UserScreenName, element.TotalResult.Score / 100, perf, getRateStr(oldRate, newRate))
 				table.appendChild(node)
+
+				//追加する一行分のノードを取得
+				function genNode(rank, name, point, perf, change) {
+					var tr = document.createElement('tr')
+
+					tr.appendChild(tdNode(rank))
+					tr.appendChild(tdNode(name))
+					tr.appendChild(tdNode(point))
+					tr.appendChild(tdNode(perf))
+					tr.appendChild(tdNode(change))
+
+					return tr;
+					function tdNode(text) {
+						var td = document.createElement('td')
+						td.appendChild(document.createTextNode(text))
+						return td
+					}
+				}
 			})
 		}
 
+		//Rating変動に関するテキストを取得
 		function getRateStr(oldRate, newRate) {
 			return `${(oldRate).toString().padStart(4)} -> ${(newRate).toString().padStart(4)} (${(newRate >= oldRate ? '+' : '')}${newRate - oldRate})`
 		}
 
+		//順位からパフォ取得
 		function getPerf(rank) {
 			var upper = 8192
 			var lower = -8192
@@ -106,6 +133,7 @@
 			}
 		}
 
+		//レートを計算
 		//https://koba-e964.github.io/atcoder-rating-estimator/test-last.html からパクってきました ごめんなさい
 		function getRating(rating, perf, count) {
 			if (count == 0) {
@@ -135,23 +163,6 @@
 			function f(n) {
 				var finf = bigf(400);
 				return (bigf(n) - finf) / (bigf(1) - finf) * 1200.0;
-			}
-		}
-
-		function genNode(rank, name, point, perf, change) {
-			var tr = document.createElement('tr')
-
-			tr.appendChild(tdNode(rank))
-			tr.appendChild(tdNode(name))
-			tr.appendChild(tdNode(point))
-			tr.appendChild(tdNode(perf))
-			tr.appendChild(tdNode(change))
-
-			return tr;
-			function tdNode(text) {
-				var td = document.createElement('td')
-				td.appendChild(document.createTextNode(text))
-				return td
 			}
 		}
 	}
