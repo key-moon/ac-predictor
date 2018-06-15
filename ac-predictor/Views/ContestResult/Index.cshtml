@@ -3,11 +3,21 @@
     ViewBag.Title = "Index";
 }
 <h1>コンテストを選択してください</h1>
-<form action="/contestresult/standings" method="get">
-    <select class="selectpicker" name="contestid" id="contestselector"></select>
-    <button class="btn btn-primary">確定</button>
-</form>
+<select class="selectpicker" name="contestid" id="contestselector"></select>
+<button type="button" class="btn btn-primary btn-lg" id="confirmbtn" data-loading-text="読み込み中…">確定</button>
 
+<table class="table table-bordered table-striped table-hover" id="standings">
+    <thead>
+        <tr>
+            <th width="10%">順位(Rated内)</th>
+            <th width="30%">ユーザ</th>
+            <th width="15%">得点</th>
+            <th width="20%">推定パフォーマンス</th>
+            <th width="25%">レート変化</th>
+        </tr>
+    </thead>
+    <tbody id="standings-body"></tbody>
+</table>
 
 @section Styles
 {
@@ -17,4 +27,5 @@
 {
     @Scripts.Render("/scripts/contestselector.js")
     @Scripts.Render("/scripts/bootstrap-select.min.js")
+    @Scripts.Render("/scripts/drawcontesttable.js")
 }
