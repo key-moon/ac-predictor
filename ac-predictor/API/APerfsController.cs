@@ -47,7 +47,6 @@ namespace ac_predictor.API
 
             foreach (var standing in standings.StandingsData)
             {
-                if (!standing.IsRated) continue;
                 if (dict.ContainsKey(standing.UserScreenName)) continue;
                 CompetitionResult[] results = CompetitionResult.GetFromJson(standing.UserScreenName);
                 double aperf = CompetitionResult.CalcAPerf(results, defaultValue);
