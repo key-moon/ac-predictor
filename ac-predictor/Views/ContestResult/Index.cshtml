@@ -2,18 +2,17 @@
 @{
     ViewBag.Title = "Index";
 }
-<h1>コンテストを選択してください</h1>
 <select class="selectpicker" name="contestid" id="contestselector"></select>
 <button type="button" class="btn btn-primary btn-lg" id="confirmbtn" data-loading-text="読み込み中…">確定</button>
 
-<table class="table table-bordered table-striped table-hover" id="standings">
+<table class="table table-bordered table-striped table-hover th-center td-center td-middle" id="standings">
     <thead>
         <tr>
-            <th width="10%">順位(Rated内)</th>
-            <th width="30%">ユーザ</th>
-            <th width="15%">得点</th>
-            <th width="20%">推定パフォーマンス</th>
-            <th width="25%">レート変化</th>
+            <th style="width:3%;white-space:nowrap;">順位</th>
+            <th>ユーザ</th>
+            <th style="width:84px;min-width:84px">得点</th>
+            <th style="width:84px;min-width:84px">パフォ</th>
+            <th style="width:168px;min-width:168px">レート変化</th>
         </tr>
     </thead>
     <tbody id="standings-body"></tbody>
@@ -21,6 +20,7 @@
 
 @section Styles
 {
+    @Styles.Render("/Content/standingstable.css")
     @Styles.Render("/Content/bootstrap-select.min.css")
 }
 @section Scripts

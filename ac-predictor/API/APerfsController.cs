@@ -18,8 +18,9 @@ namespace ac_predictor.API
         public JsonResult<string[]> Get()
         {
             APerfsDB db = new APerfsDB();
-            string[] contestIDs = db.ContestIDs.ToArray();
-            return Json(contestIDs);
+            List<string> contestIDs = db.ContestIDs;
+            contestIDs.Reverse();
+            return Json(contestIDs.ToArray());
         }
 
         /// <summary>APerf一覧の取得</summary>
