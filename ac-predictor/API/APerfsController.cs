@@ -64,7 +64,7 @@ namespace ac_predictor.API
         {
             if (ConfigurationManager.AppSettings["ApiKey"] != key) return;
             APerfsDB db = new APerfsDB();
-            db
+            db.DeleteAPerfs(contestID);
         }
     }
 }
