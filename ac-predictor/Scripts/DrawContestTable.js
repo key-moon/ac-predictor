@@ -49,8 +49,9 @@
 		//Perf計算時に使うパフォ(Ratedオンリー)
 		var activePerf = []
 		Standings.forEach(function (element) {
-			if (!element.IsRated || element.TotalResult.Count === 0) activePerf.push(APerfs[element.UserScreenName])
+			if (!element.IsRated || element.TotalResult.Count === 0) activePerf.push(APerfs[element.UserScreenName.toLowerCase()])
 		})
+		console.log(activePerf)
 
 		var rank = 1
 		var maxPerf = (contestID.substr(0, 3) === "abc" ? 1600 : (contestID.substr(0, 3) === "arc" ? 3200 : 8192))
@@ -133,16 +134,13 @@
 			})
 		}
 
-		//Rating変動に関するテキストを取得
-		
-
 		//順位からパフォ取得
 		function getPerf(rank) {
 			var upper = 8192
 			var lower = -8192
 
 			while (upper - lower > 0.5) {
-				if (rank - 0.5 > calcPerf(lower + (upper - lower) / 2)) upper -= (upper - lower) / 2
+				if (rank - 0.5 < calcPerf(lower + (upper - lower) / 2)) upper -= (upper - lower) / 2
 				else lower += (upper - lower) / 2
 			}
 
@@ -155,6 +153,7 @@
 				activePerf.forEach(function (APerf) {
 					res += 1.0 / (1.0 + Math.pow(6.0, ((X - APerf) / 400.0)))
 				})
+				//console.log(res)
 				return res;
 			}
 		}
