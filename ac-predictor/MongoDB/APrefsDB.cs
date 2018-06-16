@@ -32,11 +32,13 @@ namespace ac_predictor.MongoDB
             collection = database.GetCollection<APerfs>(TableName);
         }
 
-        public APerfs GetAPerfs(string contestName) => collection.Find(x => x.ContestID == contestName).FirstOrDefault();
+        public APerfs GetAPerfs(string contestID) => collection.Find(x => x.ContestID == contestID).FirstOrDefault();
 
         public void CreateAPerfs(APerfs aperfs) => collection.InsertOne(aperfs);
 
         public void UpdateAPerfs(APerfs aperfs) => collection.UpdateOne(x => x.ContestID == aperfs.ContestID, new UpdateDefinitionBuilder<APerfs>().Set(x => x.APerfDic, aperfs.APerfDic));
+
+        public void DeleteAPerfs(string contestID) => collection.DeleteOne(x => x.ContestID == contestID);
     }
 
     public class APerfs
