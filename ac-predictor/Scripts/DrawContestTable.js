@@ -49,7 +49,7 @@
 		//Perf計算時に使うパフォ(Ratedオンリー)
 		var activePerf = []
 		Standings.forEach(function (element) {
-			if (!element.IsRated || element.TotalResult.Count === 0) activePerf.push(APerfs[element.UserScreenName.toLowerCase()])
+			if (element.IsRated && element.TotalResult.Count !== 0) activePerf.push(APerfs[element.UserScreenName])
 		})
 		console.log(activePerf)
 
