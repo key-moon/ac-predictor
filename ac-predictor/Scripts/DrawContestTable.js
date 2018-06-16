@@ -49,11 +49,11 @@
 		//Perf計算時に使うパフォ(Ratedオンリー)
 		var activePerf = []
 		Standings.forEach(function (element) {
-			if (!element.IsRated || element.TotalResult.Count == 0) activePerf.push(APerfs[element.UserScreenName])
+			if (!element.IsRated || element.TotalResult.Count === 0) activePerf.push(APerfs[element.UserScreenName])
 		})
 
 		var rank = 1
-		var maxPerf = (contestID.substr(0, 3) == "abc" ? 1600 : (contestID.substr(0, 3) == "arc" ? 3200 : 8192))
+		var maxPerf = (contestID.substr(0, 3) === "abc" ? 1600 : (contestID.substr(0, 3) === "arc" ? 3200 : 8192))
 		var lastRank = 0
 
 		//タイの人を入れる(順位が変わったら描画→リストを空に)
@@ -61,8 +61,8 @@
 
 		//全員回す
 		Standings.forEach(function (element) {
-			if (!element.IsRated || element.TotalResult.Count == 0) return;
-			if (lastRank != element.Rank) {
+			if (!element.IsRated || element.TotalResult.Count === 0) return;
+			if (lastRank !== element.Rank) {
 				addRow()
 				rank += tiedList.length;
 				tiedList = []
@@ -162,7 +162,7 @@
 		//レートを計算
 		//https://koba-e964.github.io/atcoder-rating-estimator/test-last.html からパクってきました ごめんなさい
 		function getRating(rating, perf, count) {
-			if (count == 0) {
+			if (count === 0) {
 				rating = perf - 1200;
 			}
 			else {
