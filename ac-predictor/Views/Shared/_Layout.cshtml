@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width" />
     <title>@ViewBag.Title</title>
     @Styles.Render("/content/bootstrap.min.css")
-    @Styles.Render("/content/site.css")
+    @Styles.Render("/content/base.css")
     @RenderSection("styles", required: false)
     @Scripts.Render("/scripts/modernizr-2.8.3.js")
 </head>
@@ -38,6 +38,7 @@
         </footer>
     </div>
 
+    @Scripts.Render("/scripts/base.js")
     @Scripts.Render("/scripts/jquery-3.3.1.min.js")
     @Scripts.Render("/scripts/bootstrap.min.js")
     @RenderSection("scripts", required: false)

@@ -82,18 +82,29 @@
 				var fixRank = rank + (tiedList.length - 1) / 2
 				var perf = getPerf(fixRank)
 				var newRate = Math.round(getRating(oldRate, perf, matches))
-				var node = genNode(rank, element.UserScreenName, element.TotalResult.Score / 100, perf, getRateStr(oldRate, newRate))
+				var node = genNode(rank, element.UserScreenName, element.TotalResult.Score / 100, perf,oldRate, newRate)
 				table.appendChild(node)
 
 				//追加する一行分のノードを取得
-				function genNode(rank, name, point, perf, change) {
+				function genNode(rank, name, point, perf, oldrate, newrate) {
 					var tr = document.createElement('tr')
 
-					tr.appendChild(tdNode(rank))
-					tr.appendChild(tdNode(name))
-					tr.appendChild(tdNode(point))
-					tr.appendChild(tdNode(perf))
-					tr.appendChild(tdNode(change))
+					var rankNode = tdNode(rank)
+					tr.appendChild(rankNode)
+
+					var nameNode = tdNode(name)
+					nameNode.setAttribute("class", `user-${getColor(point)}`)
+					tr.appendChild(nameNode)
+
+					var pointNode = tdNode(point)
+					tr.appendChild(pointNode)
+
+					var perfNode = tdNode(perf)
+					perfNode.setAttribute("class",`user-${getColor(perf)}`)
+					tr.appendChild(perfNode)
+
+					var changeNode = getChangeNode(oldrate,newrate);
+					tr.appendChild(changeNode)
 
 					return tr;
 					function tdNode(text) {
@@ -101,14 +112,29 @@
 						td.appendChild(document.createTextNode(text))
 						return td
 					}
+
+					function getChangeNode(oldRate, newRate) {
+						var td = document.createElement('td')
+						
+						td.appendChild(ratingSpan(oldRate))
+						td.appendChild(document.createTextNode(" -> "))
+						td.appendChild(ratingSpan(newRate))
+						td.appendChild(document.createTextNode(`(${(newRate >= oldRate ? '+' : '')}${newRate - oldRate})`))
+						return td
+
+						function ratingSpan(rating) {
+							var span = document.createElement('span')
+							span.textContent = rating
+							span.setAttribute("class", `user-${getColor(rating)}`)
+							return span;
+						}
+					}
 				}
 			})
 		}
 
 		//Rating変動に関するテキストを取得
-		function getRateStr(oldRate, newRate) {
-			return `${(oldRate).toString().padStart(4)} -> ${(newRate).toString().padStart(4)} (${(newRate >= oldRate ? '+' : '')}${newRate - oldRate})`
-		}
+		
 
 		//順位からパフォ取得
 		function getPerf(rank) {
