@@ -28,7 +28,8 @@ namespace ac_predictor.API
         {
             APerfsDB db = new APerfsDB();
             APerfs aperfs = db.GetAPerfs(id);
-            return Json(aperfs.APerfDic);
+            Dictionary<string,double> dict = aperfs.APerfDic.Select(x => new Tuple<string, double>(x.Key.ToLower(), x.Value)).ToDictionary(x => x.Item1, y => y.Item2);
+            return Json(dict);
         }
 
         public void Post(string contestID,string key)
