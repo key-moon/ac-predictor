@@ -1,6 +1,5 @@
 ﻿var state = 0
 
-toggleLoadingState()
 var selector = document.getElementById("contestselector")
 console.log(selector)
 var ContestJson = 
@@ -20,7 +19,6 @@ JSON.parse(ContestJson)
 		selector.appendChild(innerNode)
 	}
 )
-toggleLoadingState()
 
 function toggleLoadingState() {
 	if (state == 0) {
