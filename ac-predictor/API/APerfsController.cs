@@ -44,9 +44,10 @@ namespace ac_predictor.API
             double defaultValue = contestID.Substring(0, 3) == "abc" ? 800 : 1600;
 
             Standings standings = Standings.GetStandings(contestID);
+            StandingData[] datas = standings.StandingsData;
             Dictionary<string, double> dict = aPerfs.APerfDic;
 
-            foreach (var standing in standings.StandingsData)
+            foreach (var standing in datas)
             {
                 if (!standing.IsRated) continue;
                 if (dict.ContainsKey(standing.UserScreenName)) continue;
