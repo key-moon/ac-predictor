@@ -53,7 +53,9 @@
 				if (!(APerfs[element.UserScreenName])) {
 					console.log(element.UserScreenName)
 				}
-				activePerf.push(APerfs[element.UserScreenName])
+				else {
+					activePerf.push(APerfs[element.UserScreenName])
+				}
 			}
 		})
 
@@ -86,7 +88,7 @@
 
 				var fixRank = rank + (tiedList.length - 1) / 2
 				var perf = getPerf(fixRank)
-				var newRate = Math.min(maxPerf, positivize_rating(calc_rating_from_last(oldRate, perf, matches)))
+				var newRate = Math.min(maxPerf, math.floor(positivize_rating(calc_rating_from_last(oldRate, perf, matches))))
 				var node = genNode(rank, element.UserScreenName, element.TotalResult.Score / 100, perf,oldRate, newRate)
 				table.appendChild(node)
 
@@ -137,37 +139,25 @@
 				}
 			})
 		}
+		function getPerf(rank) {
+			var upper = 8192
+			var lower = -8192
 
-		//レートを計算
-		//https://koba-e964.github.io/atcoder-rating-estimator/test-last.html からパクってきました ごめんなさい
-		function calc_rating_from_last(rating, perf, count) {
-			if (count === 0) {
-				rating = perf - 1200;
+			while (upper - lower > 0.5) {
+				if (rank - 0.5 > calcPerf(lower + (upper - lower) / 2)) upper -= (upper - lower) / 2
+				else lower += (upper - lower) / 2
 			}
-			else {
-				rating += f(count);
-				var wei = 9 - 9 * 0.9 ** count;
-				var num = wei * (2 ** (rating / 800.0)) + 2 ** (perf / 800.0);
-				var den = 1 + wei;
-				var rating = Math.log2(num / den) * 800.0;		
-				rating -= f(count + 1);
-			}
-			return Math.round(Math.max(1, rating));
 
-			function bigf(n) {
-				var num = 1.0;
-				var den = 1.0;
-				for (var i = 0; i < n; ++i) {
-					num *= 0.81;
-					den *= 0.9;
-				}
-				num = (1 - num) * 0.81 / 0.19;
-				den = (1 - den) * 0.9 / 0.1;
-				return Math.sqrt(num) / den;
-			}
-			function f(n) {
-				var finf = bigf(400);
-				return (bigf(n) - finf) / (bigf(1) - finf) * 1200.0;
+			var innerPerf = Math.round(lower + (upper - lower) / 2)
+
+			return Math.min(innerPerf, maxPerf)
+
+			function calcPerf(X) {
+				var res = 0;
+				activePerf.forEach(function (APerf) {
+					res += 1.0 / (1.0 + Math.pow(6.0, ((X - APerf) / 400.0)))
+				})
+				return res;
 			}
 		}
 	}
