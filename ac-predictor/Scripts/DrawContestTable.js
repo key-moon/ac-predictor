@@ -88,7 +88,7 @@
 
 				var fixRank = rank + (tiedList.length - 1) / 2
 				var perf = getPerf(fixRank)
-				var newRate = Math.min(maxPerf, Math.floor(positivize_rating(calc_rating_from_last(oldRate, perf, matches))))
+				var newRate = Math.min(maxPerf, math.floor(positivize_rating(calc_rating_from_last(oldRate, perf, matches))))
 				var node = genNode(rank, element.UserScreenName, element.TotalResult.Score / 100, perf,oldRate, newRate)
 				table.appendChild(node)
 
