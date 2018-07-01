@@ -1,6 +1,6 @@
 ﻿function DrawTable(contestID,callback) {
-	var StandingsURL = `http://ac-predictor.azurewebsites.net/api/standings/${contestID}`
-	var APerfsURL = `http://ac-predictor.azurewebsites.net/api/aperfs/${contestID}`
+	var StandingsURL = `/api/standings/${contestID}`
+	var APerfsURL = `/api/aperfs/${contestID}`
 	
 	var table = document.getElementById('standings-body')
 

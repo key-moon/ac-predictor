@@ -6,7 +6,7 @@ var ContestJson =
 $.ajax({
 	type: 'GET',
 	dataType: 'json',
-	url: 'http://ac-predictor.azurewebsites.net/api/aperfs',
+	url: '/api/aperfs',
 	async: false
 }).responseText
 
