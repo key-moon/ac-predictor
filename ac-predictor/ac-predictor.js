@@ -140,11 +140,9 @@ $(window).resize(function () {
 	color: #DDD;
 }
 </style>`
-	var tweetScript =
-`<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>`
 	var ratingScript = 
 `<script src="https://koba-e964.github.io/atcoder-rating-estimator/atcoder_rating.js"></script>`
-	$('#main-div').append(`<div id="menu_wrap"><div id="sidemenu" class="container"></div><div id="sidemenu-key" class="glyphicon glyphicon-menu-left"></div>${tweetScript}${ratingScript}${sideMenuScript}${sideMenuStyle}</div>`)
+	$('#main-div').append(`<div id="menu_wrap"><div id="sidemenu" class="container"></div><div id="sidemenu-key" class="glyphicon glyphicon-menu-left"></div>${ratingScript}${sideMenuScript}${sideMenuStyle}</div>`)
 }
 function appendToSideMenu(elem) {
 	$('#sidemenu').append(elem)
