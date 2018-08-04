@@ -14,7 +14,7 @@ SideMenu.Datas.Update.History = (() => {
 	var d = $.Deferred();
 	try {
 		$.ajax({
-			url: 'https://beta.atcoder.jp/users/${userScreenName}/history/json',
+			url: `https://beta.atcoder.jp/users/${userScreenName}/history/json`,
 			type: "GET",
 			dataType: "json"
 		}).done(function (history) {
@@ -34,7 +34,7 @@ SideMenu.Datas.Update.Standings = (() => {
 	var d = $.Deferred();
 	try {
 		$.ajax({
-			url: 'https://beta.atcoder.jp/contests/${contestScreenName}/standings/json',
+			url: `https://beta.atcoder.jp/contests/${contestScreenName}/standings/json`,
 			type: "GET",
 			dataType: "json"
 		}).done(function (standings) {
@@ -54,7 +54,7 @@ SideMenu.Datas.Update.APerfs = (() => {
 	var d = $.Deferred();
 	try {
 		$.ajax({
-			url: 'https://ac-predictor.azurewebsites.net/api/aperfs/${contestScreenName}',
+			url: `https://ac-predictor.azurewebsites.net/api/aperfs/${contestScreenName}`,
 			type: "GET",
 			dataType: "json"
 		}).done(function (aperfs) {
