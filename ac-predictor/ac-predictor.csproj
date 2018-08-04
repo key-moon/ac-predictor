@@ -68,6 +68,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="predictor\ac-predictor.user.js" />
     <Content Include="predictor\estimator\dom.css" />
     <Content Include="predictor\estimator\dom.html" />
     <Content Include="predictor\estimator\dom.js" />
