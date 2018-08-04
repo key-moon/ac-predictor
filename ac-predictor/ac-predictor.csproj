@@ -68,19 +68,28 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Web.config" />
+    <Content Include="predictor\ac-predictor.user.js" />
+    <Content Include="predictor\estimator\dom.css" />
+    <Content Include="predictor\estimator\dom.html" />
+    <Content Include="predictor\estimator\dom.js" />
+    <Content Include="predictor\estimator\script.js" />
+    <Content Include="predictor\estimator\settings.txt" />
+    <Content Include="predictor\header.js" />
+    <Content Include="predictor\jquery-3.3.1.min.js" />
+    <Content Include="predictor\predictor\dom.css" />
+    <Content Include="predictor\predictor\dom.html" />
+    <Content Include="predictor\predictor\dom.js" />
+    <Content Include="predictor\predictor\script.js" />
+    <Content Include="predictor\predictor\settings.txt" />
+    <Content Include="predictor\scripts.js" />
+    <Content Include="predictor\submit status\dom.css" />
+    <Content Include="predictor\submit status\dom.html" />
+    <Content Include="predictor\submit status\dom.js" />
+    <Content Include="predictor\submit status\script.js" />
+    <Content Include="predictor\submit status\settings.txt" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-    <None Include="Web.Debug.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </None>
-    <None Include="Web.Release.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </None>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
