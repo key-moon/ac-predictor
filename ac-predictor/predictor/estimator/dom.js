@@ -1,5 +1,6 @@
 (() => {
 	var estimator_state = localStorage.getItem("sidemenu_estimator_state");
+	updateImputs();
 
 	$("#estimator-input").keyup(updateImputs);
 
