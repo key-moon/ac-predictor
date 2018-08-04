@@ -1,8 +1,8 @@
 (() => {
 	var estimator_state = localStorage.getItem("sidemenu_estimator_state");
-	updateImputs();
+	updateInputs();
 
-	$("#estimator-input").keyup(updateImputs);
+	$("#estimator-input").keyup(updateInputs);
 
 	$("#estimator-toggle").click(function () {
 		if (estimator_state === 0) {
@@ -15,12 +15,12 @@
 			$("#estimator-res-desc").text("必要パフォーマンス")
 			estimator_state = 0;
 		}
-		updateImputs();
+		updateInputs();
 		updateLocalStorage()
 		updateTweetBtn()
 	})
 
-	function updateImputs () {
+	function updateInputs () {
 		var input = $("#estimator-input").val();
 		if (!isFinite(input)) {
 			displayAlert("数字ではありません")
