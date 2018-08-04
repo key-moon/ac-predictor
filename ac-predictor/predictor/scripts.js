@@ -2,13 +2,75 @@
 //NameSpace
 SideMenu = {};
 
+//共有データセット(HistoryとかStandingsとか)
+SideMenu.Datas = {};
+//共有データセットそれぞれをUpdateする関数を入れておく
+SideMenu.Datas.Update = {}
+//Datas.Update内に関数を追加
+//History
+SideMenu.Datas.Update.History = (() => {
+	var d = $.Deferred();
+	try {
+		$.ajax({
+			url: 'https://beta.atcoder.jp/users/${userScreenName}/history/json',
+			type: "GET",
+			dataType: "json"
+		}).done(function (history) {
+			SideMenu.Datas.History = history;
+			d.resolve();
+		})
+	}
+	catch {
+		d.reject();
+	}
+	return d.promise();
+});
+
+//Standings
+SideMenu.Datas.Update.Standings = (() => {
+	var d = $.Deferred();
+	try {
+		$.ajax({
+			url: 'https://beta.atcoder.jp/contests/${contestScreenName}/standings/json',
+			type: "GET",
+			dataType: "json"
+		}).done(function (standings) {
+			SideMenu.Datas.Standings = standings;
+			d.resolve();
+		})
+	}
+	catch{
+		d.reject();
+	}
+	return d.promise();
+});
+
+//APerfs
+SideMenu.Datas.Update.APerfs = (() => {
+	var d = $.Deferred();
+	try {
+		$.ajax({
+			url: 'https://ac-predictor.azurewebsites.net/api/aperfs/${contestScreenName}',
+			type: "GET",
+			dataType: "json"
+		}).done(function (aperfs) {
+			SideMenu.Datas.APerfs = aperfs
+			d.resolve();
+		})
+	}
+	catch{
+		d.reject();
+	}
+	return d.promise();
+});
+
 //サイドメニューを生成
-(function() {
+(function () {
 	var menuWidth = 350
 	var keyWidth = 50
 	var speed = 150
 	var sideMenuScript =
-`<script>//参考:http://blog.8bit.co.jp/?p=12308
+		`<script>//参考:http://blog.8bit.co.jp/?p=12308
 (() => {
 const activeClass = 'sidemenu-active'
 var menuWrap = '#menu_wrap'
@@ -55,7 +117,7 @@ $('#sidemenu').on('click','.menu-header',(event) => {
 })();
 </script>`
 	var sideMenuStyle =
-`<style>#menu_wrap{
+		`<style>#menu_wrap{
 	display:block;
 	position:fixed;
 	top:0;
@@ -127,8 +189,8 @@ $('#sidemenu').on('click','.menu-header',(event) => {
 	transform: translateY(-100%);
 }
 </style>`
-	var ratingScript = 
-`<script src="https://koba-e964.github.io/atcoder-rating-estimator/atcoder_rating.js"></script>`
+	var ratingScript =
+		`<script src="https://koba-e964.github.io/atcoder-rating-estimator/atcoder_rating.js"></script>`
 	$('#main-div').append(`<div id="menu_wrap"><div id="sidemenu" class="container"></div><div id="sidemenu-key" class="glyphicon glyphicon-menu-left"></div>${ratingScript}${sideMenuScript}${sideMenuStyle}</div>`);
 })();
 
