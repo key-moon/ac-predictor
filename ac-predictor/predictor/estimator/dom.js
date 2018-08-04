@@ -1,6 +1,25 @@
 (() => {
 	var estimator_state = localStorage.getItem("sidemenu_estimator_state");
-	$("#estimator-input").keyup(function () {
+
+	$("#estimator-input").keyup(updateImputs);
+
+	$("#estimator-toggle").click(function () {
+		if (estimator_state === 0) {
+			$("#estimator-input-desc").text("パフォーマンス")
+			$("#estimator-res-desc").text("到達レーティング")
+			estimator_state = 1;
+		}
+		else {
+			$("#estimator-input-desc").text("目標レーティング")
+			$("#estimator-res-desc").text("必要パフォーマンス")
+			estimator_state = 0;
+		}
+		updateImputs();
+		updateLocalStorage()
+		updateTweetBtn()
+	})
+
+	function updateImputs () {
 		var input = $("#estimator-input").val();
 		if (!isFinite(input)) {
 			displayAlert("数字ではありません")
@@ -38,25 +57,7 @@
 		$("#estimator-res").val(res)
 		updateLocalStorage()
 		updateTweetBtn()
-	});
-
-	$("#estimator-toggle").click(function () {
-		if (estimator_state === 0) {
-			$("#estimator-input-desc").text("パフォーマンス")
-			$("#estimator-res-desc").text("到達レーティング")
-			estimator_state = 1;
-		}
-		else {
-			$("#estimator-input-desc").text("目標レーティング")
-			$("#estimator-res-desc").text("必要パフォーマンス")
-			estimator_state = 0;
-		}
-		var val = $("#estimator-res").val();
-		$("#estimator-res").val($("#estimator-input").val())
-		$("#estimator-input").val(val)
-		updateLocalStorage()
-		updateTweetBtn()
-	})
+	}
 
 	function updateLocalStorage() {
 		localStorage.setItem("sidemenu_estimator_state", estimator_state);
