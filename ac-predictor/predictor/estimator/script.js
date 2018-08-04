@@ -1,0 +1,1 @@
+$("#estimator-input").val(localStorage.getItem("sidemenu_estimator_value"));
