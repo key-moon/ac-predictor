@@ -14,3 +14,4 @@ var maxDic =
 SideMenu.Predictor.maxPerf = maxDic.filter(x => x[0].exec(contestScreenName))[0][1];
 
 if (!SideMenu.Datas.History) await SideMenu.Datas.Update.History();
+%dom%
