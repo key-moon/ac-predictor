@@ -7,7 +7,9 @@ SideMenu.Datas = {};
 //共有データセットそれぞれをUpdateする関数を入れておく
 SideMenu.Datas.Update = {}
 //Datas.Update内に関数を追加
+
 //History
+SideMenu.Datas.History = null;
 SideMenu.Datas.Update.History = (() => {
 	var d = $.Deferred();
 	try {
@@ -27,6 +29,7 @@ SideMenu.Datas.Update.History = (() => {
 });
 
 //Standings
+SideMenu.Datas.Standings = null;
 SideMenu.Datas.Update.Standings = (() => {
 	var d = $.Deferred();
 	try {
@@ -46,6 +49,7 @@ SideMenu.Datas.Update.Standings = (() => {
 });
 
 //APerfs
+SideMenu.Datas.APerfs = null;
 SideMenu.Datas.Update.APerfs = (() => {
 	var d = $.Deferred();
 	try {

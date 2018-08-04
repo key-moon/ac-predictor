@@ -63,7 +63,7 @@
     }
     
     function getRate(perf) {
-        return positivize_rating(calc_rating(SideMenu.Predictor.historyObj.filter(x => x.IsRated).map(x => x.Performance).concat(perf).reverse()));
+        return positivize_rating(calc_rating(SideMenu.Datas.History.filter(x => x.IsRated).map(x => x.Performance).concat(perf).reverse()));
     }
     
     function getPerf(rank) {
@@ -96,7 +96,7 @@
         var rank = 1;
         var isContainedMe = false;
         //全員回して自分が出てきたら順位更新フラグを立てる
-        SideMenu.Predictor.standingsObj.StandingsData.forEach(function (element) {
+		SideMenu.Datas.Standings.StandingsData.forEach(function (element) {
             if (!element.IsRated || element.TotalResult.Count === 0) return;
             if (lastRank !== element.Rank) {
                 if (isContainedMe) {
@@ -125,12 +125,8 @@
         }
     })
     function LoadStandings() {
-        $.ajax({
-            url: SideMenu.Predictor.standingsJsonURL,
-            type: "GET",
-            dataType: "json"
-        }).done(function (standings) {
-            SideMenu.Predictor.standingsObj = standings
+		SideMenu.Datas.Update.Standings()
+		.done(() => {
             CalcActivePerf()
         })
     }
@@ -138,13 +134,13 @@
     function CalcActivePerf() {
         activePerf = []
         //Perf計算時に使うパフォ(Ratedオンリー)
-        SideMenu.Predictor.standingsObj.StandingsData.forEach(function (element) {
+		SideMenu.Datas.Standings.StandingsData.forEach(function (element) {
             if (element.IsRated && element.TotalResult.Count !== 0) {
-                if (!(SideMenu.Predictor.aperfsObj[element.UserScreenName])) {
+				if (!(SideMenu.Datas.APerfs[element.UserScreenName])) {
                     console.log(element.UserScreenName)
                 }
                 else {
-                    activePerf.push(SideMenu.Predictor.aperfsObj[element.UserScreenName])
+					activePerf.push(SideMenu.Datas.APerfs[element.UserScreenName])
                 }
             }
         })
@@ -164,13 +160,9 @@
     
     function LoadAPerfs() {
         $('#estimator-reload').button('loading')
-        $.ajax({
-            url: SideMenu.Predictor.aperfsJsonURL,
-            type: "GET",
-            dataType: "json"
-        }).done(function (aperfs) {
-            SideMenu.Predictor.aperfsObj = aperfs
-            dicLength = Object.keys(SideMenu.Predictor.aperfsObj).length;
+		SideMenu.Datas.APerfs
+		.done(() => {
+			dicLength = Object.keys(SideMenu.Datas.APerfs).length;
             LoadStandings()
         })
     }

@@ -26,7 +26,7 @@
 			displayAlert("数字ではありません")
 			return;
 		}
-		var history = SideMenu.Predictor.historyObj.filter(x => x.IsRated)
+		var history = SideMenu.Datas.History.filter(x => x.IsRated)
 		history.sort(function (a, b) {
 			if (a.EndTime < b.EndTime) return 1;
 			if (a.EndTime > b.EndTime) return -1;

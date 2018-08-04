@@ -13,11 +13,4 @@ var maxDic =
     ];
 SideMenu.Predictor.maxPerf = maxDic.filter(x => x[0].exec(contestScreenName))[0][1];
 
-//データのロードをしていこうな
-$.ajax({
-    url: SideMenu.Predictor.historyJsonURL,
-    type: "GET",
-    dataType: "json"
-}).done(function (history) {
-    SideMenu.Predictor.historyObj = history
-})
+if (!SideMenu.Datas.History) SideMenu.Datas.Update.History();
