@@ -1,13 +1,13 @@
 (() => {
-    if (!startTime.isBefore()) {
-        $("#estimator-input-rank").attr("disabled","")
-        $("#estimator-input-perf").attr("disabled","")
-        $("#estimator-input-rate").attr("disabled","")
-        $("#estimator-reload").attr("disabled","")
-        $("#estimator-current").attr("disabled","")
-        $("#estimator-tweet").attr("disabled","")
-        $("#predictor-alert").html("<h5 class='sidemenu-txt'>コンテストは始まっていません</h5>");
-    }
+	if (!startTime.isBefore()) {
+		$("#estimator-input-rank").attr("disabled", "")
+		$("#estimator-input-perf").attr("disabled", "")
+		$("#estimator-input-rate").attr("disabled", "")
+		$("#estimator-reload").attr("disabled", "")
+		$("#estimator-current").attr("disabled", "")
+		$("#estimator-tweet").attr("disabled", "")
+		$("#predictor-alert").html("<h5 class='sidemenu-txt'>コンテストは始まっていません</h5>");
+	}
     else {
         LoadAPerfs()
         if(!endTime.isBefore()) var loadTimer = setInterval(LoadAPerfs, 30000)
@@ -160,11 +160,20 @@
     
     function LoadAPerfs() {
         $('#estimator-reload').button('loading')
-		SideMenu.Datas.APerfs
+		SideMenu.Datas.Update.APerfs()
 		.done(() => {
 			dicLength = Object.keys(SideMenu.Datas.APerfs).length;
             LoadStandings()
-        })
+		})
+		.fail(() => {
+			$("#estimator-input-rank").attr("disabled", "")
+			$("#estimator-input-perf").attr("disabled", "")
+			$("#estimator-input-rate").attr("disabled", "")
+			$("#estimator-reload").attr("disabled", "")
+			$("#estimator-current").attr("disabled", "")
+			$("#estimator-tweet").attr("disabled", "")
+			$("#predictor-alert").html("<h5 class='sidemenu-txt'>データの読み込みに失敗しました。</h5>");
+		})
     }
     
     $('#estimator-reload').click(function () {
@@ -187,4 +196,4 @@
     $('#estimator-input-rate').keyup(function(event) {
         UpdatePredictorFromRate($("#estimator-input-rate").val())
     });
-    })();
+})();
