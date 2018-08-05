@@ -13,13 +13,110 @@
 //NameSpace
 SideMenu = {};
 
+//共有データセット(HistoryとかStandingsとか)
+SideMenu.Datas = {};
+//共有データセットそれぞれをUpdateする関数を入れておく
+SideMenu.Datas.Update = {}
+
+//Datas.Update内に関数を追加
+//History
+SideMenu.Datas.History = null;
+SideMenu.Datas.Update.History = (() => {
+	var d = $.Deferred();
+	try {
+		$.ajax({
+			url: `https://beta.atcoder.jp/users/${userScreenName}/history/json`,
+			type: "GET",
+			dataType: "json"
+		}).done(function (history) {
+			SideMenu.Datas.History = history;
+			d.resolve();
+		})
+	}
+	catch {
+		d.reject();
+	}
+	return d.promise();
+});
+
+//Standings
+SideMenu.Datas.Standings = null;
+SideMenu.Datas.Update.Standings = (() => {
+	var d = $.Deferred();
+	try {
+		$.ajax({
+			url: `https://beta.atcoder.jp/contests/${contestScreenName}/standings/json`,
+			type: "GET",
+			dataType: "json"
+		}).done(function (standings) {
+			SideMenu.Datas.Standings = standings;
+			d.resolve();
+		})
+	}
+	catch{
+		d.reject();
+	}
+	return d.promise();
+});
+
+//APerfs
+SideMenu.Datas.APerfs = null;
+SideMenu.Datas.Update.APerfs = (() => {
+	var d = $.Deferred();
+	try {
+		$.ajax({
+			url: `https://ac-predictor.azurewebsites.net/api/aperfs/${contestScreenName}`,
+			type: "GET",
+			dataType: "json"
+		}).done(function (aperfs) {
+			SideMenu.Datas.APerfs = aperfs
+			d.resolve();
+		})
+	}
+	catch{
+		d.reject();
+	}
+	return d.promise();
+});
+
+
+//ライブラリを追加するやつ
+SideMenu.appendLibrary = function (source) {
+	$('head').append(`<script src="${source}"></script>`);
+};
+
+SideMenu.appendLibrary("https://koba-e964.github.io/atcoder-rating-estimator/atcoder_rating.js");
+
+//サイドメニュー追加(将来仕様変更が起きる可能性大)
+SideMenu.appendToSideMenu = async function (match, title, elemFunc) {
+	try {
+		if (!match.test(location.href)) return;
+		//アコーディオンメニュー
+		var dom =
+			`<div class="menu-wrapper">
+	<div class="menu-header">
+		<h4 class="sidemenu-txt">${title}<span class="glyphicon glyphicon-menu-up" style="float: right"></span></h4>
+	</div>
+	<div class="menu-box"><div class="menu-content">${await elemFunc()}</div></div>
+</div>`
+		$('#sidemenu').append(dom);
+		var contents = $('.menu-content');
+		var contentElem = contents[contents.length - 1];
+		$(contentElem).parents('.menu-box').css('height', contentElem.scrollHeight)
+	}
+	catch (e) {
+		console.error(e);
+	}
+};
+
+
 //サイドメニューを生成
-(function() {
+(function () {
 	var menuWidth = 350
 	var keyWidth = 50
 	var speed = 150
 	var sideMenuScript =
-`<script>//参考:http://blog.8bit.co.jp/?p=12308
+		`<script>//参考:http://blog.8bit.co.jp/?p=12308
 (() => {
 const activeClass = 'sidemenu-active'
 var menuWrap = '#menu_wrap'
@@ -66,7 +163,7 @@ $('#sidemenu').on('click','.menu-header',(event) => {
 })();
 </script>`
 	var sideMenuStyle =
-`<style>#menu_wrap{
+		`<style>#menu_wrap{
 	display:block;
 	position:fixed;
 	top:0;
@@ -138,134 +235,177 @@ $('#sidemenu').on('click','.menu-header',(event) => {
 	transform: translateY(-100%);
 }
 </style>`
-	var ratingScript = 
-`<script src="https://koba-e964.github.io/atcoder-rating-estimator/atcoder_rating.js"></script>`
+	var ratingScript =
+`<script>from: https://koba-e964.github.io/atcoder-rating-estimator/atcoder_rating.js
+function bigf(n) {
+    var num = 1.0;
+    var den = 1.0;
+    for (var i = 0; i < n; ++i) {
+	num *= 0.81;
+	den *= 0.9;
+    }
+    num = (1 - num) * 0.81 / 0.19;
+    den = (1 - den) * 0.9 / 0.1;
+    return Math.sqrt(num) / den;
+}
+
+function f(n) {
+    var finf = bigf(400);
+    return (bigf(n) - finf) / (bigf(1) - finf) * 1200.0;
+}
+
+// Returns unpositivized ratings.
+function calc_rating(arr) {
+    var n = arr.length;
+    var num = 0.0;
+    var den = 0.0;
+    for (var i = n - 1; i >= 0; --i) {
+	num *= 0.9;
+	num += 0.9 * Math.pow(2, arr[i] / 800.0);
+	den *= 0.9;
+	den += 0.9;
+    }
+    var rating = Math.log2(num / den) * 800.0;
+    rating -= f(n);
+    return rating;
+}
+
+// Takes and returns unpositivized ratings.
+function calc_rating_from_last(last, perf, n) {
+    last += f(n);
+    var wei = 9 - 9 * 0.9 ** n;
+    var num = wei * (2 ** (last / 800.0)) + 2 ** (perf / 800.0) ;
+    var den = 1 + wei;
+    var rating = Math.log2(num / den) * 800.0;
+    rating -= f(n + 1);
+    return rating;
+}
+
+// (-inf, inf) -> (0, inf)
+function positivize_rating(r) {
+    if (r >= 400.0) {
+	return r;
+    }
+    return 400.0 * Math.exp((r - 400.0) / 400.0);
+}
+
+// (0, inf) -> (-inf, inf)
+function unpositivize_rating(r) {
+    if (r >= 400.0) {
+	return r;
+    }
+    return 400.0 + 400.0 * Math.log(r / 400.0);
+}</script>`;
 	$('#main-div').append(`<div id="menu_wrap"><div id="sidemenu" class="container"></div><div id="sidemenu-key" class="glyphicon glyphicon-menu-left"></div>${ratingScript}${sideMenuScript}${sideMenuStyle}</div>`);
 })();
-
-//サイドメニュー追加(将来仕様変更が起きる可能性大です)
-SideMenu.appendToSideMenu = function (match, title, elemFunc) {
-	try {
-		if (!match.test(location.href)) return;
-		//アコーディオンメニュー
-		var dom =
-			`<div class="menu-wrapper">
-	<div class="menu-header">
-		<h4 class="sidemenu-txt">${title}<span class="glyphicon glyphicon-menu-up" style="float: right"></span></h4>
-	</div>
-	<div class="menu-box"><div class="menu-content">${elemFunc()}</div></div>
-</div>`
-		$('#sidemenu').append(dom);
-		var contents = $('.menu-content');
-		var contentElem = contents[contents.length - 1];
-		$(contentElem).parents('.menu-box').css('height', contentElem.scrollHeight)
-	}
-	catch (e) {
-		console.error(e);
-	}
-};
-
-//ライブラリを追加するやつ
-SideMenu.appendLibrary = function (source) {
-	$('head').append(`<script src="${source}"></script>`);
-};
-
 //Estimator
 (() => {
-	SideMenu.appendToSideMenu(/beta.atcoder.jp/,'Estimator','getElem');
-	function getElem() {
-		
-		var js = 
-	`var estimator_state = 0;
-	\$("#estimator-input").keyup(function () {
-		var input = \$("#estimator-input").val();
-		if (!isFinite(input)) {
-			displayAlert("数字ではありません")
-			return;
-		}
-		var history = SideMenu.Predictor.historyObj.filter(x => x.IsRated)
-		history.sort(function (a, b) {
-			if (a.EndTime < b.EndTime) return 1;
-			if (a.EndTime > b.EndTime) return -1;
-			return 0;
-		})
-		history = history.map(x => x.InnerPerformance)
-		var input = parseInt(input, 10)
-		var res = -1;
-		if (estimator_state === 0) {
-			// binary search
-			var goal_rating = unpositivize_rating(input)
-			var lo = -10000.0;
-			var hi = 10000.0;
-			for (var i = 0; i < 100; ++i) {
-				var mid = (hi + lo) / 2;
-				var r = calc_rating([mid].concat(history));
-				if (r >= goal_rating) {
-					hi = mid;
-				} else {
-					lo = mid;
-				}
+	SideMenu.appendToSideMenu(/beta.atcoder.jp/,'Estimator',getElem);
+	async function getElem() {
+		$("#estimator-input").val(localStorage.getItem("sidemenu_estimator_value"));
+	if (!SideMenu.Datas.History) await SideMenu.Datas.Update.History();
+	var js = 
+	`(() => {
+		var estimator_state = localStorage.getItem("sidemenu_estimator_state");
+		updateInputs();
+	
+		\$("#estimator-input").keyup(updateInputs);
+	
+		\$("#estimator-toggle").click(function () {
+			if (estimator_state === 0) {
+				\$("#estimator-input-desc").text("パフォーマンス")
+				\$("#estimator-res-desc").text("到達レーティング")
+				estimator_state = 1;
 			}
-			res = (hi + lo) / 2;
-		}
-		else {
-			res = calc_rating([input].concat(history));
-		}
-		res = Math.round(res * 100) / 100
-		\$("#estimator-res").val(res)
-		updateTweetBtn()
-	});
+			else {
+				\$("#estimator-input-desc").text("目標レーティング")
+				\$("#estimator-res-desc").text("必要パフォーマンス")
+				estimator_state = 0;
+			}
+			updateInputs();
+			updateLocalStorage()
+			updateTweetBtn()
+		})
 	
-	\$("#estimator-toggle").click(function () {
-		if (estimator_state === 0) {
-			\$("#estimator-input-desc").text("パフォーマンス")
-			\$("#estimator-res-desc").text("到達レーティング")
-			estimator_state = 1;
+		function updateInputs () {
+			var input = \$("#estimator-input").val();
+			if (!isFinite(input)) {
+				displayAlert("数字ではありません")
+				return;
+			}
+			var history = SideMenu.Datas.History.filter(x => x.IsRated)
+			history.sort(function (a, b) {
+				if (a.EndTime < b.EndTime) return 1;
+				if (a.EndTime > b.EndTime) return -1;
+				return 0;
+			})
+			history = history.map(x => x.InnerPerformance)
+			var input = parseInt(input, 10)
+			var res = -1;
+			if (estimator_state === 0) {
+				// binary search
+				var goal_rating = unpositivize_rating(input)
+				var lo = -10000.0;
+				var hi = 10000.0;
+				for (var i = 0; i < 100; ++i) {
+					var mid = (hi + lo) / 2;
+					var r = calc_rating([mid].concat(history));
+					if (r >= goal_rating) {
+						hi = mid;
+					} else {
+						lo = mid;
+					}
+				}
+				res = (hi + lo) / 2;
+			}
+			else {
+				res = calc_rating([input].concat(history));
+			}
+			res = Math.round(res * 100) / 100
+			\$("#estimator-res").val(res)
+			updateLocalStorage()
+			updateTweetBtn()
 		}
-		else {
-			\$("#estimator-input-desc").text("目標レーティング")
-			\$("#estimator-res-desc").text("必要パフォーマンス")
-			estimator_state = 0;
-		}
-		var val = \$("#estimator-res").val();
-		\$("#estimator-res").val(\$("#estimator-input").val())
-		\$("#estimator-input").val(val)
-		updateTweetBtn()
-	})
 	
-	function updateTweetBtn() {
-		var tweetStr = 
+		function updateLocalStorage() {
+			localStorage.setItem("sidemenu_estimator_state", estimator_state);
+			localStorage.setItem("sidemenu_estimator_value", \$("#estimator-input").val());
+		}
+	
+		function updateTweetBtn() {
+			var tweetStr =
 	\`AtCoderのハンドルネーム: \${userScreenName}%0A
 	\${estimator_state == 0 ? "目標レーティング" : "パフォーマンス"}: \${\$("#estimator-input").val()}%0A
 	\${estimator_state == 0 ? "必要パフォーマンス" : "到達レーティング"}: \${\$("#estimator-res").val()}\`
-		\$('#estimator-tweet').attr("href", \`https://twitter.com/intent/tweet?text=\${tweetStr}\`)
-	}
+			\$('#estimator-tweet').attr("href", \`https://twitter.com/intent/tweet?text=\${tweetStr}\`)
+		}
 	
-	function displayAlert (message) {
-		var alertDiv =  document.createElement('div')
-		alertDiv.setAttribute("role", "alert")
-		alertDiv.setAttribute("class", "alert alert-warning alert-dismissible")
+		function displayAlert(message) {
+			var alertDiv = document.createElement('div')
+			alertDiv.setAttribute("role", "alert")
+			alertDiv.setAttribute("class", "alert alert-warning alert-dismissible")
 			var closeButton = document.createElement('button')
 			closeButton.setAttribute("type", "button")
 			closeButton.setAttribute("class", "close")
 			closeButton.setAttribute("data-dismiss", "alert")
 			closeButton.setAttribute("aria-label", "閉じる")
-				var closeSpan = document.createElement('span')
-				closeSpan.setAttribute("aria-hidden", "true")
-				closeSpan.textContent = "×"
+			var closeSpan = document.createElement('span')
+			closeSpan.setAttribute("aria-hidden", "true")
+			closeSpan.textContent = "×"
 			closeButton.appendChild(closeSpan)
-			var	messageContent = document.createTextNode(message)
-		alertDiv.appendChild(closeButton)
-		alertDiv.appendChild(messageContent)
-		\$("#estimator-alert").append(alertDiv)
-	}`;
+			var messageContent = document.createTextNode(message)
+			alertDiv.appendChild(closeButton)
+			alertDiv.appendChild(messageContent)
+			\$("#estimator-alert").append(alertDiv)
+		}
+	})();`;
 		var style = 
 	``;
 		var dom = 
 	`<div id="estimator-alert"></div>
 	<div class="row">
 		<div class="input-group">
-			<span class="input-group-addon" id="estimator-input-desc">目標レート</span>
+			<span class="input-group-addon" id="estimator-input-desc">目標レーティング</span>
 			<input type="number" class="form-control" id="estimator-input">
 		</div>
 	</div>
@@ -281,7 +421,7 @@ SideMenu.appendLibrary = function (source) {
 	<div class="row" style="margin: 10px 0px;">
 		<a class="btn btn-default col-xs-offset-8 col-xs-4" rel="nofollow" onClick="window.open(encodeURI(decodeURI(this.href)),'twwindow','width=550, height=450, personalbar=0, toolbar=0, scrollbars=1'); return false;" id='estimator-tweet'>ツイート</a>
 	</div>`;
-		return `{dom}
+		return `${dom}
 	<script>${js}</script>
 	<style>${style}</style>`;
 	}
@@ -289,8 +429,8 @@ SideMenu.appendLibrary = function (source) {
 
 //Predictor
 (() => {
-	SideMenu.appendToSideMenu(/beta.atcoder.jp\/contests\//,'Predictor','getElem');
-	function getElem() {
+	SideMenu.appendToSideMenu(/beta.atcoder.jp\/contests\//,'Predictor',getElem);
+	async function getElem() {
 		//NameSpace
 	SideMenu.Predictor = {};
 	SideMenu.Predictor.historyJsonURL = `https://beta.atcoder.jp/users/${userScreenName}/history/json`
@@ -306,16 +446,8 @@ SideMenu.appendLibrary = function (source) {
 	    ];
 	SideMenu.Predictor.maxPerf = maxDic.filter(x => x[0].exec(contestScreenName))[0][1];
 	
-	//データのロードをしていこうな
-	$.ajax({
-	    url: SideMenu.Predictor.historyJsonURL,
-	    type: "GET",
-	    dataType: "json"
-	}).done(function (history) {
-	    SideMenu.Predictor.historyObj = history
-	})
-	
-		var js = 
+	if (!SideMenu.Datas.History) await SideMenu.Datas.Update.History().done(() => { isDone = true });
+	var js = 
 	`(() => {
 	    if (!startTime.isBefore()) {
 	        \$("#estimator-input-rank").attr("disabled","")
@@ -381,7 +513,7 @@ SideMenu.appendLibrary = function (source) {
 	    }
 	    
 	    function getRate(perf) {
-	        return positivize_rating(calc_rating(SideMenu.Predictor.historyObj.filter(x => x.IsRated).map(x => x.Performance).concat(perf).reverse()));
+	        return positivize_rating(calc_rating(SideMenu.Datas.History.filter(x => x.IsRated).map(x => x.Performance).concat(perf).reverse()));
 	    }
 	    
 	    function getPerf(rank) {
@@ -414,7 +546,7 @@ SideMenu.appendLibrary = function (source) {
 	        var rank = 1;
 	        var isContainedMe = false;
 	        //全員回して自分が出てきたら順位更新フラグを立てる
-	        SideMenu.Predictor.standingsObj.StandingsData.forEach(function (element) {
+			SideMenu.Datas.Standings.StandingsData.forEach(function (element) {
 	            if (!element.IsRated || element.TotalResult.Count === 0) return;
 	            if (lastRank !== element.Rank) {
 	                if (isContainedMe) {
@@ -443,12 +575,8 @@ SideMenu.appendLibrary = function (source) {
 	        }
 	    })
 	    function LoadStandings() {
-	        \$.ajax({
-	            url: SideMenu.Predictor.standingsJsonURL,
-	            type: "GET",
-	            dataType: "json"
-	        }).done(function (standings) {
-	            SideMenu.Predictor.standingsObj = standings
+			SideMenu.Datas.Update.Standings()
+			.done(() => {
 	            CalcActivePerf()
 	        })
 	    }
@@ -456,13 +584,13 @@ SideMenu.appendLibrary = function (source) {
 	    function CalcActivePerf() {
 	        activePerf = []
 	        //Perf計算時に使うパフォ(Ratedオンリー)
-	        SideMenu.Predictor.standingsObj.StandingsData.forEach(function (element) {
+			SideMenu.Datas.Standings.StandingsData.forEach(function (element) {
 	            if (element.IsRated && element.TotalResult.Count !== 0) {
-	                if (!(SideMenu.Predictor.aperfsObj[element.UserScreenName])) {
+					if (!(SideMenu.Datas.APerfs[element.UserScreenName])) {
 	                    console.log(element.UserScreenName)
 	                }
 	                else {
-	                    activePerf.push(SideMenu.Predictor.aperfsObj[element.UserScreenName])
+						activePerf.push(SideMenu.Datas.APerfs[element.UserScreenName])
 	                }
 	            }
 	        })
@@ -482,13 +610,9 @@ SideMenu.appendLibrary = function (source) {
 	    
 	    function LoadAPerfs() {
 	        \$('#estimator-reload').button('loading')
-	        \$.ajax({
-	            url: SideMenu.Predictor.aperfsJsonURL,
-	            type: "GET",
-	            dataType: "json"
-	        }).done(function (aperfs) {
-	            SideMenu.Predictor.aperfsObj = aperfs
-	            dicLength = Object.keys(SideMenu.Predictor.aperfsObj).length;
+			SideMenu.Datas.APerfs
+			.done(() => {
+				dicLength = Object.keys(SideMenu.Datas.APerfs).length;
 	            LoadStandings()
 	        })
 	    }
@@ -553,7 +677,7 @@ SideMenu.appendLibrary = function (source) {
 	        </div>-->
 	    </div>
 	</div>`;
-		return `{dom}
+		return `${dom}
 	<script>${js}</script>
 	<style>${style}</style>`;
 	}
@@ -561,16 +685,16 @@ SideMenu.appendLibrary = function (source) {
 
 //Submit Status
 (() => {
-	SideMenu.appendToSideMenu(/beta.atcoder.jp/,'Submit Status','getElem');
-	function getElem() {
+	SideMenu.appendToSideMenu(/beta.atcoder.jp/,'Submit Status',getElem);
+	async function getElem() {
 		
-		var js = 
+	var js = 
 	``;
 		var style = 
 	``;
 		var dom = 
 	``;
-		return `{dom}
+		return `${dom}
 	<script>${js}</script>
 	<style>${style}</style>`;
 	}

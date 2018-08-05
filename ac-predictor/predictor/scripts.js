@@ -6,8 +6,8 @@ SideMenu = {};
 SideMenu.Datas = {};
 //共有データセットそれぞれをUpdateする関数を入れておく
 SideMenu.Datas.Update = {}
-//Datas.Update内に関数を追加
 
+//Datas.Update内に関数を追加
 //History
 SideMenu.Datas.History = null;
 SideMenu.Datas.Update.History = (() => {
@@ -67,6 +67,37 @@ SideMenu.Datas.Update.APerfs = (() => {
 	}
 	return d.promise();
 });
+
+
+//ライブラリを追加するやつ
+SideMenu.appendLibrary = function (source) {
+	$('head').append(`<script src="${source}"></script>`);
+};
+
+SideMenu.appendLibrary("https://koba-e964.github.io/atcoder-rating-estimator/atcoder_rating.js");
+
+//サイドメニュー追加(将来仕様変更が起きる可能性大)
+SideMenu.appendToSideMenu = async function (match, title, elemFunc) {
+	try {
+		if (!match.test(location.href)) return;
+		//アコーディオンメニュー
+		var dom =
+			`<div class="menu-wrapper">
+	<div class="menu-header">
+		<h4 class="sidemenu-txt">${title}<span class="glyphicon glyphicon-menu-up" style="float: right"></span></h4>
+	</div>
+	<div class="menu-box"><div class="menu-content">${await elemFunc()}</div></div>
+</div>`
+		$('#sidemenu').append(dom);
+		var contents = $('.menu-content');
+		var contentElem = contents[contents.length - 1];
+		$(contentElem).parents('.menu-box').css('height', contentElem.scrollHeight)
+	}
+	catch (e) {
+		console.error(e);
+	}
+};
+
 
 //サイドメニューを生成
 (function () {
@@ -194,33 +225,65 @@ $('#sidemenu').on('click','.menu-header',(event) => {
 }
 </style>`
 	var ratingScript =
-		`<script src="https://koba-e964.github.io/atcoder-rating-estimator/atcoder_rating.js"></script>`
+`<script>from: https://koba-e964.github.io/atcoder-rating-estimator/atcoder_rating.js
+function bigf(n) {
+    var num = 1.0;
+    var den = 1.0;
+    for (var i = 0; i < n; ++i) {
+	num *= 0.81;
+	den *= 0.9;
+    }
+    num = (1 - num) * 0.81 / 0.19;
+    den = (1 - den) * 0.9 / 0.1;
+    return Math.sqrt(num) / den;
+}
+
+function f(n) {
+    var finf = bigf(400);
+    return (bigf(n) - finf) / (bigf(1) - finf) * 1200.0;
+}
+
+// Returns unpositivized ratings.
+function calc_rating(arr) {
+    var n = arr.length;
+    var num = 0.0;
+    var den = 0.0;
+    for (var i = n - 1; i >= 0; --i) {
+	num *= 0.9;
+	num += 0.9 * Math.pow(2, arr[i] / 800.0);
+	den *= 0.9;
+	den += 0.9;
+    }
+    var rating = Math.log2(num / den) * 800.0;
+    rating -= f(n);
+    return rating;
+}
+
+// Takes and returns unpositivized ratings.
+function calc_rating_from_last(last, perf, n) {
+    last += f(n);
+    var wei = 9 - 9 * 0.9 ** n;
+    var num = wei * (2 ** (last / 800.0)) + 2 ** (perf / 800.0) ;
+    var den = 1 + wei;
+    var rating = Math.log2(num / den) * 800.0;
+    rating -= f(n + 1);
+    return rating;
+}
+
+// (-inf, inf) -> (0, inf)
+function positivize_rating(r) {
+    if (r >= 400.0) {
+	return r;
+    }
+    return 400.0 * Math.exp((r - 400.0) / 400.0);
+}
+
+// (0, inf) -> (-inf, inf)
+function unpositivize_rating(r) {
+    if (r >= 400.0) {
+	return r;
+    }
+    return 400.0 + 400.0 * Math.log(r / 400.0);
+}</script>`;
 	$('#main-div').append(`<div id="menu_wrap"><div id="sidemenu" class="container"></div><div id="sidemenu-key" class="glyphicon glyphicon-menu-left"></div>${ratingScript}${sideMenuScript}${sideMenuStyle}</div>`);
 })();
-
-//サイドメニュー追加(将来仕様変更が起きる可能性大です)
-SideMenu.appendToSideMenu = function (match, title, elemFunc) {
-	try {
-		if (!match.test(location.href)) return;
-		//アコーディオンメニュー
-		var dom =
-			`<div class="menu-wrapper">
-	<div class="menu-header">
-		<h4 class="sidemenu-txt">${title}<span class="glyphicon glyphicon-menu-up" style="float: right"></span></h4>
-	</div>
-	<div class="menu-box"><div class="menu-content">${elemFunc()}</div></div>
-</div>`
-		$('#sidemenu').append(dom);
-		var contents = $('.menu-content');
-		var contentElem = contents[contents.length - 1];
-		$(contentElem).parents('.menu-box').css('height', contentElem.scrollHeight)
-	}
-	catch (e) {
-		console.error(e);
-	}
-};
-
-//ライブラリを追加するやつ
-SideMenu.appendLibrary = function (source) {
-	$('head').append(`<script src="${source}"></script>`);
-};
