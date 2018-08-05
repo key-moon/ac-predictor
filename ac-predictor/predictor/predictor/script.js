@@ -1,9 +1,5 @@
 //NameSpace
 SideMenu.Predictor = {};
-SideMenu.Predictor.historyJsonURL = `https://beta.atcoder.jp/users/${userScreenName}/history/json`
-SideMenu.Predictor.standingsJsonURL = `https://beta.atcoder.jp/contests/${contestScreenName}/standings/json`
-SideMenu.Predictor.aperfsJsonURL = `https://ac-predictor.azurewebsites.net/api/aperfs/${contestScreenName}`
-
 var maxDic =
     [
         [/^abc\d{3}$/, 1600],

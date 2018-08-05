@@ -1,11 +1,11 @@
 (() => {
 	if (!startTime.isBefore()) {
-		$("#estimator-input-rank").attr("disabled", "")
-		$("#estimator-input-perf").attr("disabled", "")
-		$("#estimator-input-rate").attr("disabled", "")
-		$("#estimator-reload").attr("disabled", "")
-		$("#estimator-current").attr("disabled", "")
-		$("#estimator-tweet").attr("disabled", "")
+		$("#predictor-input-rank").attr("disabled", "")
+		$("#predictor-input-perf").attr("disabled", "")
+		$("#predictor-input-rate").attr("disabled", "")
+		$("#predictor-reload").attr("disabled", "")
+		$("#predictor-current").attr("disabled", "")
+		$("#predictor-tweet").attr("disabled", "")
 		$("#predictor-alert").html("<h5 class='sidemenu-txt'>コンテストは始まっていません</h5>");
 	}
     else {
@@ -15,9 +15,9 @@
     
     $('[data-toggle="tooltip"]').tooltip()
     function UpdatePredictor(rank,perf,rate) {
-        $("#estimator-input-rank").val(round(rank))
-        $("#estimator-input-perf").val(round(perf))
-        $("#estimator-input-rate").val(round(rate))
+		$("#predictor-input-rank").val(round(rank))
+		$("#predictor-input-perf").val(round(perf))
+		$("#predictor-input-rate").val(round(rate))
         updatePredictorTweetBtn()
         function round(val) {
             return Math.round(val * 100) / 100;
@@ -87,7 +87,7 @@
             return res;
         }
     }
-    $('#estimator-current').click(function () {
+	$('#predictor-current').click(function () {
         //自分の順位を確認
         var myRank = 0;
     
@@ -144,56 +144,57 @@
                 }
             }
         })
-        $('#estimator-reload').button('reset')
+        $('#predictor-reload').button('reset')
         switch(lastUpdated) {
             case 0:
-                UpdatePredictorFromRank($("#estimator-input-rank").val())
+				UpdatePredictorFromRank($("#predictor-input-rank").val())
                 break;
             case 1:
-                UpdatePredictorFromPerf($("#estimator-input-perf").val())
+				UpdatePredictorFromPerf($("#predictor-input-perf").val())
                 break;
             case 2:
-                UpdatePredictorFromRate($("#estimator-input-rate").val())
+				UpdatePredictorFromRate($("#predictor-input-rate").val())
                 break;
         }
     }
     
     function LoadAPerfs() {
-        $('#estimator-reload').button('loading')
+        $('#predictor-reload').button('loading')
 		SideMenu.Datas.Update.APerfs()
 		.done(() => {
 			dicLength = Object.keys(SideMenu.Datas.APerfs).length;
             LoadStandings()
 		})
 		.fail(() => {
-			$("#estimator-input-rank").attr("disabled", "")
-			$("#estimator-input-perf").attr("disabled", "")
-			$("#estimator-input-rate").attr("disabled", "")
-			$("#estimator-reload").attr("disabled", "")
-			$("#estimator-current").attr("disabled", "")
-			$("#estimator-tweet").attr("disabled", "")
+			$("#predictor-input-rank").attr("disabled", "")
+			$("#predictor-input-perf").attr("disabled", "")
+			$("#predictor-input-rate").attr("disabled", "")
+			$("#predictor-reload").attr("disabled", "")
+			$("#predictor-current").attr("disabled", "")
+			$("#predictor-tweet").attr("disabled", "")
 			$("#predictor-alert").html("<h5 class='sidemenu-txt'>データの読み込みに失敗しました。</h5>");
+			$('#predictor-reload').button('reset')
 		})
     }
     
-    $('#estimator-reload').click(function () {
+    $('#predictor-reload').click(function () {
         LoadAPerfs()
     })
     function updatePredictorTweetBtn() {
         var tweetStr = 
-    `Rated内順位: ${$("#estimator-input-rank").val()}位%0A
-    パフォーマンス: ${$("#estimator-input-perf").val()}%0A
-    レート: ${$("#estimator-input-rate").val()}`
+	`Rated内順位: ${$("#predictor-input-rank").val()}位%0A
+    パフォーマンス: ${$("#predictor-input-perf").val()}%0A
+    レート: ${$("#predictor-input-rate").val()}`
         $('#predictor-tweet').attr("href", `https://twitter.com/intent/tweet?text=${tweetStr}`)
     }
     var lastUpdated = 0;
-    $('#estimator-input-rank').keyup(function(event) {
-        UpdatePredictorFromRank($("#estimator-input-rank").val())
+	$('#predictor-input-rank').keyup(function(event) {
+		UpdatePredictorFromRank($("#predictor-input-rank").val())
     });
-    $('#estimator-input-perf').keyup(function(event) {
-        UpdatePredictorFromPerf($("#estimator-input-perf").val())
+	$('#predictor-input-perf').keyup(function(event) {
+		UpdatePredictorFromPerf($("#predictor-input-perf").val())
     });
-    $('#estimator-input-rate').keyup(function(event) {
-        UpdatePredictorFromRate($("#estimator-input-rate").val())
+	$('#predictor-input-rate').keyup(function(event) {
+		UpdatePredictorFromRate($("#predictor-input-rate").val())
     });
 })();

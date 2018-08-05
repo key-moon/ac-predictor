@@ -17,10 +17,10 @@ SideMenu.Datas.Update.History = (() => {
 			url: `https://beta.atcoder.jp/users/${userScreenName}/history/json`,
 			type: "GET",
 			dataType: "json"
-		}).done(function (history) {
+		}).done(history => {
 			SideMenu.Datas.History = history;
 			d.resolve();
-		})
+		}).fail(() => { d.reject(); });
 	}
 	catch {
 		d.reject();
@@ -37,10 +37,10 @@ SideMenu.Datas.Update.Standings = (() => {
 			url: `https://beta.atcoder.jp/contests/${contestScreenName}/standings/json`,
 			type: "GET",
 			dataType: "json"
-		}).done(function (standings) {
+		}).done(standings => {
 			SideMenu.Datas.Standings = standings;
 			d.resolve();
-		})
+		}).fail(() => { d.reject(); });
 	}
 	catch{
 		d.reject();
@@ -57,12 +57,12 @@ SideMenu.Datas.Update.APerfs = (() => {
 			url: `https://ac-predictor.azurewebsites.net/api/aperfs/${contestScreenName}`,
 			type: "GET",
 			dataType: "json"
-		}).done(function (aperfs) {
+		}).done(aperfs => {
 			SideMenu.Datas.APerfs = aperfs
 			d.resolve();
-		})
+		}).fail(() => { d.reject(); });
 	}
-	catch{
+	catch {
 		d.reject();
 	}
 	return d.promise();
