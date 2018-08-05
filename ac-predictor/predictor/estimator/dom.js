@@ -15,6 +15,7 @@
 			$("#estimator-res-desc").text("必要パフォーマンス")
 			estimator_state = 0;
 		}
+		$("#estimator-input").val($("#estimator-res").val());
 		updateInputs();
 		updateLocalStorage()
 		updateTweetBtn()
