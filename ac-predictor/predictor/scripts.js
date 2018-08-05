@@ -103,7 +103,6 @@ SideMenu.appendToSideMenu = async function (match, title, elemFunc) {
 };
 
 
-
 //サイドメニューを生成
 (function () {
 	var menuWidth = 350
@@ -292,3 +291,14 @@ function unpositivize_rating(r) {
 }</script>`;
 	$('#main-div').append(`<div id="menu_wrap"><div id="sidemenu" class="container"></div><div id="sidemenu-key" class="glyphicon glyphicon-menu-left"></div>${ratingScript}${sideMenuScript}${sideMenuStyle}</div>`);
 })();
+
+
+//サイドメニュー要素の入れ物
+SideMenu.Elements = {};
+SideMenu.Elements.ViewOrder = ["Predictor","Estimator"];
+
+%elements%
+
+for (var element in SideMenu.Elements.ViewOrder) {
+	await SideMenu.Elements[element]();
+}
