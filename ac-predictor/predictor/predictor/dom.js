@@ -163,9 +163,11 @@
 		SideMenu.Datas.Update.APerfs()
 		.done(() => {
 			dicLength = Object.keys(SideMenu.Datas.APerfs).length;
+			$("#predictor-alert").html(`<h5 class='sidemenu-txt'>最終更新 : ${moment().format('HH:mm:ss')}</h5>`);
             LoadStandings()
 		})
 		.fail(() => {
+			$('#predictor-reload').button('reset')
 			$("#predictor-input-rank").attr("disabled", "")
 			$("#predictor-input-perf").attr("disabled", "")
 			$("#predictor-input-rate").attr("disabled", "")
@@ -173,7 +175,6 @@
 			$("#predictor-current").attr("disabled", "")
 			$("#predictor-tweet").attr("disabled", "")
 			$("#predictor-alert").html("<h5 class='sidemenu-txt'>データの読み込みに失敗しました。</h5>");
-			$('#predictor-reload').button('reset')
 		})
     }
     
