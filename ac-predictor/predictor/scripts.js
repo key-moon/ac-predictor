@@ -295,10 +295,11 @@ function unpositivize_rating(r) {
 
 //サイドメニュー要素の入れ物
 SideMenu.Elements = {};
-SideMenu.Elements.ViewOrder = ["Predictor","Estimator"];
+SideMenu.ViewOrder = ["Predictor","Estimator"];
 
 %elements%
 
-for (var element in SideMenu.Elements.ViewOrder) {
-	await SideMenu.Elements[element]();
-}
+
+SideMenu.ViewOrder.forEach(async (elem) => {
+	await SideMenu.Elements[elem]();
+});
