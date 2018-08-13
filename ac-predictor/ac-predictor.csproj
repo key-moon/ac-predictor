@@ -268,7 +268,7 @@
     <Content Include="Scripts\jquery-3.3.1.slim.min.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
     <None Include="Scripts\_references.js" />
-    <Content Include="sw\atcoder-sw.js" />
+    <Content Include="sw\sw.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -287,7 +287,7 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\ContestResult\Index.cshtml" />
     <Content Include="Views\Install\Index.cshtml" />
-    <Content Include="sw\atcoder-manifest.json" />
+    <Content Include="sw\manifest.json" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
