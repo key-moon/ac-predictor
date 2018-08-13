@@ -68,10 +68,17 @@ SideMenu.Datas.Update.APerfs = (() => {
 	return d.promise();
 });
 
-
 //ライブラリを追加するやつ
 SideMenu.appendLibrary = function (source) {
-	$('head').append(`<script src="${source}"></script>`);
+    var defferd = $.Deferred();
+    $.ajax({
+        url: script
+    }).done(((src) => {
+        $('head').append(`<script>${src}</script>`);
+    })(() => {
+        defferd.fail();
+    }));
+    return defferd.promise();
 };
 
 SideMenu.appendLibrary("https://koba-e964.github.io/atcoder-rating-estimator/atcoder_rating.js");
@@ -104,7 +111,7 @@ SideMenu.appendToSideMenu = async function (match, title, elemFunc) {
 
 
 //サイドメニューを生成
-(function () {
+(() => {
 	var menuWidth = 350
 	var keyWidth = 50
 	var speed = 150
@@ -295,7 +302,7 @@ function unpositivize_rating(r) {
 
 //サイドメニュー要素の入れ物
 SideMenu.Elements = {};
-SideMenu.ViewOrder = ["Predictor","Estimator"];
+SideMenu.ViewOrder = ["Predictor", "Estimator"];
 
 %elements%
 
