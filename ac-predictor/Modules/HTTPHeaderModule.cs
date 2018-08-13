@@ -36,6 +36,18 @@ namespace ac_predictor.Modules
                     }
                 }
             }
+            if (Regex.IsMatch(url.AbsolutePath, "^/sw", RegexOptions.IgnoreCase))
+            {
+                if (request.Headers.AllKeys.Contains("Origin"))
+                {
+                    Uri hostUrl = new Uri(request.Headers["Origin"]);
+                    if (IsAllowedHost(hostUrl.Host))
+                    {
+                        responce.Headers.Add("Access-Control-Allow-Origin", hostUrl.GetLeftPart(UriPartial.Authority));
+                        responce.Headers.Add("Service-Worker-Allowed", hostUrl.GetLeftPart(UriPartial.Authority));
+                    }
+                }
+            }
         }
 
         public void Dispose(){}
