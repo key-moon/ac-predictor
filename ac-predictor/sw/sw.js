@@ -19,8 +19,7 @@ messaging.setBackgroundMessageHandler(function (payload) {
     
     var notificationTitle = 'ac-predictor default notification';
     var notificationOptions = {
-        body: 'Background Message body.',
-        icon: '/public/img/icon/avatar.png'
+        body: 'Background Message body.'
     };
 
     return self.registration.showNotification(notificationTitle, notificationOptions);
