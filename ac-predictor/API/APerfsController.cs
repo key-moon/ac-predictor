@@ -28,7 +28,10 @@ namespace ac_predictor.API
         {
             APerfsDB db = new APerfsDB();
             APerfs aperfs = db.GetAPerfs(id);
-            if (aperfs == null) aperfs.APerfDic = new Dictionary<string, double>();
+            if (aperfs == null)
+            {
+                aperfs = new APerfs("", "", new Dictionary<string, double>());
+            }
             return Json(aperfs.APerfDic);
         }
 
