@@ -81,7 +81,27 @@ SideMenu.appendLibrary = function (source) {
     return defferd.promise();
 };
 
-SideMenu.appendLibrary("https://koba-e964.github.io/atcoder-rating-estimator/atcoder_rating.js");
+
+
+//通知関連
+SideMenu.Notifications = {};
+SideMenu.Notifications.CanSend = false;
+(async () => {
+    if (Notification.permission === 'denied') return;
+    if (Notification.permission === 'default') {
+        await (async () => {
+            var defferd = $.Deferred();
+            Notification.requestPermission((permission) => {
+                SideMenu.Notifications.CanSend = permission === 'granted';
+                defferd.resolve();
+            })();
+            return defferd.promise();
+        });
+        if (!Notification.permission) return;
+    }
+})();
+
+await SideMenu.appendLibrary("https://koba-e964.github.io/atcoder-rating-estimator/atcoder_rating.js");
 
 //サイドメニュー追加(将来仕様変更が起きる可能性大)
 SideMenu.appendToSideMenu = async function (match, title, elemFunc) {
