@@ -10,8 +10,7 @@ namespace ac_predictor.Util
     {
         public static List<CrossOriginPolicy> CrossOriginPolicies = new List<CrossOriginPolicy>
         {
-            new CrossOriginPolicy("^/api",".*atcoder\\.jp"),
-            new CrossOriginPolicy("^/sw",".*atcoder\\.jp")
+            new CrossOriginPolicy("^/api",".*atcoder\\.jp")
         };
 
         public class CrossOriginPolicy

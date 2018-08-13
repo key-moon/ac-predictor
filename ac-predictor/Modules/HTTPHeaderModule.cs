@@ -31,7 +31,6 @@ namespace ac_predictor.Modules
             var crossorigin = CrossOriginSettings.AllowedRequestPolicy(requestUrl, originUrl);
             if (crossorigin is null) return;
             AddHeader("Access-Control-Allow-Origin", originUrl.GetLeftPart(UriPartial.Authority), false);
-            if (crossorigin.RequestAbsolutePathRegex.IsMatch("/sw")) AddHeader("Service-Worker-Allowed", originUrl.GetLeftPart(UriPartial.Authority), false);
 
             void AddHeader(string key, string value, bool AllowDuplicate = true)
             {
