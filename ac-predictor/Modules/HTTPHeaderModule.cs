@@ -4,11 +4,12 @@ using System.Linq;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using ac_predictor.Util;
 
 namespace ac_predictor.Modules
 {
     /// <summary>
-    /// 送信するHeaderを
+    /// 送信するHeaderを調節
     /// </summary>
     public class HTTPHeaderModule : IHttpModule
     {
@@ -24,37 +25,15 @@ namespace ac_predictor.Modules
         {
             HttpRequest request = (HttpRequest)sender.GetType().GetProperty("Request").GetValue(sender);
             HttpResponse responce = (HttpResponse)sender.GetType().GetProperty("Response").GetValue(sender);
-            var url = request.Url;
-            if (Regex.IsMatch(url.AbsolutePath, "^/api", RegexOptions.IgnoreCase))
-            {
-                if (request.Headers.AllKeys.Contains("Origin"))
-                {
-                    Uri hostUrl = new Uri(request.Headers["Origin"]);
-                    if (IsAllowedHost(hostUrl.Host))
-                    {
-                        responce.Headers.Add("Access-Control-Allow-Origin", hostUrl.GetLeftPart(UriPartial.Authority));
-                    }
-                }
-            }
-            if (Regex.IsMatch(url.AbsolutePath, "^/sw", RegexOptions.IgnoreCase))
-            {
-                if (request.Headers.AllKeys.Contains("Origin"))
-                {
-                    Uri hostUrl = new Uri(request.Headers["Origin"]);
-                    if (IsAllowedHost(hostUrl.Host))
-                    {
-                        responce.Headers.Add("Access-Control-Allow-Origin", hostUrl.GetLeftPart(UriPartial.Authority));
-                        responce.Headers.Add("Service-Worker-Allowed", hostUrl.GetLeftPart(UriPartial.Authority));
-                    }
-                }
-            }
+            if (!request.Headers.AllKeys.Contains("Origin")) return;
+            var requestUrl = request.Url;
+            var originUrl = new Uri(request.Headers["Origin"]);
+            var crossorigin = CrossOriginSettings.AllowedRequestPolicy(requestUrl, originUrl);
+            if (crossorigin is null) return;
+            responce.Headers.Add("Access-Control-Allow-Origin", originUrl.GetLeftPart(UriPartial.Authority));
+            if (crossorigin.RequestAbsolutePathRegex.IsMatch("/sw")) responce.Headers.Add("Service-Worker-Allowed", originUrl.GetLeftPart(UriPartial.Authority));   
         }
 
         public void Dispose(){}
-
-        private bool IsAllowedHost(string host)
-        {
-            return Regex.IsMatch(host, ".*atcoder\\.jp", RegexOptions.IgnoreCase);
-        }
     }
 }
