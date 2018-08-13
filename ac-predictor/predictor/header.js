@@ -7,4 +7,5 @@
 // @license     MIT
 // @supportURL  http://ac-predictor.azurewebsites.net/support
 // @match       https://beta.atcoder.jp/*
+// @exclude     https://beta.atcoder.jp/*/json
 // ==/UserScript==
