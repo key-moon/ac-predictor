@@ -30,8 +30,14 @@ namespace ac_predictor.Modules
             var originUrl = new Uri(request.Headers["Origin"]);
             var crossorigin = CrossOriginSettings.AllowedRequestPolicy(requestUrl, originUrl);
             if (crossorigin is null) return;
-            responce.Headers.Add("Access-Control-Allow-Origin", originUrl.GetLeftPart(UriPartial.Authority));
-            if (crossorigin.RequestAbsolutePathRegex.IsMatch("/sw")) responce.Headers.Add("Service-Worker-Allowed", originUrl.GetLeftPart(UriPartial.Authority));   
+            AddHeader("Access-Control-Allow-Origin", originUrl.GetLeftPart(UriPartial.Authority), false);
+            if (crossorigin.RequestAbsolutePathRegex.IsMatch("/sw")) AddHeader("Service-Worker-Allowed", originUrl.GetLeftPart(UriPartial.Authority), false);
+
+            void AddHeader(string key, string value, bool AllowDuplicate = true)
+            {
+                if (!AllowDuplicate && responce.Headers.AllKeys.Contains(key)) responce.Headers.Remove(key);
+                responce.Headers.Add(key, value);
+            }
         }
 
         public void Dispose(){}
