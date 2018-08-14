@@ -28,7 +28,10 @@ namespace ac_predictor.API
         {
             APerfsDB db = new APerfsDB();
             APerfs aperfs = db.GetAPerfs(id);
-            if (aperfs == null) aperfs.APerfDic = new Dictionary<string, double>();
+            if (aperfs == null)
+            {
+                aperfs = new APerfs("", "", new Dictionary<string, double>());
+            }
             return Json(aperfs.APerfDic);
         }
 
@@ -47,7 +50,7 @@ namespace ac_predictor.API
             Standings standings = Standings.GetStandings(contestID);
             StandingData[] datas = standings.StandingsData;
             Dictionary<string, double> dict = aPerfs.APerfDic;
-
+            int count = 0;
             foreach (var standing in datas)
             {
                 if (!standing.IsRated) continue;
@@ -55,11 +58,21 @@ namespace ac_predictor.API
                 CompetitionResult[] results = CompetitionResult.GetFromJson(standing.UserScreenName);
                 double aperf = CompetitionResult.CalcAPerf(results, defaultValue);
                 dict.Add(standing.UserScreenName, aperf);
+                count++;
+                if (count >= 100)
+                {
+                    Update();
+                    count = 0;
+                }
             }
 
-            aPerfs.APerfDic = dict;
-            if (!isContainContest) db.CreateAPerfs(aPerfs);
-            else db.UpdateAPerfs(aPerfs);
+            Update();
+            void Update()
+            {
+                aPerfs.APerfDic = dict;
+                if (!isContainContest) db.CreateAPerfs(aPerfs);
+                else db.UpdateAPerfs(aPerfs);
+            }
         }
 
         public void Delete(string contestID,string key)
