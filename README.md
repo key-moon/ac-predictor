@@ -5,6 +5,7 @@
 ルートディレクトリは/ac-predictor/predictor/とします。
 
 #構造
+
 ```
 ├ {要素名}
 │　　　├ settings.txt
