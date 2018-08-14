@@ -42,9 +42,20 @@
         
         var deffer = $.Deferred();
 
-        $.ajax({ type: 'GET', dataType: 'json', url: StandingsURL }, { type: 'GET', dataType: 'json', url: APerfsURL })
-        .done((standings,aPerfs) => {
-            draw(standings.StandingsData, aPerfs, standings.Fixed);
+        $.when(
+            $.ajax({
+                type: 'GET', dataType: 'json', url: StandingsURL
+            }),
+            $.ajax({
+                type: 'GET', dataType: 'json', url: APerfsURL
+            }))
+        .done((standings, aPerfs) => {
+            if (standings[1] !== 'success' || aPerfs[1] !== 'success') {
+                //例外処理
+                deffer.fail();
+                return;
+            }
+            draw(standings[0].StandingsData, aPerfs[0], standings[0].Fixed);
             deffer.resolve();
         });
 
@@ -65,7 +76,7 @@
                         activePerf.push(APerfs[element.UserScreenName])
                     }
                 }
-            })
+            });
 
             var rank = 1
             var maxPerf = (contestID.substr(0, 3) === "abc" ? 1600 : (contestID.substr(0, 3) === "arc" ? 3200 : 8192))
