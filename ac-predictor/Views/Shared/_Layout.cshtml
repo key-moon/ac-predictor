@@ -4,43 +4,44 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
     <title>@ViewBag.Title</title>
+
     @Styles.Render("/content/bootstrap.min.css")
     @Styles.Render("/content/base.css")
     @RenderSection("styles", required: false)
+
     @Scripts.Render("/scripts/modernizr-2.8.3.js")
+    @Scripts.Render("/scripts/jquery-3.3.1.min.js")
+    @Scripts.Render("/scripts/popper.min.js")
+    @Scripts.Render("/scripts/bootstrap.min.js")
+    @Scripts.Render("/scripts/base.js")
+    @RenderSection("scripts", required: false)
 </head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 <body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                @Html.ActionLink("ac-predictor", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
-            </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("インストール", "index", "install")</li>
-                    <li><a href="https://github.com/key-moon/ac-predictor">GitHub</a></li>
-                </ul>
-            </div>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+         @Html.ActionLink("ac-predictor", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+        
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-top" aria-controls="Navber" aria-expanded="false" aria-label="ナビゲーションの切替">
+                <span class="navbar-toggler-icon"></span>
+            </button>
         </div>
-    </div>
+        <div class="navbar-collapse collapse" id="navbar-top">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">@Html.ActionLink("インストール", "index", "install", new { area = "" }, new { @class = "nav-link" })</li>
+                <li class="nav-item"><a class="nav-link" href="https://github.com/key-moon/ac-predictor">GitHub</a></li>
+            </ul>
+        </div>
+    </nav>
+
     <div class="container body-content">
         @RenderBody()
         <hr />
         <footer>
-            <p>&copy; @DateTime.Now.Year - keymoon</p>
+            <p>&copy; @DateTime.Now.Year - <a href="https://twitter.com/kymn_">keymoon</a></p>
         </footer>
     </div>
-
-    @Scripts.Render("/scripts/base.js")
-    @Scripts.Render("/scripts/jquery-3.3.1.min.js")
-    @Scripts.Render("/scripts/bootstrap.min.js")
-    @RenderSection("scripts", required: false)
 </body>
 </html>
