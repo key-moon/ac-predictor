@@ -35,30 +35,22 @@
         });
     });
     function DrawTable(contestID) {
-        var StandingsURL = `/api/standings/${contestID}`;
-        var APerfsURL = `/api/aperfs/${contestID}`;
+        const StandingsURL = `/api/standings/${contestID}`;
+        const APerfsURL = `/api/aperfs/${contestID}`;
 
         var table = document.getElementById('standings-body');
-
-        var isFixed;
-
-        var APerfs;
-        var Standings;
-
-        var deffer = $.Deferred();
         
+        var deffer = $.Deferred();
+
         $.ajax({ type: 'GET', dataType: 'json', url: StandingsURL }, { type: 'GET', dataType: 'json', url: APerfsURL })
         .done((standings,aPerfs) => {
-            Standings = standings.StandingsData;
-            isFixed = standings.Fixed;
-            APerfs = aPerfs;
-            draw();
+            draw(standings.StandingsData, aPerfs, standings.Fixed);
             deffer.resolve();
         });
 
         return deffer.promise();
 
-        function draw() {
+        function draw(Standings, APerfs, isFixed) {
             //テーブルをクリア
             table.textContent = null;
 
