@@ -2,8 +2,10 @@
 @{
     ViewBag.Title = "Index";
 }
-<select class="selectpicker" name="contestid" id="contestselector"></select>
-<button type="button" class="btn btn-primary btn-lg" id="confirmbtn" data-loading-text="読み込み中…">確定</button>
+<form class="form-inline">
+    <select class="form-control-lg" id="contest-selector"></select>
+    <button type="button" class="btn btn-primary btn-lg" id="confirm-btn">確定</button>
+</form>
 
 <table class="table table-bordered table-striped table-hover th-center td-center td-middle" id="standings">
     <thead>
@@ -21,12 +23,9 @@
 @section Styles
 {
     @Styles.Render("/Content/standingstable.css")
-    @Styles.Render("/Content/bootstrap-select.min.css")
 }
 @section Scripts
 {
     @Scripts.Render("https://koba-e964.github.io/atcoder-rating-estimator/atcoder_rating.js")
     @Scripts.Render("/scripts/contestselector.js")
-    @Scripts.Render("/scripts/bootstrap-select.min.js")
-    @Scripts.Render("/scripts/drawcontesttable.js")
 }
