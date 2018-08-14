@@ -262,3 +262,8 @@ __pycache__/
 
 /ac-predictor/Web.config
 /ac-predictor/Properties/PublishProfiles
+/ac-predictor/Content/bootstrap*
+/ac-predictor/Scripts/bootstrap*
+/ac-predictor/Scripts/jquery*
+/ac-predictor/Scripts/**/popper*
+/ac-predictor/Scripts/modernizr*
