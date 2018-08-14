@@ -267,3 +267,5 @@ __pycache__/
 /ac-predictor/Scripts/jquery*
 /ac-predictor/Scripts/**/popper*
 /ac-predictor/Scripts/modernizr*
+/ac-predictor/Scripts/README.md
+/ac-predictor/Scripts/index.d.ts
