@@ -102,14 +102,14 @@
             //タイリストの人全員分行追加
             function addRow() {
                 tiedList.forEach(function (element) {
-                    var oldRate = (isFixed ? element.OldRating : element.Rating)
-                    var matches = element.Competitions - (isFixed ? 1 : 0)
+                    var oldRate = (isFixed ? element.OldRating : element.Rating);
+                    var matches = element.Competitions - (isFixed && element.IsRated ? 1 : 0);
 
-                    var fixRank = rank + (tiedList.length - 1) / 2
-                    var perf = getPerf(fixRank)
-                    var newRate = Math.min(maxPerf, Math.floor(positivize_rating(calc_rating_from_last(oldRate, perf, matches))))
-                    var node = genNode(rank, element.UserScreenName, element.TotalResult.Score / 100, perf, oldRate, newRate)
-                    table.appendChild(node)
+                    var fixRank = rank + (tiedList.length - 1) / 2;
+                    var perf = getPerf(fixRank);
+                    var newRate = Math.min(maxPerf, Math.floor(positivize_rating(matches !== 0 ? calc_rating_from_last(oldRate, perf, matches) : perf - 1200)));
+                    var node = genNode(rank, element.UserScreenName, element.TotalResult.Score / 100, perf, oldRate, newRate);
+                    table.appendChild(node);
 
                     //追加する一行分のノードを取得
                     function genNode(rank, name, point, perf, oldrate, newrate) {
