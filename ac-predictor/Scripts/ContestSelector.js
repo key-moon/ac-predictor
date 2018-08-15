@@ -113,51 +113,19 @@
 
                     //追加する一行分のノードを取得
                     function genNode(rank, name, point, perf, oldrate, newrate) {
-                        var tr = document.createElement('tr')
-
-                        var rankNode = tdNode(rank)
-                        tr.appendChild(rankNode)
-
-                        var nameNode = tdNode(name)
-                        nameNode.setAttribute("class", `user-${getColor(oldrate)}`)
-                        tr.appendChild(nameNode)
-
-                        var pointNode = tdNode(point)
-                        tr.appendChild(pointNode)
-
-                        var perfNode = tdNode(perf)
-                        perfNode.setAttribute("class", `user-${getColor(perf)}`)
-                        tr.appendChild(perfNode)
-
-                        var changeNode = getChangeNode(oldrate, newrate);
-                        tr.appendChild(changeNode)
-
-                        return tr;
-                        function tdNode(text) {
-                            var td = document.createElement('td')
-                            td.appendChild(document.createTextNode(text))
-                            return td
-                        }
-
+                        return `<tr><td>${rank}</td><td class="user-${getColor(oldrate)}"><a href=http://beta.atcoder.jp/users/${name}>${name}</a></td><td>${pointNode}</td><td>${getChangeNode(oldrate, newrate)}</td></tr>`;
                         function getChangeNode(oldRate, newRate) {
-                            var td = document.createElement('td')
-
-                            td.appendChild(ratingSpan(oldRate))
-                            td.appendChild(document.createTextNode(" -> "))
-                            td.appendChild(ratingSpan(newRate))
-                            td.appendChild(document.createTextNode(`(${(newRate >= oldRate ? '+' : '')}${newRate - oldRate})`))
-                            return td
+                            return `${ratingSpan(oldRate)} -> ${ratingSpan(newRate)}(${z(newRate >= oldRate ? '+' : '')}${newRate - oldRate})`;
 
                             function ratingSpan(rating) {
-                                var span = document.createElement('span')
-                                span.textContent = rating
-                                span.setAttribute("class", `user-${getColor(rating)}`)
-                                return span;
+                                return `<span class="user-${getColor(rate)}">${rate}</span>`;
                             }
                         }
                     }
                 })
             }
+
+            // O(nlogn)
             function getPerf(rank) {
                 var upper = 8192
                 var lower = -8192
@@ -171,6 +139,7 @@
 
                 return Math.min(innerPerf, maxPerf)
 
+                // O(n)
                 function calcPerf(X) {
                     var res = 0;
                     activePerf.forEach(function (APerf) {
