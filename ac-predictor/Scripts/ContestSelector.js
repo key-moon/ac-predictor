@@ -37,7 +37,7 @@
 
 
     function DrawTable(contestID) {
-        var table = document.getElementById('standings-body');
+        var table = $('#standings-body');
         
         var deffer = $.Deferred();
 
@@ -85,13 +85,10 @@
         //R := レートの幅(4000くらい)
         function draw(Standings, APerfs, isFixed, ContainUnrated) {
             //テーブルをクリア
-            table.textContent = null;
+            table.empty()
 
             //Perf計算時に使うパフォ(Ratedオンリー)
             var activePerf = []
-            var rank = 1;
-            var lastRank = 0;
-            var ratedCount = 0;
             Standings.forEach(function (element) {
                 if (element.IsRated && element.TotalResult.Count !== 0) {
                     if (!(APerfs[element.UserScreenName])) {
@@ -110,8 +107,10 @@
                 (contestID.substr(0, 3) === "abc" ? 1600 : (contestID.substr(0, 3) === "arc" ? 3200 : Math.ceil(getPerf(0.5)))));
             
             //タイの人を入れる(順位が変わったら描画→リストを空に)
-            var tiedList = []
-            rank = 1;
+            var tiedList = [];
+            var rank = 1;
+            var lastRank = 0;
+            var ratedCount = 0;
             //全員回す
             Standings.forEach(function (element) {
                 if ((ContainUnrated || !element.IsRated) || element.TotalResult.Count === 0) return;
@@ -139,19 +138,19 @@
                 }
                 var perf = currentPerf + 0.5;
                 tiedList.forEach(function (element) {
-                    var oldRate = (isFixed ? element.OldRating : element.Rating);
                     var matches = element.Competitions - (isFixed && element.IsRated ? 1 : 0);
+                    var oldRate = (isFixed ? element.OldRating : element.Rating);
 
-                    var newRate = (isFixed ? Math.floor(positivize_rating(matches !== 0 ? calc_rating_from_last(oldRate, perf, matches) : perf - 1200)) : element.Rating);
+                    var newRate = (isFixed ? element.Rating : Math.floor(positivize_rating(matches !== 0 ? calc_rating_from_last(oldRate, perf, matches) : perf - 1200)));
                     var name = element.UserScreenName;
                     var point = element.TotalResult.Score / 100;
-                    var node = `<tr><td>${rank}</td><td class="user-${getColor(oldRate)}"><a href=http://beta.atcoder.jp/users/${name} >${name}</a></td><td>${pointNode}</td><td>${getRatingChangeStr(oldrate, newRate)}</td></tr>`;
-                    table.appendChild(node);
+                    var node = `<tr><td>${rank}</td><td class="user-${getColor(oldRate)}"><a href=http://beta.atcoder.jp/users/${name} >${name}</a></td><td>${point}</td><td>${perf}</td><td>${getRatingChangeStr(oldRate, newRate)}</td></tr>`;
+                    table.append(node);
                     
                     function getRatingChangeStr(oldRate, newRate) {
                         return element.IsRated ? `${ratingSpan(oldRate)} -> ${ratingSpan(newRate)}(${(newRate >= oldRate ? '+' : '')}${newRate - oldRate})` : `${ratingSpan(oldRate)}(unrated)`;
 
-                        function ratingSpan(rating) {
+                        function ratingSpan(rate) {
                             return `<span class="user-${getColor(rate)}">${rate}</span>`;
                         }
                     }
