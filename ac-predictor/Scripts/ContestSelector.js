@@ -127,18 +127,16 @@
                     var matches = element.Competitions - (isFixed && element.IsRated ? 1 : 0);
 
                     var newRate = (isFixed ? Math.floor(positivize_rating(matches !== 0 ? calc_rating_from_last(oldRate, perf, matches) : perf - 1200)) : element.Rating);
-                    var node = genNode(rank, element.UserScreenName, element.TotalResult.Score / 100, perf, oldRate, newRate);
+                    var name = element.UserScreenName;
+                    var point = element.TotalResult.Score / 100;
+                    var node = `<tr><td>${rank}</td><td class="user-${getColor(oldRate)}"><a href=http://beta.atcoder.jp/users/${name} >${name}</a></td><td>${pointNode}</td><td>${getRatingChangeStr(oldrate, newRate)}</td></tr>`;
                     table.appendChild(node);
+                    
+                    function getRatingChangeStr(oldRate, newRate) {
+                        return element.IsRated ? `${ratingSpan(oldRate)} -> ${ratingSpan(newRate)}(${(newRate >= oldRate ? '+' : '')}${newRate - oldRate})` : `${ratingSpan(oldRate)}(unrated)`;
 
-                    //追加する一行分のノードを取得
-                    function genNode(rank, name, point, perf, oldrate, newrate) {
-                        return `<tr><td>${rank}</td><td class="user-${getColor(oldrate)}"><a href=http://beta.atcoder.jp/users/${name}>${name}</a></td><td>${pointNode}</td><td>${getChangeNode(oldrate, newrate)}</td></tr>`;
-                        function getChangeNode(oldRate, newRate) {
-                            return `${ratingSpan(oldRate)} -> ${ratingSpan(newRate)}(${(newRate >= oldRate ? '+' : '')}${newRate - oldRate})`;
-
-                            function ratingSpan(rating) {
-                                return `<span class="user-${getColor(rate)}">${rate}</span>`;
-                            }
+                        function ratingSpan(rating) {
+                            return `<span class="user-${getColor(rate)}">${rate}</span>`;
                         }
                     }
                 })
