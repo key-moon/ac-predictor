@@ -126,7 +126,7 @@
                     var oldRate = (isFixed ? element.OldRating : element.Rating);
                     var matches = element.Competitions - (isFixed && element.IsRated ? 1 : 0);
 
-                    var newRate = Math.floor(positivize_rating(matches !== 0 ? calc_rating_from_last(oldRate, perf, matches) : perf - 1200));
+                    var newRate = (isFixed ? Math.floor(positivize_rating(matches !== 0 ? calc_rating_from_last(oldRate, perf, matches) : perf - 1200)) : element.Rating);
                     var node = genNode(rank, element.UserScreenName, element.TotalResult.Score / 100, perf, oldRate, newRate);
                     table.appendChild(node);
 
