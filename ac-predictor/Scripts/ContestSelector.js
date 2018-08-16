@@ -1,4 +1,10 @@
 ﻿$(() => {
+    indexedDB.open("PredictorDB", 1).onupgradeneeded = function (event) {
+        var db = event.target.result;
+        db.createObjectStore("APerfs", { keyPath: "id" });
+        db.createObjectStore("Standings", { keyPath: "id" });
+    };
+
     var state = 0;
 
     $('#show-unrated-description').tooltip();
@@ -46,37 +52,35 @@
             getContestInfo("Standings"),
             getContestInfo("APerfs")
         )
-            .done((standings, aPerfs) => {
-                //確定していたらローカルストレージに保存する
-                if (standings.Fixed) {
-                    localStorage.setItem(`APerfs-${contestID}`, JSON.stringify(aPerfs));
-                    localStorage.setItem(`Standings-${contestID}`, JSON.stringify(standings));
-                }
-                draw(standings.StandingsData, aPerfs, standings.Fixed, $("#show-unrated").prop("checked"));
-                deffer.resolve();
-            }).fail(x => {
-                deffer.reject();
-            });
-
+        .done((standings, aPerfs) => {
+            //確定していたストレージに保存する
+            if (standings.Fixed) {
+                setData('APerfs', contestID, aPerfs);
+                setData('Standings', contestID, standings);
+            }
+            draw(standings.StandingsData, aPerfs, standings.Fixed, $("#show-unrated").prop("checked"));
+            deffer.resolve();
+        }).fail(x => {
+            deffer.reject();
+        });
+        
         return deffer.promise();
 
         function getContestInfo(type) {
             var deffer = $.Deferred();
-            const lsKey = `${type}-${contestID}`;
 
-            //ローカルストレージに存在してたらそっちを返す
-            if (localStorage.getItem(lsKey)) {
-                deffer.resolve(JSON.parse(localStorage.getItem(lsKey)));
-            }
-            else {
+            //ストレージに存在してたらそっちを返す
+            getData(type, contestID).done(aperfs => {
+                deffer.resolve(aperfs);
+            }).fail(() => {
                 $.ajax({
                     type: 'GET', dataType: 'json', url: `/api/${type}/${contestID}`
                 }).done(aperfs => {
                     deffer.resolve(aperfs);
                 }).fail(() => {
-                    deffer.reject();
+                        deffer.reject();
                 });
-            }
+            });
             return deffer.promise();
         }
 
@@ -195,5 +199,45 @@
                 return res;
             }
         }
+    }
+
+    function setData(store, key, value) {
+        var defferd = $.Deferred();
+        try {
+            indexedDB.open('PredictorDB').onsuccess = (e) => {
+                var db = e.target.result;
+                var trans = db.transaction(store, 'readwrite');
+                var objStore = trans.objectStore(store);
+                var data = { id: key, data: value };
+                var putReq = objStore.put(data);
+                putReq.onsuccess = function () {
+                    defferd.resolve();
+                }
+            }
+        }
+        catch (e){
+            defferd.reject(e);
+        }
+        return defferd.promise();
+    }
+
+    function getData(store, key) {
+        var defferd = $.Deferred();
+        try {
+            indexedDB.open('PredictorDB').onsuccess = (e) => {
+                var db = e.target.result;
+                var trans = db.transaction(store, 'readwrite');
+                var objStore = trans.objectStore(store);
+                objStore.get(key).onsuccess = function (event) {
+                    var result = event.target.result;
+                    if (!result) defferd.reject("key was not found");
+                    else defferd.resolve(result.data);
+                };
+            }
+        }
+        catch{
+            defferd.reject();
+        }
+        return defferd.promise();
     }
 })();
