@@ -3,8 +3,13 @@
     ViewBag.Title = "Index";
 }
 <form class="form-inline">
-    <select class="form-control-lg col-sm-5" id="contest-selector"></select>
-    <button type="button" class="btn btn-primary btn-lg col-sm-2" id="confirm-btn">確定</button>
+    <select class="form-control col-sm-5" id="contest-selector"></select>
+    <button type="button" class="btn btn-primary col-sm-2" id="confirm-btn">確定</button>
+    <div class="custom-control custom-checkbox my-1 mx-2">
+        <input type="checkbox" class="custom-control-input" id="show-unrated">
+        <label class="custom-control-label" for="show-unrated" data-toggle="tooltip" title="表示のみで、その人の存在は計算に反映されません。" id="show-unrated-description">unratedな参加者を表示する</label>
+    </div>
+
 </form>
 
 <table class="table table-bordered table-striped table-hover th-center td-center td-middle" id="standings">

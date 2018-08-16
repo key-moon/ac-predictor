@@ -1,6 +1,8 @@
 ﻿$(() => {
     var state = 0;
 
+    $('#show-unrated-description').tooltip();
+
     toggleLoadingState();
     $.ajax({
         type: 'GET',
@@ -51,7 +53,7 @@
                 localStorage.setItem(`APerfs-${contestID}`, JSON.stringify(aPerfs));
                 localStorage.setItem(`Standings-${contestID}`, JSON.stringify(standings));
             }
-            draw(standings.StandingsData, aPerfs, standings.Fixed, false);
+            draw(standings.StandingsData, aPerfs, standings.Fixed, $("#show-unrated").prop("checked"));
             deffer.resolve();
         }).fail(x => {
             deffer.reject();
