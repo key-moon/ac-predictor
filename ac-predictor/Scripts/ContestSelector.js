@@ -37,31 +37,47 @@
 
 
     function DrawTable(contestID) {
-        const StandingsURL = `/api/standings/${contestID}`;
-        const APerfsURL = `/api/aperfs/${contestID}`;
-
         var table = document.getElementById('standings-body');
         
         var deffer = $.Deferred();
 
         $.when(
-            $.ajax({
-                type: 'GET', dataType: 'json', url: StandingsURL
-            }),
-            $.ajax({
-                type: 'GET', dataType: 'json', url: APerfsURL
-            }))
+            getContestInfo("Standings"),
+            getContestInfo("APerfs")
+        )
         .done((standings, aPerfs) => {
-            if (standings[1] !== 'success' || aPerfs[1] !== 'success') {
-                //例外処理
-                deffer.fail();
-                return;
+            //確定していたらローカルストレージに保存する
+            if (standings.Fixed) {
+                localStorage.setItem(`APerfs-${contestID}`, JSON.stringify(aPerfs));
+                localStorage.setItem(`Standings-${contestID}`, JSON.stringify(standings));
             }
-            draw(standings[0].StandingsData, aPerfs[0], standings[0].Fixed, false);
+            draw(standings.StandingsData, aPerfs, standings.Fixed, false);
             deffer.resolve();
+        }).fail(x => {
+            deffer.reject();
         });
 
         return deffer.promise();
+        
+        function getContestInfo(type) {
+            var deffer = $.Deferred();
+            const lsKey = `${type}-${contestID}`;
+
+            //ローカルストレージに存在してたらそっちを返す
+            if (localStorage.getItem(lsKey)) {
+                deffer.resolve(JSON.parse(localStorage.getItem(lsKey)));
+            }
+            else {
+                $.ajax({
+                    type: 'GET', dataType: 'json', url: `/api/${type}/${contestID}`
+                }).done(aperfs => {
+                    deffer.resolve(aperfs);
+                }).fail(() => {
+                    deffer.reject();
+                });
+            }
+            return deffer.promise();
+        }
 
         //O(n + mR)
         //n := サブミットした人数(2500人くらい ?)
