@@ -117,6 +117,7 @@
                 if (lastRank !== element.Rank) {
                     addRow();
                     rank += ratedCount;
+                    ratedCount = 0;
                     tiedList = [];
                 }
                 tiedList.push(element);
