@@ -39,27 +39,27 @@
 
     function DrawTable(contestID) {
         var table = $('#standings-body');
-        
+
         var deffer = $.Deferred();
 
         $.when(
             getContestInfo("Standings"),
             getContestInfo("APerfs")
         )
-        .done((standings, aPerfs) => {
-            //確定していたらローカルストレージに保存する
-            if (standings.Fixed) {
-                localStorage.setItem(`APerfs-${contestID}`, JSON.stringify(aPerfs));
-                localStorage.setItem(`Standings-${contestID}`, JSON.stringify(standings));
-            }
-            draw(standings.StandingsData, aPerfs, standings.Fixed, $("#show-unrated").prop("checked"));
-            deffer.resolve();
-        }).fail(x => {
-            deffer.reject();
-        });
+            .done((standings, aPerfs) => {
+                //確定していたらローカルストレージに保存する
+                if (standings.Fixed) {
+                    localStorage.setItem(`APerfs-${contestID}`, JSON.stringify(aPerfs));
+                    localStorage.setItem(`Standings-${contestID}`, JSON.stringify(standings));
+                }
+                draw(standings.StandingsData, aPerfs, standings.Fixed, $("#show-unrated").prop("checked"));
+                deffer.resolve();
+            }).fail(x => {
+                deffer.reject();
+            });
 
         return deffer.promise();
-        
+
         function getContestInfo(type) {
             var deffer = $.Deferred();
             const lsKey = `${type}-${contestID}`;
@@ -91,16 +91,31 @@
             //Perf計算時に使うパフォ(Ratedオンリー)
             var activePerf = []
             Standings.forEach(function (element) {
-                if (element.IsRated && element.TotalResult.Count !== 0) {
-                    if (!(APerfs[element.UserScreenName])) {
-                        //存在しないユーザ
-                        //console.log(element.UserScreenName)
-                    }
-                    else {
-                        activePerf.push(APerfs[element.UserScreenName]);
-                    }
+                if (!element.IsRated || element.TotalResult.Count === 0) return;
+                if (!(APerfs[element.UserScreenName])) {
+                    //console.log(element.UserScreenName)
+                    return;
                 }
+                activePerf.push(APerfs[element.UserScreenName]);
             });
+
+            //要するにUnRatedコン
+            if (activePerf.length === 0) {
+                //レーティングは変動しないので、コンテスト中と同じ扱いをして良い。(逆にしないと)
+                isFixed = false;
+
+                //元はRatedだったと推測できる場合、通常のRatedと同じような扱い
+                var maxRate = /abc\d{3}/.test(contestID) ? 1200 : (/arc\d{3}/.test(contestID) ? 2800 : Infinity);
+                activePerf = [];
+                for (var i = 0; i < Standings.length; i++) {
+                    var element = Standings[i];
+                    if (element.OldRating >= maxRate || element.TotalResult.Count === 0) continue;
+                    if (!(APerfs[element.UserScreenName])) continue;
+                    //Ratedフラグをオンに
+                    Standings[i].IsRated = true;
+                    activePerf.push(APerfs[element.UserScreenName]);
+                }
+            }
 
             //限界パフォーマンス(上限なしの場合は一位の人のパフォ)
             var maxPerf = contestID === "SoundHound Inc. Programming Contest 2018 -Masters Tournament-" ? 2400 :
