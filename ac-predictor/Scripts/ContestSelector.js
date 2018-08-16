@@ -9,7 +9,6 @@
         dataType: 'json',
         url: '/api/aperfs'
     }).done(contests => {
-        console.log(contests);
         contests.forEach((element) => {
             $("#contest-selector").append(`<option>${element}</option>`);
         });
@@ -104,10 +103,13 @@
             });
 
             //限界パフォーマンス(上限なしの場合は一位の人のパフォ)
-            var maxPerf = contestID ===
-                ("SoundHound Inc. Programming Contest 2018 -Masters Tournament-" ? 2400 :
-                (contestID.substr(0, 3) === "abc" ? 1600 : (contestID.substr(0, 3) === "arc" ? 3200 : Math.ceil(getPerf(0.5)))));
-            
+            var maxPerf = contestID === "SoundHound Inc. Programming Contest 2018 -Masters Tournament-" ? 2400 :
+                    (contestID.substr(0, 3) === "abc" ? 1600 : (contestID.substr(0, 3) === "arc" ? 3200 : Math.ceil(getPerf(1))));
+
+            //addRowを回すときのパフォ 0.5を引いているのは四捨五入が発生する境界に置くため
+            var currentPerf = maxPerf - 0.5;
+            var rankVal = calcRankVal(currentPerf);
+
             //タイの人を入れる(順位が変わったら描画→リストを空に)
             var tiedList = [];
             var rank = 1;
@@ -129,9 +131,6 @@
             //最後に更新してあげる
             addRow();
 
-            //現在のパフォ 0.5を引いているのは四捨五入が発生する境界に置くため
-            var currentPerf = maxPerf - 0.5;
-            var rankVal = calcRankVal(currentPerf);
             //タイリストの人全員行追加
             function addRow() {
                 var fixRank = rank + Math.max(0, ratedCount - 1) / 2;
@@ -165,14 +164,12 @@
                 var upper = 8192
                 var lower = -8192
 
-                while (upper - lower > 1) {
-                    if (rank - 0.5 > calcRankVal(lower + (upper - lbower) / 2)) upper -= (upper - lower) / 2
+                while (upper - lower > 0.5) {
+                    if (rank - 0.5 > calcRankVal(lower + (upper - lower) / 2)) upper -= (upper - lower) / 2
                     else lower += (upper - lower) / 2
                 }
 
-                var innerPerf = Math.ceil(lower + (upper - lower) / 2)
-
-                return Math.min(innerPerf, maxPerf)
+                return innerPerf = lower + (upper - lower) / 2;
             }
             // O(m)
             function calcRankVal(X) {
