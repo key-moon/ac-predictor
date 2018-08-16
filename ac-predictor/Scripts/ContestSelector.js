@@ -115,7 +115,7 @@
             var ratedCount = 0;
             //全員回す
             Standings.forEach(function (element) {
-                if ((ContainUnrated || !element.IsRated) || element.TotalResult.Count === 0) return;
+                if ((!ContainUnrated && !element.IsRated) || element.TotalResult.Count === 0) return;
                 if (lastRank !== element.Rank) {
                     addRow();
                     rank += ratedCount;
@@ -134,7 +134,7 @@
             var rankVal = calcRankVal(currentPerf);
             //タイリストの人全員行追加
             function addRow() {
-                var fixRank = rank + (ratedCount - 1) / 2;
+                var fixRank = rank + Math.max(0, ratedCount - 1) / 2;
                 while (rankVal < fixRank) {
                     currentPerf--;
                     rankVal = calcRankVal(currentPerf);
