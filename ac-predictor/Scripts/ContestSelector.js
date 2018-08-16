@@ -132,7 +132,7 @@
             var rankVal = calcRankVal(currentPerf);
             //タイリストの人全員行追加
             function addRow() {
-                var fixRank = rank + (tiedList.length - 1) / 2;
+                var fixRank = rank + (ratedCount - 1) / 2;
                 while (rankVal < fixRank) {
                     currentPerf--;
                     rankVal = calcRankVal(currentPerf);
