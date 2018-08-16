@@ -145,7 +145,7 @@
                     var newRate = (isFixed ? element.Rating : Math.floor(positivize_rating(matches !== 0 ? calc_rating_from_last(oldRate, perf, matches) : perf - 1200)));
                     var name = element.UserScreenName;
                     var point = element.TotalResult.Score / 100;
-                    var node = `<tr><td>${rank}</td><td class="user-${getColor(oldRate)}"><a href=http://beta.atcoder.jp/users/${name} >${name}</a></td><td>${point}</td><td>${perf}</td><td>${getRatingChangeStr(oldRate, newRate)}</td></tr>`;
+                    var node = `<tr><td>${rank}</td><td><a class="user-${getColor(oldRate)}" href=http://beta.atcoder.jp/users/${name} >${name}</a></td><td>${point}</td><td>${perf}</td><td>${getRatingChangeStr(oldRate, newRate)}</td></tr>`;
                     table.append(node);
                     
                     function getRatingChangeStr(oldRate, newRate) {
