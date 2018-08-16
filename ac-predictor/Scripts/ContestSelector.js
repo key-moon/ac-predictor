@@ -63,10 +63,10 @@
 
         return deffer.promise();
 
-        //O(nmlogR)
+        //O(n + mR)
         //n := サブミットした人数(2500人くらい ?)
         //m := Ratedな人(これも2500人)
-        //R := レートを測る幅(8192 ～ -8192)
+        //R := レートの幅(4000くらい)
         function draw(Standings, APerfs, isFixed, ContainUnrated) {
             //テーブルをクリア
             table.textContent = null;
@@ -114,7 +114,7 @@
             //現在のパフォ 0.5を引いているのは四捨五入が発生する境界に置くため
             var currentPerf = maxPerf - 0.5;
             var rankVal = calcRankVal(currentPerf);
-            //タイリストの人全員分行追加
+            //タイリストの人全員行追加
             function addRow() {
                 var fixRank = rank + (tiedList.length - 1) / 2;
                 while (rankVal < fixRank) {
