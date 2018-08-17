@@ -9,20 +9,27 @@
 
     $('#show-unrated-description').tooltip();
 
-    toggleLoadingState();
+    if (localStorage.getItem('predictor-contests')) setItemToSelector(JSON.parse(localStorage.getItem('predictor-contests')));
     $.ajax({
         type: 'GET',
         dataType: 'json',
         url: '/api/aperfs'
     }).done(contests => {
-        contests.forEach((element) => {
-            $("#contest-selector").append(`<option>${element}</option>`);
-        });
-        toggleLoadingState();
+        setItemToSelector(contests);
+        localStorage.setItem('predictor-contests', JSON.stringify(contests));
     });
 
+    function setItemToSelector(items) {
+        var selected = $("#contest-selector").val();
+        $("#contest-selector").empty();
+        items.forEach((item) => {
+            $("#contest-selector").append(`<option>${item}</option>`);
+        });
+        $("#contest-selector").val(selected);
+    }
+
     function toggleLoadingState() {
-        if (state == 0) {
+        if (state === 0) {
             state = 1
             $('#confirm-btn').text('読み込み中…');
             $('#confirm-btn').prop("disabled", true);
