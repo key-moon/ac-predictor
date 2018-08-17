@@ -13,70 +13,71 @@ SideMenu.Datas.Update = {}
 //History
 SideMenu.Datas.History = null;
 SideMenu.Datas.Update.History = (() => {
-	var d = $.Deferred();
-	try {
-		$.ajax({
-			url: `https://beta.atcoder.jp/users/${userScreenName}/history/json`,
-			type: "GET",
-			dataType: "json"
-		}).done(history => {
-			SideMenu.Datas.History = history;
-			d.resolve();
-		}).fail(() => { d.reject(); });
-	}
-	catch {
-		d.reject();
-	}
-	return d.promise();
+    var d = $.Deferred();
+    try {
+        $.ajax({
+            url: `https://beta.atcoder.jp/users/${userScreenName}/history/json`,
+            type: "GET",
+            dataType: "json"
+        }).done(history => {
+            SideMenu.Datas.History = history;
+            d.resolve();
+        }).fail(() => { d.reject(); });
+    }
+    catch (e) {
+        d.reject(e);
+    }
+    return d.promise();
 });
 
 //Standings
 SideMenu.Datas.Standings = null;
 SideMenu.Datas.Update.Standings = (() => {
-	var d = $.Deferred();
-	try {
-		$.ajax({
-			url: `https://beta.atcoder.jp/contests/${contestScreenName}/standings/json`,
-			type: "GET",
-			dataType: "json"
-		}).done(standings => {
-			SideMenu.Datas.Standings = standings;
-			d.resolve();
-		}).fail(() => { d.reject(); });
-	}
-	catch{
-		d.reject();
-	}
-	return d.promise();
+    var d = $.Deferred();
+    try {
+        $.ajax({
+            url: `https://beta.atcoder.jp/contests/${contestScreenName}/standings/json`,
+            type: "GET",
+            dataType: "json"
+        }).done(standings => {
+            SideMenu.Datas.Standings = standings;
+            d.resolve();
+        }).fail(() => { d.reject(); });
+    }
+    catch (e) {
+        d.reject();
+    }
+    return d.promise();
 });
 
 //APerfs
 SideMenu.Datas.APerfs = null;
 SideMenu.Datas.Update.APerfs = (() => {
-	var d = $.Deferred();
-	try {
-		$.ajax({
-			url: `https://ac-predictor.azurewebsites.net/api/aperfs/${contestScreenName}`,
-			type: "GET",
-			dataType: "json"
-		}).done(aperfs => {
-			SideMenu.Datas.APerfs = aperfs
-			d.resolve();
-		}).fail(() => { d.reject(); });
-	}
-	catch {
-		d.reject();
-	}
-	return d.promise();
+    var d = $.Deferred();
+    try {
+        $.ajax({
+            url: `https://ac-predictor.azurewebsites.net/api/aperfs/${contestScreenName}`,
+            type: "GET",
+            dataType: "json"
+        }).done(aperfs => {
+            SideMenu.Datas.APerfs = aperfs
+            d.resolve();
+        }).fail(() => { d.reject(); });
+    }
+    catch (e) {
+        d.reject();
+    }
+    return d.promise();
 });
 
 //ライブラリを追加するやつ
 SideMenu.appendLibrary = function (source) {
     var defferd = $.Deferred();
     $.ajax({
-        url: script
+        url: source
     }).done(((src) => {
         $('head').append(`<script>${src}</script>`);
+        defferd.resolve();
     })(() => {
         defferd.fail();
     }));
@@ -103,42 +104,42 @@ SideMenu.Notifications.CanSend = false;
     }
 })();
 
-await SideMenu.appendLibrary("https://koba-e964.github.io/atcoder-rating-estimator/atcoder_rating.js");
+SideMenu.appendLibrary("https://koba-e964.github.io/atcoder-rating-estimator/atcoder_rating.js");
 
 //サイドメニュー追加(将来仕様変更が起きる可能性大)
 SideMenu.appendToSideMenu = async function (match, title, elemFunc) {
-	var defferd = $.Deferred();
-	try {
-		if (!match.test(location.href)) return;
-		//アコーディオンメニュー
-		var dom =
-			`<div class="menu-wrapper">
+    var defferd = $.Deferred();
+    try {
+        if (!match.test(location.href)) return;
+        //アコーディオンメニュー
+        var dom =
+            `<div class="menu-wrapper">
 	<div class="menu-header">
 		<h4 class="sidemenu-txt">${title}<span class="glyphicon glyphicon-menu-up" style="float: right"></span></h4>
 	</div>
 	<div class="menu-box"><div class="menu-content">${await elemFunc()}</div></div>
 </div>`
-		$('#sidemenu').append(dom);
-		var contents = $('.menu-content');
-		var contentElem = contents[contents.length - 1];
-		$(contentElem).parents('.menu-box').css('height', contentElem.scrollHeight)
-		defferd.resolve();
-	}
-	catch (e) {
-		console.error(e);
-		defferd.reject();
-	}
-	return defferd.promise();
+        $('#sidemenu').append(dom);
+        var contents = $('.menu-content');
+        var contentElem = contents[contents.length - 1];
+        $(contentElem).parents('.menu-box').css('height', contentElem.scrollHeight)
+        defferd.resolve();
+    }
+    catch (e) {
+        console.error(e);
+        defferd.reject();
+    }
+    return defferd.promise();
 };
 
 
 //サイドメニューを生成
 (() => {
-	var menuWidth = 350
-	var keyWidth = 50
-	var speed = 150
-	var sideMenuScript =
-		`<script>//参考:http://blog.8bit.co.jp/?p=12308
+    var menuWidth = 350
+    var keyWidth = 50
+    var speed = 150
+    var sideMenuScript =
+        `<script>//参考:http://blog.8bit.co.jp/?p=12308
 (() => {
 const activeClass = 'sidemenu-active'
 var menuWrap = '#menu_wrap'
@@ -184,8 +185,8 @@ $('#sidemenu').on('click','.menu-header',(event) => {
 
 })();
 </script>`
-	var sideMenuStyle =
-		`<style>#menu_wrap{
+    var sideMenuStyle =
+        `<style>#menu_wrap{
 	display:block;
 	position:fixed;
 	top:0;
@@ -257,8 +258,8 @@ $('#sidemenu').on('click','.menu-header',(event) => {
 	transform: translateY(-100%);
 }
 </style>`
-	var ratingScript =
-`<script>from: https://koba-e964.github.io/atcoder-rating-estimator/atcoder_rating.js
+    var ratingScript =
+        `<script>from: https://koba-e964.github.io/atcoder-rating-estimator/atcoder_rating.js
 function bigf(n) {
     var num = 1.0;
     var den = 1.0;
@@ -318,14 +319,15 @@ function unpositivize_rating(r) {
     }
     return 400.0 + 400.0 * Math.log(r / 400.0);
 }</script>`;
-	$('#main-div').append(`<div id="menu_wrap"><div id="sidemenu" class="container"></div><div id="sidemenu-key" class="glyphicon glyphicon-menu-left"></div>${ratingScript}${sideMenuScript}${sideMenuStyle}</div>`);
+    $('#main-div').append(`<div id="menu_wrap"><div id="sidemenu" class="container"></div><div id="sidemenu-key" class="glyphicon glyphicon-menu-left"></div>${ratingScript}${sideMenuScript}${sideMenuStyle}</div>`);
 })();
 
 
 //IndexedDB DB
+SideMenu.DataBase = {};
 SideMenu.DataBase.Name = "PredictorDB";
 SideMenu.DataBase.StoreNames = ["APerfs", "Standings"];
-indexedDB.open(SideMenu.DataBase.Name, SideMenu.Version).onupgradeneeded = (event) =>  {
+indexedDB.open(SideMenu.DataBase.Name, SideMenu.Version).onupgradeneeded = (event) => {
     var db = event.target.result;
     SideMenu.DataBase.StoreNames.forEach(store => {
         db.createObjectStore(store, { keyPath: "id" });
@@ -364,8 +366,8 @@ SideMenu.DataBase.GetData = (store, key) => {
             };
         }
     }
-    catch{
-        defferd.reject();
+    catch (e) {
+        defferd.reject(e);
     }
     return defferd.promise();
 };
@@ -379,5 +381,5 @@ SideMenu.ViewOrder = ["Predictor", "Estimator"];
 
 
 SideMenu.ViewOrder.forEach(async (elem) => {
-	await SideMenu.Elements[elem]();
+    await SideMenu.Elements[elem]();
 });
