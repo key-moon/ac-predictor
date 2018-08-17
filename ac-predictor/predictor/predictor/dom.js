@@ -80,27 +80,33 @@
         SetUpdateInterval();
         return;
     }
-    console.log("a");
+
     $.when(
         SideMenu.DataBase.GetData("APerf", contestScreenName),
         SideMenu.DataBase.GetData("Standings", contestScreenName)
     ).done((aperfs, standings) => {
         SideMenu.Datas.APerfs = aperfs;
         SideMenu.Datas.Standing = standings;
+        CalcActivePerf();
+        UpdatePredictorFromLast();
+        enabled();
         AddAlert('ローカルストレージから取得されました。');
     }).fail(() => {
         UpdatePredictor();
     })
 
+    //
     function SetUpdateInterval() {
         UpdatePredictor();
         if (!endTime.isBefore()) setTimeout(SetUpdateInterval, Interval);
     }
-    
+
+    //
     function getRate(perf) {
         return positivize_rating(calc_rating(SideMenu.Datas.History.filter(x => x.IsRated).map(x => x.Performance).concat(perf).reverse()));
     }
-    
+
+    //
     function getPerf(rank) {
         var upper = 8192
         var lower = -8192
@@ -122,7 +128,8 @@
             return res;
         }
     }
-    
+
+    //
     function UpdatePredictor() {
         $('#predictor-reload').button('loading');
         AddAlert('順位表読み込み中…');
