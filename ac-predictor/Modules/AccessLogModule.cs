@@ -23,9 +23,10 @@ namespace ac_predictor.Modules
         
         public void Logging(object sender, EventArgs e)
         {
-            AccessLogDB db = new AccessLogDB();
             DateTime endTime = DateTime.Now;
             HttpRequest request = (HttpRequest)sender.GetType().GetProperty("Request").GetValue(sender);
+            if (request.UserHostAddress == ":::0") return;
+            AccessLogDB db = new AccessLogDB();
             LogObj log = new LogObj
             {
                 RequestedTime = new BsonDateTime(beginTime),

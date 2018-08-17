@@ -34,7 +34,6 @@ namespace ac_predictor.MongoDB
 
     public class LogObj
     {
-        [BsonDateTimeOptions]
         public BsonDateTime RequestedTime;
         public int Elapsedms;
         public string Url;
