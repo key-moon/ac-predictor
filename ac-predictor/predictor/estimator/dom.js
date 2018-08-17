@@ -41,16 +41,16 @@
 				}
 			}
             res = (hi + lo) / 2;
-            $("#estimator-input-desc").text("目標レーティング")
-            $("#estimator-res-desc").text("必要パフォーマンス")
+            $("#estimator-input-desc").text("目標レーティング");
+            $("#estimator-res-desc").text("必要パフォーマンス");
 		}
 		else {
             res = calc_rating([input].concat(history));
-            $("#estimator-input-desc").text("パフォーマンス")
-            $("#estimator-res-desc").text("到達レーティング")
+            $("#estimator-input-desc").text("パフォーマンス");
+            $("#estimator-res-desc").text("到達レーティング");
         }
-		res = Math.round(res * 100) / 100
-		$("#estimator-res").val(res)
+        res = Math.round(res * 100) / 100
+        if (!isNaN(res)) $("#estimator-res").val(res);
         updateLocalStorage();
         updateTweetBtn();
 	}
