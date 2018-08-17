@@ -134,6 +134,11 @@
         $('#predictor-reload').button('loading');
         AddAlert('順位表読み込み中…');
         SideMenu.Datas.Update.APerfs().then(SideMenu.Datas.Update.Standings).then(() => {
+            if (SideMenu.Datas.APerfs.length === 0) {
+                enabled();
+                AddAlert('APerfのデータが提供されていません');
+                return;
+            }
             if (SideMenu.Datas.Standings.Fixed) {
                 SideMenu.DataBase.SetData('APerfs', contestScreenName, SideMenu.Datas.APerfs);
                 SideMenu.DataBase.SetData('Standings', contestScreenName, SideMenu.Datas.Standings);
@@ -144,7 +149,7 @@
             AddAlert(`最終更新 : ${moment().format('HH:mm:ss')}`);
         }).fail(() => {
             disabled();
-            AddAlert('データの読み込みに失敗しました。');
+            AddAlert('データの読み込みに失敗しました');
         });
     }
 
