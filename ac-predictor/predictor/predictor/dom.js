@@ -82,11 +82,11 @@
     }
 
     $.when(
-        SideMenu.DataBase.GetData("APerf", contestScreenName),
+        SideMenu.DataBase.GetData("APerfs", contestScreenName),
         SideMenu.DataBase.GetData("Standings", contestScreenName)
     ).done((aperfs, standings) => {
         SideMenu.Datas.APerfs = aperfs;
-        SideMenu.Datas.Standing = standings;
+        SideMenu.Datas.Standings = standings;
         CalcActivePerf();
         UpdatePredictorFromLast();
         enabled();
