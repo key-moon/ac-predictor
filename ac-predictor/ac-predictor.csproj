@@ -208,7 +208,9 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Handlers\OPTIONSHandler.cs" />
+    <Compile Include="Modules\AccessLogModule.cs" />
     <Compile Include="Modules\HTTPHeaderModule.cs" />
+    <Compile Include="MongoDB\AccessLogDB.cs" />
     <Compile Include="MongoDB\APrefsDB.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util\CrossOriginSettings.cs" />
