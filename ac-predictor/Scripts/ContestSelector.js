@@ -103,11 +103,15 @@
             table.empty()
 
             //Perf計算時に使うパフォ(Ratedオンリー)
-            var activePerf = []
+            var activePerf = [];
+            const ratedLimit = contestID === "SoundHound Inc. Programming Contest 2018 -Masters Tournament-"
+                ? 2000 : (/abc\d{3}/.test(contestID) ? 1200 : (/arc\d{3}/.test(contestID) ? 2800 : Infinity));
+            const defaultAPerf = /abc\d{3}/.test(contestID) ? 800 : 1600;
             Standings.forEach(function (element) {
                 if (!element.IsRated || element.TotalResult.Count === 0) return;
                 if (!(APerfs[element.UserScreenName])) {
-                    //console.log(element.UserScreenName)
+                    //ここで何も追加しないと下限RatedValueが人数を下回ってしまい、こわれる
+                    activePerf.push(defaultAPerf);
                     return;
                 }
                 activePerf.push(APerfs[element.UserScreenName]);
@@ -119,11 +123,10 @@
                 isFixed = false;
 
                 //元はRatedだったと推測できる場合、通常のRatedと同じような扱い
-                var maxRate = /abc\d{3}/.test(contestID) ? 1200 : (/arc\d{3}/.test(contestID) ? 2800 : Infinity);
                 activePerf = [];
                 for (var i = 0; i < Standings.length; i++) {
                     var element = Standings[i];
-                    if (element.OldRating >= maxRate || element.TotalResult.Count === 0) continue;
+                    if (element.OldRating >= ratedLimit || element.TotalResult.Count === 0) continue;
                     if (!(APerfs[element.UserScreenName])) continue;
                     //Ratedフラグをオンに
                     Standings[i].IsRated = true;
@@ -132,8 +135,7 @@
             }
 
             //限界パフォーマンス(上限なしの場合は一位の人のパフォ)
-            var maxPerf = contestID === "SoundHound Inc. Programming Contest 2018 -Masters Tournament-" ? 2400 :
-                    (contestID.substr(0, 3) === "abc" ? 1600 : (contestID.substr(0, 3) === "arc" ? 3200 : Math.ceil(getPerf(1))));
+            var maxPerf = ratedLimit === Infinity ? getPerf(1) : ratedLimit + 400;
 
             //addRowを回すときのパフォ 0.5を引いているのは四捨五入が発生する境界に置くため
             var currentPerf = maxPerf - 0.5;
@@ -163,7 +165,7 @@
             //タイリストの人全員行追加
             function addRow() {
                 var fixRank = rank + Math.max(0, ratedCount - 1) / 2;
-                while (rankVal < fixRank) {
+                while (rankVal < fixRank - 0.5 && currentPerf >= -8192) {
                     currentPerf--;
                     rankVal = calcRankVal(currentPerf);
                 }
