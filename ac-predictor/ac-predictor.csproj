@@ -81,11 +81,6 @@
     <Content Include="predictor\predictor\script.js" />
     <Content Include="predictor\predictor\settings.txt" />
     <Content Include="predictor\scripts.js" />
-    <Content Include="predictor\submit status\dom.css" />
-    <Content Include="predictor\submit status\dom.html" />
-    <Content Include="predictor\submit status\dom.js" />
-    <Content Include="predictor\submit status\script.js" />
-    <Content Include="predictor\submit status\settings.txt" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
