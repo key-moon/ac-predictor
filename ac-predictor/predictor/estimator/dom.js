@@ -1,27 +1,17 @@
 (() => {
-	var estimator_state = localStorage.getItem("sidemenu_estimator_state");
-	updateInputs();
+    var estimator_state = localStorage.getItem("sidemenu_estimator_state");
+    $("#estimator-input").val(localStorage.getItem("sidemenu_estimator_value"));
+    updateInputs();
 
 	$("#estimator-input").keyup(updateInputs);
 
-	$("#estimator-toggle").click(function () {
-		if (estimator_state === 0) {
-			$("#estimator-input-desc").text("パフォーマンス")
-			$("#estimator-res-desc").text("到達レーティング")
-			estimator_state = 1;
-		}
-		else {
-			$("#estimator-input-desc").text("目標レーティング")
-			$("#estimator-res-desc").text("必要パフォーマンス")
-			estimator_state = 0;
-		}
-		$("#estimator-input").val($("#estimator-res").val());
+    $("#estimator-toggle").click(function () {
+        $("#estimator-input").val($("#estimator-res").val());
+        estimator_state = (estimator_state + 1) % 2;
 		updateInputs();
-		updateLocalStorage()
-		updateTweetBtn()
-	})
+    })
 
-	function updateInputs () {
+	function updateInputs() {
 		var input = $("#estimator-input").val();
 		if (!isFinite(input)) {
 			displayAlert("数字ではありません")
@@ -34,7 +24,7 @@
 			return 0;
 		})
 		history = history.map(x => x.InnerPerformance)
-		var input = parseInt(input, 10)
+		var input = parseInt(input)
 		var res = -1;
 		if (estimator_state === 0) {
 			// binary search
@@ -50,15 +40,19 @@
 					lo = mid;
 				}
 			}
-			res = (hi + lo) / 2;
+            res = (hi + lo) / 2;
+            $("#estimator-input-desc").text("目標レーティング")
+            $("#estimator-res-desc").text("必要パフォーマンス")
 		}
 		else {
-			res = calc_rating([input].concat(history));
-		}
+            res = calc_rating([input].concat(history));
+            $("#estimator-input-desc").text("パフォーマンス")
+            $("#estimator-res-desc").text("到達レーティング")
+        }
 		res = Math.round(res * 100) / 100
 		$("#estimator-res").val(res)
-		updateLocalStorage()
-		updateTweetBtn()
+        updateLocalStorage();
+        updateTweetBtn();
 	}
 
 	function updateLocalStorage() {
