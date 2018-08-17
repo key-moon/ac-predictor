@@ -1,65 +1,100 @@
 (() => {
-	if (!startTime.isBefore()) {
-		$("#predictor-input-rank").attr("disabled", "")
-		$("#predictor-input-perf").attr("disabled", "")
-		$("#predictor-input-rate").attr("disabled", "")
-		$("#predictor-reload").attr("disabled", "")
-		$("#predictor-current").attr("disabled", "")
-		$("#predictor-tweet").attr("disabled", "")
-		$("#predictor-alert").html("<h5 class='sidemenu-txt'>コンテストは始まっていません</h5>");
-	}
-    else {
-        LoadAPerfs()
-        if(!endTime.isBefore()) var loadTimer = setInterval(LoadAPerfs, 30000)
-    }
-    
-    $('[data-toggle="tooltip"]').tooltip()
-    function UpdatePredictor(rank,perf,rate) {
-		$("#predictor-input-rank").val(round(rank))
-		$("#predictor-input-perf").val(round(perf))
-		$("#predictor-input-rate").val(round(rate))
-        updatePredictorTweetBtn()
-        function round(val) {
-            return Math.round(val * 100) / 100;
+    $('[data-toggle="tooltip"]').tooltip();
+    $('#predictor-reload').click(function () {
+        UpdatePredictor();
+    });
+    $('#predictor-current').click(function () {
+        //自分の順位を確認
+        var myRank = 0;
+
+        var tiedList = []
+        var lastRank = 0;
+        var rank = 1;
+        var isContainedMe = false;
+        //全員回して自分が出てきたら順位更新フラグを立てる
+        SideMenu.Datas.Standings.StandingsData.forEach(function (element) {
+            if (!element.IsRated || element.TotalResult.Count === 0) return;
+            if (lastRank !== element.Rank) {
+                if (isContainedMe) {
+                    myRank = rank + (tiedList.length - 1) / 2;
+                    isContainedMe = false;
+                }
+                rank += tiedList.length;
+                tiedList = []
+            }
+
+            if (isContainedMe) {
+                myRank = rank + (tiedList.length - 1) / 2;
+                isContainedMe = false;
+            }
+
+            if (userScreenName === element.UserScreenName) isContainedMe = true;
+            tiedList.push(element)
+            lastRank = element.Rank;
+        })
+        //存在しなかったら空欄
+        if (myRank === 0) {
+            disabled();
         }
-    }
-    
-    function UpdatePredictorFromRank(rank) {
-        var perf = getPerf(rank)
-        var rate = getRate(perf)
-        lastUpdated = 0
-        UpdatePredictor(rank,perf,rate)
-    }
-    
-    function UpdatePredictorFromPerf(perf) {
-        var upper = 16384
-        var lower = 0
-        while(upper - lower > 0.125) {
-            if (perf > getPerf(lower + (upper - lower) / 2)) upper -= (upper - lower) / 2
-            else lower += (upper - lower) / 2
+        else {
+            lastUpdated = 0;
+            UpdatePredictorFromLast();
         }
-        lastUpdated = 1
-        var rank = lower + (upper - lower) / 2;
-        var rate = getRate(perf)
-        UpdatePredictor(rank,perf,rate)
+    });
+    $('#predictor-input-rank').keyup(function (event) {
+        lastUpdated = 0;
+        UpdatePredictorFromLast();
+    });
+    $('#predictor-input-perf').keyup(function (event) {
+        lastUpdated = 1;
+        UpdatePredictorFromLast();
+    });
+    $('#predictor-input-rate').keyup(function (event) {
+        lastUpdated = 2;
+        UpdatePredictorFromLast();
+    });
+
+    const specialContest = ['practice', 'APG4b', 'abs'];
+
+    const predictorElements = ['predictor-input-rank', 'predictor-input-perf', 'predictor-input-rate', 'predictor-current', 'predictor-reload', 'predictor-tweet'];
+    const firstContestDate = moment("2016-07-16 21:00");
+    const Interval = 30000;
+
+    var lastUpdated = 0;
+    if (!startTime.isBefore()) {
+        disabled();
+        AddAlert('コンテストは始まっていません');
+        return;
     }
-    function UpdatePredictorFromRate(rate) {
-        var upper = 16384
-        var lower = 0
-        while(upper - lower > 0.125) {
-            if (rate < getRate(lower + (upper - lower) / 2)) upper -= (upper - lower) / 2
-            else lower += (upper - lower) / 2
-        }
-        lastUpdated = 2
-        var perf = lower + (upper - lower) / 2;
-        upper = 16384
-        lower = 0
-        while(upper - lower > 0.125) {
-            if (perf > getPerf(lower + (upper - lower) / 2)) upper -= (upper - lower) / 2
-            else lower += (upper - lower) / 2
-        }
-        var rank = lower + (upper - lower) / 2;
-        UpdatePredictor(rank,perf,rate)
+    if (moment(startTime) < firstContestDate) {
+        disabled();
+        AddAlert('現行レートシステムが始まる前のコンテストです');
+        return;
+    }
+    if (specialContest.indexOf(contestScreenName) >= 0) {
+        disabled();
+        AddAlert('順位表が存在しないコンテストです');
+        return;
+    }
+    if (!endTime.isBefore()) {
+        SetUpdateInterval();
+        return;
+    }
+    console.log("a");
+    $.when(
+        SideMenu.DataBase.GetData("APerf", contestScreenName),
+        SideMenu.DataBase.GetData("Standings", contestScreenName)
+    ).done((aperfs, standings) => {
+        SideMenu.Datas.APerfs = aperfs;
+        SideMenu.Datas.Standing = standings;
+        AddAlert('ローカルストレージから取得されました。');
+    }).fail(() => {
+        UpdatePredictor();
+    })
+
+    function SetUpdateInterval() {
+        UpdatePredictor();
+        if (!endTime.isBefore()) setTimeout(SetUpdateInterval, Interval);
     }
     
     function getRate(perf) {
@@ -87,100 +122,126 @@
             return res;
         }
     }
-	$('#predictor-current').click(function () {
-        //自分の順位を確認
-        var myRank = 0;
     
-        var tiedList = []
-        var lastRank = 0;
-        var rank = 1;
-        var isContainedMe = false;
-        //全員回して自分が出てきたら順位更新フラグを立てる
-		SideMenu.Datas.Standings.StandingsData.forEach(function (element) {
-            if (!element.IsRated || element.TotalResult.Count === 0) return;
-            if (lastRank !== element.Rank) {
-                if (isContainedMe) {
-                     myRank = rank + (tiedList.length - 1) / 2;
-                    isContainedMe = false;
-                }
-                rank += tiedList.length;
-                tiedList = []
+    function UpdatePredictor() {
+        $('#predictor-reload').button('loading');
+        AddAlert('順位表読み込み中…');
+        SideMenu.Datas.Update.APerfs().then(SideMenu.Datas.Update.Standings).then(() => {
+            if (SideMenu.Datas.Standings.Fixed) {
+                SideMenu.DataBase.SetData('APerfs', contestScreenName, SideMenu.Datas.APerfs);
+                SideMenu.DataBase.SetData('Standings', contestScreenName, SideMenu.Datas.Standings);
             }
-    
-            if (isContainedMe) {
-                 myRank = rank + (tiedList.length - 1) / 2;
-                isContainedMe = false;
-            }
-    
-            if(userScreenName == element.UserScreenName) isContainedMe = true;
-            tiedList.push(element)
-            lastRank = element.Rank;
-        })
-        //存在しなかったら空欄
-        if(myRank === 0) {
-            UpdatePredictor("","","")
-        }
-        else {
-            UpdatePredictorFromRank(myRank)
-        }
-    })
-    function LoadStandings() {
-		SideMenu.Datas.Update.Standings()
-		.done(() => {
-            CalcActivePerf()
-        })
+            CalcActivePerf();
+            UpdatePredictorFromLast();
+            enabled();
+            AddAlert(`最終更新 : ${moment().format('HH:mm:ss')}`);
+        }).fail(() => {
+            disabled();
+            AddAlert('データの読み込みに失敗しました。');
+        });
     }
-    
+
+    //
     function CalcActivePerf() {
         activePerf = []
         //Perf計算時に使うパフォ(Ratedオンリー)
-		SideMenu.Datas.Standings.StandingsData.forEach(function (element) {
+        SideMenu.Datas.Standings.StandingsData.forEach(function (element) {
             if (element.IsRated && element.TotalResult.Count !== 0) {
-				if (!(SideMenu.Datas.APerfs[element.UserScreenName])) {
-                    console.log(element.UserScreenName)
+                if (!(SideMenu.Datas.APerfs[element.UserScreenName])) {
+                    //console.log(element.UserScreenName)
+
                 }
                 else {
-					activePerf.push(SideMenu.Datas.APerfs[element.UserScreenName])
+                    activePerf.push(SideMenu.Datas.APerfs[element.UserScreenName])
                 }
             }
-        })
-        $('#predictor-reload').button('reset')
-        switch(lastUpdated) {
+        });
+    }
+
+    //
+    function UpdatePredictorFromLast() {
+        switch (lastUpdated) {
             case 0:
-				UpdatePredictorFromRank($("#predictor-input-rank").val())
+                UpdatePredictorFromRank();
                 break;
             case 1:
-				UpdatePredictorFromPerf($("#predictor-input-perf").val())
+                UpdatePredictorFromPerf();
                 break;
             case 2:
-				UpdatePredictorFromRate($("#predictor-input-rate").val())
+                UpdatePredictorFromRate();
                 break;
         }
+        function UpdatePredictorFromRank() {
+            var rank = $("#predictor-input-rank").val();
+            var perf = getPerf(rank);
+            var rate = getRate(perf);
+            lastUpdated = 0;
+            UpdatePredictor(rank, perf, rate);
+        }
+        function UpdatePredictorFromPerf() {
+            var perf = $("#predictor-input-perf").val();
+            var upper = 16384
+            var lower = 0
+            while (upper - lower > 0.125) {
+                if (perf > getPerf(lower + (upper - lower) / 2)) upper -= (upper - lower) / 2
+                else lower += (upper - lower) / 2
+            }
+            lastUpdated = 1
+            var rank = lower + (upper - lower) / 2;
+            var rate = getRate(perf)
+            UpdatePredictor(rank, perf, rate)
+        }
+        function UpdatePredictorFromRate() {
+            var rate = $("#predictor-input-rate").val();
+            var upper = 16384
+            var lower = 0
+            while (upper - lower > 0.125) {
+                if (rate < getRate(lower + (upper - lower) / 2)) upper -= (upper - lower) / 2
+                else lower += (upper - lower) / 2
+            }
+            lastUpdated = 2
+            var perf = lower + (upper - lower) / 2;
+            upper = 16384
+            lower = 0
+            while (upper - lower > 0.125) {
+                if (perf > getPerf(lower + (upper - lower) / 2)) upper -= (upper - lower) / 2
+                else lower += (upper - lower) / 2
+            }
+            var rank = lower + (upper - lower) / 2;
+            UpdatePredictor(rank, perf, rate)
+        }
+        function UpdatePredictor(rank, perf, rate) {
+            $("#predictor-input-rank").val(round(rank))
+            $("#predictor-input-perf").val(round(perf))
+            $("#predictor-input-rate").val(round(rate))
+            updatePredictorTweetBtn()
+            function round(val) {
+                return Math.round(val * 100) / 100;
+            }
+        }
     }
-    
-    function LoadAPerfs() {
-        $('#predictor-reload').button('loading')
-		SideMenu.Datas.Update.APerfs()
-		.done(() => {
-			dicLength = Object.keys(SideMenu.Datas.APerfs).length;
-			$("#predictor-alert").html(`<h5 class='sidemenu-txt'>最終更新 : ${moment().format('HH:mm:ss')}</h5>`);
-            LoadStandings()
-		})
-		.fail(() => {
-			$('#predictor-reload').button('reset')
-			$("#predictor-input-rank").attr("disabled", "")
-			$("#predictor-input-perf").attr("disabled", "")
-			$("#predictor-input-rate").attr("disabled", "")
-			$("#predictor-reload").attr("disabled", "")
-			$("#predictor-current").attr("disabled", "")
-			$("#predictor-tweet").attr("disabled", "")
-			$("#predictor-alert").html("<h5 class='sidemenu-txt'>データの読み込みに失敗しました。</h5>");
-		})
+
+    //最終更新などの要素を追加する
+    function AddAlert(content) {
+        $("#predictor-alert").html(`<h5 class='sidemenu-txt'>${content}</h5>`);
     }
-    
-    $('#predictor-reload').click(function () {
-        LoadAPerfs()
-    })
+
+    //要素のDisableadを外す
+    function enabled() {
+        $('#predictor-reload').button('reset');
+        predictorElements.forEach(element => {
+            $(`#${element}`).removeAttr("disabled");
+        });
+    }
+
+    //要素にDisableadをつける
+    function disabled() {
+        $('#predictor-reload').button('reset');
+        predictorElements.forEach(element => {
+            $(`#${element}`).attr("disabled");
+        });
+    };
+
     function updatePredictorTweetBtn() {
         var tweetStr = 
 `Rated内順位: ${$("#predictor-input-rank").val()}位%0A
@@ -188,14 +249,4 @@
 レート: ${$("#predictor-input-rate").val()}`
         $('#predictor-tweet').attr("href", `https://twitter.com/intent/tweet?text=${tweetStr}`)
     }
-    var lastUpdated = 0;
-	$('#predictor-input-rank').keyup(function(event) {
-		UpdatePredictorFromRank($("#predictor-input-rank").val())
-    });
-	$('#predictor-input-perf').keyup(function(event) {
-		UpdatePredictorFromPerf($("#predictor-input-perf").val())
-    });
-	$('#predictor-input-rate').keyup(function(event) {
-		UpdatePredictorFromRate($("#predictor-input-rate").val())
-    });
 })();
