@@ -60,6 +60,10 @@
     const firstContestDate = moment("2016-07-16 21:00");
     const Interval = 30000;
 
+    const ratedLimit = contestID === "SoundHound Inc. Programming Contest 2018 -Masters Tournament-"
+        ? 2000 : (/abc\d{3}/.test(contestID) ? 1200 : (/arc\d{3}/.test(contestID) ? 2800 : Infinity));
+    const defaultAPerf = /abc\d{3}/.test(contestID) ? 800 : 1600;
+
     var lastUpdated = 0;
     if (!startTime.isBefore()) {
         disabled();
@@ -161,7 +165,7 @@
             if (element.IsRated && element.TotalResult.Count !== 0) {
                 if (!(SideMenu.Datas.APerfs[element.UserScreenName])) {
                     //console.log(element.UserScreenName)
-
+                    activePerf.push(defaultAPerf);
                 }
                 else {
                     activePerf.push(SideMenu.Datas.APerfs[element.UserScreenName])
