@@ -53,7 +53,10 @@
             getContestInfo("APerfs")
         )
         .done((standings, aPerfs) => {
-            //確定していたストレージに保存する
+            //確定していたらストレージに保存する
+            for (var i = 0; i < standings.StandingsData.length; i++) {
+                delete standings.StandingsData[i].TaskResults;
+            }
             if (standings.Fixed) {
                 setData('APerfs', contestID, aPerfs);
                 setData('Standings', contestID, standings);
@@ -69,7 +72,7 @@
         function getContestInfo(type) {
             var deffer = $.Deferred();
 
-            //ストレージに存在してたらそっちを返す
+            //ストレージに存在していたらそっちを返す
             getData(type, contestID).done(aperfs => {
                 deffer.resolve(aperfs);
             }).fail(() => {
