@@ -1,8 +1,8 @@
 # ac-predictor.user.js
 
-[https://greasyfork.org/ja/scripts/369954-ac-predictor](ac-predictor)のビルド前ファイルです。ビルドは現状自作ツール(非公開)を使用していますが、いずれWebPack等に移行する予定です。
+[ac-predictor](https://greasyfork.org/ja/scripts/369954-ac-predictor)のビルド前ファイルです。ビルドは現状自作ツール(非公開)を使用していますが、いずれWebPack等に移行する予定です。
 
-ルートディレクトリは/ac-predictor/predictor/とします。
+ルートディレクトリは[/ac-predictor/predictor/](/ac-predictor/predictor)とします。
 
 # 構造
 
@@ -94,3 +94,6 @@ SideMenu.Elements.[settings.txt.name] = (async () => {
 ## SideMenu直下の変数
 ### SideMenu.ViewOrder
 SideMenuに表示する順番です。ここによって無効化なども可能です。
+
+# 謝辞
+リポジトリ移行前に送られたため、現在ここでは見られないプルリクです([ツイート画面が2つ出てくる現象を修正](https://github.com/key-moon/ac-predictor/pull/1))。miozuneさん、ありがとうございます!
