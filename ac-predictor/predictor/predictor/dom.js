@@ -1,4 +1,18 @@
 (() => {
+    //各参加者の
+    var eachParticipationPerf = {};
+
+    const specialContest = ['practice', 'APG4b', 'abs'];
+
+    const predictorElements = ['predictor-input-rank', 'predictor-input-perf', 'predictor-input-rate', 'predictor-current', 'predictor-reload', 'predictor-tweet'];
+    const firstContestDate = moment("2016-07-16 21:00");
+    const Interval = 30000;
+
+    const ratedLimit = contestScreenName === "SoundHound Inc. Programming Contest 2018 -Masters Tournament-"
+        ? 2000 : (/abc\d{3}/.test(contestScreenName) ? 1200 : (/arc\d{3}/.test(contestScreenName) ? 2800 : Infinity));
+    const defaultAPerf = /abc\d{3}/.test(contestScreenName) ? 800 : 1600;
+
+
     $('[data-toggle="tooltip"]').tooltip();
     $('#predictor-reload').click(function () {
         UpdatePredictor();
@@ -20,7 +34,7 @@
                     isContainedMe = false;
                 }
                 rank += tiedList.length;
-                tiedList = []
+                tiedList = [];
             }
 
             if (isContainedMe) {
@@ -53,16 +67,8 @@
         lastUpdated = 2;
         UpdatePredictorFromLast();
     });
+    $('thead > tr').append('<th class="standings-result-th" style="width:84px;min-width:84px;">perf</th><th class="standings-result-th" style="width:168px;min-width:168px;">レート変化</th>');
 
-    const specialContest = ['practice', 'APG4b', 'abs'];
-
-    const predictorElements = ['predictor-input-rank', 'predictor-input-perf', 'predictor-input-rate', 'predictor-current', 'predictor-reload', 'predictor-tweet'];
-    const firstContestDate = moment("2016-07-16 21:00");
-    const Interval = 30000;
-
-    const ratedLimit = contestID === "SoundHound Inc. Programming Contest 2018 -Masters Tournament-"
-        ? 2000 : (/abc\d{3}/.test(contestID) ? 1200 : (/arc\d{3}/.test(contestID) ? 2800 : Infinity));
-    const defaultAPerf = /abc\d{3}/.test(contestID) ? 800 : 1600;
 
     var lastUpdated = 0;
     if (!startTime.isBefore()) {
@@ -95,6 +101,8 @@
         UpdatePredictorFromLast();
         enabled();
         AddAlert('ローカルストレージから取得されました。');
+        updateEachStandingsData();
+        updateStandings();
     }).fail(() => {
         UpdatePredictor();
     })
@@ -116,21 +124,22 @@
         var lower = -8192
     
         while (upper - lower > 0.5) {
-            if (rank - 0.5 > calcPerf(lower + (upper - lower) / 2)) upper -= (upper - lower) / 2
+            if (rank - 0.5 > calcRankVal(lower + (upper - lower) / 2)) upper -= (upper - lower) / 2
             else lower += (upper - lower) / 2
         }
     
         var innerPerf = Math.round(lower + (upper - lower) / 2)
     
-        return Math.min(innerPerf, SideMenu.Predictor.maxPerf)
-    
-        function calcPerf(X) {
-            var res = 0;
-            activePerf.forEach(function (APerf) {
-                res += 1.0 / (1.0 + Math.pow(6.0, ((X - APerf) / 400.0)))
-            })
-            return res;
-        }
+        return Math.min(innerPerf, SideMenu.Predictor.maxPerf);
+    }
+
+    //
+    function calcRankVal(X) {
+        var res = 0;
+        activePerf.forEach(function (APerf) {
+            res += 1.0 / (1.0 + Math.pow(6.0, ((X - APerf) / 400.0)))
+        })
+        return res;
     }
 
     //
@@ -139,7 +148,7 @@
         AddAlert('順位表読み込み中…');
         SideMenu.Datas.Update.APerfs().then(SideMenu.Datas.Update.Standings).then(() => {
             if (SideMenu.Datas.APerfs.length === 0) {
-                enabled();
+                disabled();
                 AddAlert('APerfのデータが提供されていません');
                 return;
             }
@@ -149,6 +158,8 @@
             }
             CalcActivePerf();
             UpdatePredictorFromLast();
+            updateEachStandingsData();
+            updateStandings();
             enabled();
             AddAlert(`最終更新 : ${moment().format('HH:mm:ss')}`);
         }).fail(() => {
@@ -273,7 +284,79 @@
         predictorElements.forEach(element => {
             $(`#${element}`).attr("disabled");
         });
-    };
+    }
+
+    function updateEachStandingsData() {
+
+        eachParticipationPerf = {};
+
+        const IsFixed = SideMenu.Datas.Standings.Fixed;
+        //タイの人を入れる(順位が変わったら描画→リストを空に)
+        var tiedList = [];
+        var rank = 1;
+        var lastRank = 0;
+        var ratedCount = 0;
+        var maxPerf = ratedLimit === Infinity ? getPerf(1) : ratedLimit + 400;
+        var currentPerf = maxPerf - 0.5;
+        var rankVal = calcRankVal(currentPerf);
+        //全員回す
+        SideMenu.Datas.Standings.StandingsData.forEach(function (element) {
+            if (lastRank !== element.Rank) {
+                addRow();
+                rank += ratedCount;
+                ratedCount = 0;
+                tiedList = [];
+            }
+            tiedList.push(element);
+            lastRank = element.Rank;
+            if (element.IsRated && element.TotalResult.Count !== 0) ratedCount++;
+        });
+        //最後に更新してあげる
+        addRow();
+
+        //タイリストの人全員行追加
+        function addRow() {
+            var fixRank = rank + Math.max(0, ratedCount - 1) / 2;
+            while (rankVal < fixRank - 0.5 && currentPerf >= -8192) {
+                currentPerf--;
+                rankVal = calcRankVal(currentPerf);
+            }
+            tiedList.forEach(e => {
+                var isRated = e.IsRated && e.TotalResult.Count !== 0;
+                var matches = e.Competitions - (IsFixed && isRated ? 1 : 0);
+                var perf = currentPerf + 0.5;
+                var oldRate = (IsFixed ? e.OldRating : e.Rating);
+                var newRate = (IsFixed ? e.Rating : Math.floor(positivize_rating(matches !== 0 ? calc_rating_from_last(oldRate, perf, matches) : perf - 1200)));
+                eachParticipationPerf[e.UserScreenName] = { perf: perf, oldRate: oldRate, newRate: newRate, isRated: isRated, isSubmitted: e.TotalResult.Count !== 0 };
+            });
+        }
+    }
+
+    //
+    function updateStandings() {
+        if (!/standings$/.test(document.location)) return;
+        $('#standings-tbody > tr').each((index, elem) => {
+            var userName = $('.standings-username .username', elem).text();
+            var perfArr = eachParticipationPerf[userName];
+            if (!perfArr) {
+                $(elem).append(`<td class="standings-result">-</td>`);
+                $(elem).append(`<td class="standings-result">-</td>`);
+                return;
+            }
+            var perf = perfArr.isSubmitted ? ratingSpan(perfArr.perf) : '<span class="user-unrated">-</span>';
+            var oldRate = perfArr.oldRate;
+            var newRate = perfArr.newRate;
+            var IsRated = perfArr.isRated;
+            $(elem).append(`<td class="standings-result">${ratingSpan(perf)}</td>`);
+            $(elem).append(`<td class="standings-result">${getRatingChangeStr(oldRate,newRate)}</td>`);
+            function getRatingChangeStr(oldRate, newRate) {
+                return IsRated ? `${ratingSpan(oldRate)} -> ${ratingSpan(newRate)}(${(newRate >= oldRate ? '+' : '')}${newRate - oldRate})` : `${ratingSpan(oldRate)}(unrated)`;
+            }
+            function ratingSpan(rate) {
+                return `<span class="user-${SideMenu.GetColor(rate)}">${rate}</span>`;
+            }
+        });
+    }
 
     function updatePredictorTweetBtn() {
         var tweetStr = 
