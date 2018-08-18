@@ -377,6 +377,15 @@ SideMenu.DataBase.GetData = (store, key) => {
 SideMenu.Elements = {};
 SideMenu.ViewOrder = ["Predictor", "Estimator"];
 
+SideMenu.Colors = ["unrated", "gray", "brown", "green", "cyan", "blue", "yellow", "orange", "red"];
+SideMenu.GetColor = (rating) => {
+    var colorIndex = 0
+    if (rating > 0) {
+        colorIndex = Math.min(Math.floor(rating / 400) + 1, 8)
+    }
+    return SideMenu.Colors[colorIndex]
+};
+
 %elements%
 
 
