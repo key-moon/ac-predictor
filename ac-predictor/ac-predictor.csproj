@@ -174,8 +174,7 @@
     <Compile Include="AtCoder\Standing.cs" />
     <Compile Include="Controllers\ContestResultController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\InstallController.cs" />
-    <Compile Include="Controllers\ValuesController.cs" />
+    <Compile Include="Controllers\UserScriptController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -269,7 +268,7 @@
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\ContestResult\Index.cshtml" />
-    <Content Include="Views\Install\Index.cshtml" />
+    <Content Include="Views\UserScript\Install.cshtml" />
     <Content Include="Notification\manifest.json" />
   </ItemGroup>
   <ItemGroup>

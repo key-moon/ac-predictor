@@ -16,7 +16,7 @@ textarea {
     max-width: 280px;
 }*/
 
-/*user*/
+/*色*/
 .user-red {color:#FF0000;}
 .user-orange {color:#FF8000;}
 .user-yellow {color:#C0C000;}
@@ -27,3 +27,10 @@ textarea {
 .user-gray {color:#808080;}
 .user-unrated {color:#000000;}
 .user-admin {color:#C000C0;}
+
+/*見出しとか*/
+h3 {
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 420;
+}

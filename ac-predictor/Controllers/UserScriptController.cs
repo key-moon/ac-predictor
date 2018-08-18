@@ -6,10 +6,15 @@ using System.Web.Mvc;
 
 namespace ac_predictor.Controllers
 {
-    public class InstallController : Controller
+    public class UserScriptController : Controller
     {
         // GET: Install
         public ActionResult Index()
+        {
+            return View();
+        }
+
+        public ActionResult Install()
         {
             return View();
         }
