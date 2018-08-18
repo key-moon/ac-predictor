@@ -336,7 +336,7 @@
 
     //結果データを順位表に追加する
     function addPerfToStandings() {
-        if (!/standings$/.test(document.location)) return;
+        if (!/standings(\?.*)?$/.test(document.location)) return;
         $('#standings-tbody > tr').each((index, elem) => {
             var userName = $('.standings-username .username', elem).text();
             var perfArr = eachParticipationResults[userName];
