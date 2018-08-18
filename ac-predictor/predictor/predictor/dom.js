@@ -1,6 +1,6 @@
 (() => {
-    //各参加者の
-    var eachParticipationPerf = {};
+    //各参加者の結果
+    var eachParticipationResults = {};
 
     const specialContest = ['practice', 'APG4b', 'abs'];
 
@@ -52,22 +52,22 @@
         }
         else {
             lastUpdated = 0;
-            UpdatePredictorFromLast();
+            UpdatePredictorForm();
         }
     });
     $('#predictor-input-rank').keyup(function (event) {
         lastUpdated = 0;
-        UpdatePredictorFromLast();
+        UpdatePredictorForm();
     });
     $('#predictor-input-perf').keyup(function (event) {
         lastUpdated = 1;
-        UpdatePredictorFromLast();
+        UpdatePredictorForm();
     });
     $('#predictor-input-rate').keyup(function (event) {
         lastUpdated = 2;
-        UpdatePredictorFromLast();
+        UpdatePredictorForm();
     });
-    new MutationObserver(() => { console.log('a'); updateStandings();}).observe(document.getElementById('standings-tbody'), { childList: true });
+    new MutationObserver(() => { console.log('a'); addPerfToStandings();}).observe(document.getElementById('standings-tbody'), { childList: true });
     $('thead > tr').append('<th class="standings-result-th" style="width:84px;min-width:84px;">perf</th><th class="standings-result-th" style="width:168px;min-width:168px;">レート変化</th>');
 
 
@@ -99,27 +99,27 @@
         SideMenu.Datas.APerfs = aperfs;
         SideMenu.Datas.Standings = standings;
         CalcActivePerf();
-        UpdatePredictorFromLast();
+        UpdatePredictorForm();
         enabled();
         AddAlert('ローカルストレージから取得されました。');
-        updateEachStandingsData();
-        updateStandings();
+        updateResultsData();
+        addPerfToStandings();
     }).fail(() => {
         UpdatePredictor();
     })
 
-    //
+    //再描画をの期間を再更新する
     function SetUpdateInterval() {
         UpdatePredictor();
         if (!endTime.isBefore()) setTimeout(SetUpdateInterval, Interval);
     }
 
-    //
+    //自分のレートをパフォから求める
     function getRate(perf) {
         return positivize_rating(calc_rating(SideMenu.Datas.History.filter(x => x.IsRated).map(x => x.Performance).concat(perf).reverse()));
     }
 
-    //
+    //パフォを順位から求める()
     function getPerf(rank) {
         var upper = 8192
         var lower = -8192
@@ -134,7 +134,7 @@
         return Math.min(innerPerf, SideMenu.Predictor.maxPerf);
     }
 
-    //
+    //パフォを求める際に出てくるパフォごとの順位を求める
     function calcRankVal(X) {
         var res = 0;
         activePerf.forEach(function (APerf) {
@@ -143,7 +143,7 @@
         return res;
     }
 
-    //
+    //データを更新して描画する
     function UpdatePredictor() {
         $('#predictor-reload').button('loading');
         AddAlert('順位表読み込み中…');
@@ -158,9 +158,9 @@
                 SideMenu.DataBase.SetData('Standings', contestScreenName, SideMenu.Datas.Standings);
             }
             CalcActivePerf();
-            UpdatePredictorFromLast();
-            updateEachStandingsData();
-            updateStandings();
+            UpdatePredictorForm();
+            updateResultsData();
+            addPerfToStandings();
             enabled();
             AddAlert(`最終更新 : ${moment().format('HH:mm:ss')}`);
         }).fail(() => {
@@ -169,7 +169,7 @@
         });
     }
 
-    //
+    //ActivePerfの再計算
     function CalcActivePerf() {
         activePerf = []
         var isSomebodyRated = false;
@@ -203,8 +203,8 @@
         }
     }
 
-    //
-    function UpdatePredictorFromLast() {
+    //フォームを更新
+    function UpdatePredictorForm() {
         switch (lastUpdated) {
             case 0:
                 UpdatePredictorFromRank();
@@ -287,9 +287,10 @@
         });
     }
 
-    function updateEachStandingsData() {
+    //全員の結果データを更新する
+    function updateResultsData() {
 
-        eachParticipationPerf = {};
+        eachParticipationResults = {};
 
         const IsFixed = SideMenu.Datas.Standings.Fixed;
         //タイの人を入れる(順位が変わったら描画→リストを空に)
@@ -328,17 +329,17 @@
                 var perf = currentPerf + 0.5;
                 var oldRate = (IsFixed ? e.OldRating : e.Rating);
                 var newRate = (IsFixed ? e.Rating : Math.floor(positivize_rating(matches !== 0 ? calc_rating_from_last(oldRate, perf, matches) : perf - 1200)));
-                eachParticipationPerf[e.UserScreenName] = { perf: perf, oldRate: oldRate, newRate: newRate, isRated: isRated, isSubmitted: e.TotalResult.Count !== 0 };
+                eachParticipationResults[e.UserScreenName] = { perf: perf, oldRate: oldRate, newRate: newRate, isRated: isRated, isSubmitted: e.TotalResult.Count !== 0 };
             });
         }
     }
 
-    //
-    function updateStandings() {
+    //結果データを順位表に追加する
+    function addPerfToStandings() {
         if (!/standings$/.test(document.location)) return;
         $('#standings-tbody > tr').each((index, elem) => {
             var userName = $('.standings-username .username', elem).text();
-            var perfArr = eachParticipationPerf[userName];
+            var perfArr = eachParticipationResults[userName];
             if (!perfArr) {
                 $(elem).append(`<td class="standings-result">-</td>`);
                 $(elem).append(`<td class="standings-result">-</td>`);
@@ -359,6 +360,7 @@
         });
     }
 
+    //ツイートボタンを更新する
     function updatePredictorTweetBtn() {
         var tweetStr = 
 `Rated内順位: ${$("#predictor-input-rank").val()}位%0A
