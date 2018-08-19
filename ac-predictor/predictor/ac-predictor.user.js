@@ -1,17 +1,19 @@
 // ==UserScript==
 // @name        ac-predictor
 // @namespace   http://ac-predictor.azurewebsites.net/
-// @version     0.1.4
+// @version     1.0.0
 // @description コンテスト中にAtCoderのパフォーマンスを予測します
 // @author      keymoon
 // @license     MIT
-// @homepage    https://github.com/key-moon/ac-predictor
-// @supportURL  https://github.com/key-moon/ac-predictor/issues
+// @supportURL  https://github.com/key-moon/ac-predictor.user.js/issues
 // @match       https://beta.atcoder.jp/*
+// @exclude     https://beta.atcoder.jp/*/json
 // ==/UserScript==
 
 //NameSpace
 SideMenu = {};
+
+SideMenu.Version = 1.0;
 
 //共有データセット(HistoryとかStandingsとか)
 SideMenu.Datas = {};
@@ -22,101 +24,133 @@ SideMenu.Datas.Update = {}
 //History
 SideMenu.Datas.History = null;
 SideMenu.Datas.Update.History = (() => {
-	var d = $.Deferred();
-	try {
-		$.ajax({
-			url: `https://beta.atcoder.jp/users/${userScreenName}/history/json`,
-			type: "GET",
-			dataType: "json"
-		}).done(function (history) {
-			SideMenu.Datas.History = history;
-			d.resolve();
-		})
-	}
-	catch {
-		d.reject();
-	}
-	return d.promise();
+    var d = $.Deferred();
+    try {
+        $.ajax({
+            url: `https://beta.atcoder.jp/users/${userScreenName}/history/json`,
+            type: "GET",
+            dataType: "json"
+        }).done(history => {
+            SideMenu.Datas.History = history;
+            d.resolve();
+        }).fail(() => { d.reject(); });
+    }
+    catch (e) {
+        d.reject(e);
+    }
+    return d.promise();
 });
 
 //Standings
 SideMenu.Datas.Standings = null;
 SideMenu.Datas.Update.Standings = (() => {
-	var d = $.Deferred();
-	try {
-		$.ajax({
-			url: `https://beta.atcoder.jp/contests/${contestScreenName}/standings/json`,
-			type: "GET",
-			dataType: "json"
-		}).done(function (standings) {
-			SideMenu.Datas.Standings = standings;
-			d.resolve();
-		})
-	}
-	catch{
-		d.reject();
-	}
-	return d.promise();
+    var d = $.Deferred();
+    try {
+        $.ajax({
+            url: `https://beta.atcoder.jp/contests/${contestScreenName}/standings/json`,
+            type: "GET",
+            dataType: "json"
+        }).done(standings => {
+            SideMenu.Datas.Standings = standings;
+            d.resolve();
+        }).fail(() => { d.reject(); });
+    }
+    catch (e) {
+        d.reject();
+    }
+    return d.promise();
 });
 
 //APerfs
 SideMenu.Datas.APerfs = null;
 SideMenu.Datas.Update.APerfs = (() => {
-	var d = $.Deferred();
-	try {
-		$.ajax({
-			url: `https://ac-predictor.azurewebsites.net/api/aperfs/${contestScreenName}`,
-			type: "GET",
-			dataType: "json"
-		}).done(function (aperfs) {
-			SideMenu.Datas.APerfs = aperfs
-			d.resolve();
-		})
-	}
-	catch{
-		d.reject();
-	}
-	return d.promise();
+    var d = $.Deferred();
+    try {
+        $.ajax({
+            url: `https://ac-predictor.azurewebsites.net/api/aperfs/${contestScreenName}`,
+            type: "GET",
+            dataType: "json"
+        }).done(aperfs => {
+            SideMenu.Datas.APerfs = aperfs
+            d.resolve();
+        }).fail(() => { d.reject(); });
+    }
+    catch (e) {
+        d.reject();
+    }
+    return d.promise();
 });
-
 
 //ライブラリを追加するやつ
 SideMenu.appendLibrary = function (source) {
-	$('head').append(`<script src="${source}"></script>`);
+    var defferd = $.Deferred();
+    $.ajax({
+        url: source
+    }).done(((src) => {
+        $('head').append(`<script>${src}</script>`);
+        defferd.resolve();
+    })(() => {
+        defferd.fail();
+    }));
+    return defferd.promise();
 };
+
+
+
+//通知関連
+SideMenu.Notifications = {};
+SideMenu.Notifications.CanSend = false;
+(async () => {
+    if (Notification.permission === 'denied') return;
+    if (Notification.permission === 'default') {
+        await (async () => {
+            var defferd = $.Deferred();
+            Notification.requestPermission((permission) => {
+                SideMenu.Notifications.CanSend = permission === 'granted';
+                defferd.resolve();
+            })();
+            return defferd.promise();
+        });
+        if (!Notification.permission) return;
+    }
+})();
 
 SideMenu.appendLibrary("https://koba-e964.github.io/atcoder-rating-estimator/atcoder_rating.js");
 
 //サイドメニュー追加(将来仕様変更が起きる可能性大)
 SideMenu.appendToSideMenu = async function (match, title, elemFunc) {
-	try {
-		if (!match.test(location.href)) return;
-		//アコーディオンメニュー
-		var dom =
-			`<div class="menu-wrapper">
+    var defferd = $.Deferred();
+    try {
+        if (!match.test(location.href)) return;
+        //アコーディオンメニュー
+        var dom =
+            `<div class="menu-wrapper">
 	<div class="menu-header">
 		<h4 class="sidemenu-txt">${title}<span class="glyphicon glyphicon-menu-up" style="float: right"></span></h4>
 	</div>
 	<div class="menu-box"><div class="menu-content">${await elemFunc()}</div></div>
 </div>`
-		$('#sidemenu').append(dom);
-		var contents = $('.menu-content');
-		var contentElem = contents[contents.length - 1];
-		$(contentElem).parents('.menu-box').css('height', contentElem.scrollHeight)
-	}
-	catch (e) {
-		console.error(e);
-	}
+        $('#sidemenu').append(dom);
+        var contents = $('.menu-content');
+        var contentElem = contents[contents.length - 1];
+        $(contentElem).parents('.menu-box').css('height', contentElem.scrollHeight)
+        defferd.resolve();
+    }
+    catch (e) {
+        console.error(e);
+        defferd.reject();
+    }
+    return defferd.promise();
 };
 
 
 //サイドメニューを生成
-(function () {
-	var menuWidth = 350
-	var keyWidth = 50
-	var speed = 150
-	var sideMenuScript =
-		`<script>//参考:http://blog.8bit.co.jp/?p=12308
+(() => {
+    var menuWidth = 350
+    var keyWidth = 50
+    var speed = 150
+    var sideMenuScript =
+        `<script>//参考:http://blog.8bit.co.jp/?p=12308
 (() => {
 const activeClass = 'sidemenu-active'
 var menuWrap = '#menu_wrap'
@@ -162,8 +196,8 @@ $('#sidemenu').on('click','.menu-header',(event) => {
 
 })();
 </script>`
-	var sideMenuStyle =
-		`<style>#menu_wrap{
+    var sideMenuStyle =
+        `<style>#menu_wrap{
 	display:block;
 	position:fixed;
 	top:0;
@@ -235,8 +269,8 @@ $('#sidemenu').on('click','.menu-header',(event) => {
 	transform: translateY(-100%);
 }
 </style>`
-	var ratingScript =
-`<script>from: https://koba-e964.github.io/atcoder-rating-estimator/atcoder_rating.js
+    var ratingScript =
+        `<script>from: https://koba-e964.github.io/atcoder-rating-estimator/atcoder_rating.js
 function bigf(n) {
     var num = 1.0;
     var den = 1.0;
@@ -296,38 +330,95 @@ function unpositivize_rating(r) {
     }
     return 400.0 + 400.0 * Math.log(r / 400.0);
 }</script>`;
-	$('#main-div').append(`<div id="menu_wrap"><div id="sidemenu" class="container"></div><div id="sidemenu-key" class="glyphicon glyphicon-menu-left"></div>${ratingScript}${sideMenuScript}${sideMenuStyle}</div>`);
+    $('#main-div').append(`<div id="menu_wrap"><div id="sidemenu" class="container"></div><div id="sidemenu-key" class="glyphicon glyphicon-menu-left"></div>${ratingScript}${sideMenuScript}${sideMenuStyle}</div>`);
 })();
+
+
+//IndexedDB DB
+SideMenu.DataBase = {};
+SideMenu.DataBase.Name = "PredictorDB";
+SideMenu.DataBase.StoreNames = ["APerfs", "Standings"];
+indexedDB.open(SideMenu.DataBase.Name, SideMenu.Version).onupgradeneeded = (event) => {
+    var db = event.target.result;
+    SideMenu.DataBase.StoreNames.forEach(store => {
+        db.createObjectStore(store, { keyPath: "id" });
+    });
+};
+SideMenu.DataBase.SetData = (store, key, value) => {
+    var defferd = $.Deferred();
+    try {
+        indexedDB.open(SideMenu.DataBase.Name).onsuccess = (e) => {
+            var db = e.target.result;
+            var trans = db.transaction(store, 'readwrite');
+            var objStore = trans.objectStore(store);
+            var data = { id: key, data: value };
+            var putReq = objStore.put(data);
+            putReq.onsuccess = function () {
+                defferd.resolve();
+            }
+        }
+    }
+    catch (e) {
+        defferd.reject(e);
+    }
+    return defferd.promise();
+};
+SideMenu.DataBase.GetData = (store, key) => {
+    var defferd = $.Deferred();
+    try {
+        indexedDB.open(SideMenu.DataBase.Name).onsuccess = (e) => {
+            var db = e.target.result;
+            var trans = db.transaction(store, 'readwrite');
+            var objStore = trans.objectStore(store);
+            objStore.get(key).onsuccess = function (event) {
+                var result = event.target.result;
+                if (!result) defferd.reject("key was not found");
+                else defferd.resolve(result.data);
+            };
+        }
+    }
+    catch (e) {
+        defferd.reject(e);
+    }
+    return defferd.promise();
+};
+
+
+//サイドメニュー要素の入れ物
+SideMenu.Elements = {};
+SideMenu.ViewOrder = ["Predictor", "Estimator"];
+
+SideMenu.Colors = ["unrated", "gray", "brown", "green", "cyan", "blue", "yellow", "orange", "red"];
+SideMenu.GetColor = (rating) => {
+    var colorIndex = 0
+    if (rating > 0) {
+        colorIndex = Math.min(Math.floor(rating / 400) + 1, 8)
+    }
+    return SideMenu.Colors[colorIndex]
+};
+
 //Estimator
-(() => {
-	SideMenu.appendToSideMenu(/beta.atcoder.jp/,'Estimator',getElem);
+SideMenu.Elements.Estimator = (async () => {
+	await SideMenu.appendToSideMenu(/beta.atcoder.jp/,'Estimator',getElem);
 	async function getElem() {
-		$("#estimator-input").val(localStorage.getItem("sidemenu_estimator_value"));
+	$("#estimator-input").val(localStorage.getItem("sidemenu_estimator_value"));
 	if (!SideMenu.Datas.History) await SideMenu.Datas.Update.History();
+	
 	var js = 
 	`(() => {
-		var estimator_state = localStorage.getItem("sidemenu_estimator_state");
-		updateInputs();
+	    var estimator_state = localStorage.getItem("sidemenu_estimator_state");
+	    \$("#estimator-input").val(localStorage.getItem("sidemenu_estimator_value"));
+	    updateInputs();
 	
 		\$("#estimator-input").keyup(updateInputs);
 	
-		\$("#estimator-toggle").click(function () {
-			if (estimator_state === 0) {
-				\$("#estimator-input-desc").text("パフォーマンス")
-				\$("#estimator-res-desc").text("到達レーティング")
-				estimator_state = 1;
-			}
-			else {
-				\$("#estimator-input-desc").text("目標レーティング")
-				\$("#estimator-res-desc").text("必要パフォーマンス")
-				estimator_state = 0;
-			}
+	    \$("#estimator-toggle").click(function () {
+	        \$("#estimator-input").val(\$("#estimator-res").val());
+	        estimator_state = (estimator_state + 1) % 2;
 			updateInputs();
-			updateLocalStorage()
-			updateTweetBtn()
-		})
+	    })
 	
-		function updateInputs () {
+		function updateInputs() {
 			var input = \$("#estimator-input").val();
 			if (!isFinite(input)) {
 				displayAlert("数字ではありません")
@@ -340,15 +431,15 @@ function unpositivize_rating(r) {
 				return 0;
 			})
 			history = history.map(x => x.InnerPerformance)
-			var input = parseInt(input, 10)
+			var input = parseInt(input)
 			var res = -1;
 			if (estimator_state === 0) {
-				// binary search
+				\/\/ binary search
 				var goal_rating = unpositivize_rating(input)
 				var lo = -10000.0;
 				var hi = 10000.0;
 				for (var i = 0; i < 100; ++i) {
-					var mid = (hi + lo) / 2;
+					var mid = (hi + lo) \/ 2;
 					var r = calc_rating([mid].concat(history));
 					if (r >= goal_rating) {
 						hi = mid;
@@ -356,15 +447,19 @@ function unpositivize_rating(r) {
 						lo = mid;
 					}
 				}
-				res = (hi + lo) / 2;
+	            res = (hi + lo) \/ 2;
+	            \$("#estimator-input-desc").text("目標レーティング");
+	            \$("#estimator-res-desc").text("必要パフォーマンス");
 			}
 			else {
-				res = calc_rating([input].concat(history));
-			}
-			res = Math.round(res * 100) / 100
-			\$("#estimator-res").val(res)
-			updateLocalStorage()
-			updateTweetBtn()
+	            res = calc_rating([input].concat(history));
+	            \$("#estimator-input-desc").text("パフォーマンス");
+	            \$("#estimator-res-desc").text("到達レーティング");
+	        }
+	        res = Math.round(res * 100) \/ 100
+	        if (!isNaN(res)) \$("#estimator-res").val(res);
+	        updateLocalStorage();
+	        updateTweetBtn();
 		}
 	
 		function updateLocalStorage() {
@@ -377,7 +472,7 @@ function unpositivize_rating(r) {
 	\`AtCoderのハンドルネーム: \${userScreenName}%0A
 	\${estimator_state == 0 ? "目標レーティング" : "パフォーマンス"}: \${\$("#estimator-input").val()}%0A
 	\${estimator_state == 0 ? "必要パフォーマンス" : "到達レーティング"}: \${\$("#estimator-res").val()}\`
-			\$('#estimator-tweet').attr("href", \`https://twitter.com/intent/tweet?text=\${tweetStr}\`)
+			\$('#estimator-tweet').attr("href", \`https:\/\/twitter.com\/intent\/tweet?text=\${tweetStr}\`)
 		}
 	
 		function displayAlert(message) {
@@ -399,304 +494,485 @@ function unpositivize_rating(r) {
 			\$("#estimator-alert").append(alertDiv)
 		}
 	})();`;
-		var style = 
+	var style = 
 	``;
-		var dom = 
-	`<div id="estimator-alert"></div>
+	var dom = 
+	`<div id="estimator-alert"><\/div>
 	<div class="row">
 		<div class="input-group">
-			<span class="input-group-addon" id="estimator-input-desc">目標レーティング</span>
+			<span class="input-group-addon" id="estimator-input-desc">目標レーティング<\/span>
 			<input type="number" class="form-control" id="estimator-input">
-		</div>
-	</div>
+		<\/div>
+	<\/div>
 	<div class="row">
 		<div class="input-group">
-			<span class="input-group-addon" id="estimator-res-desc">必要パフォーマンス</span>
+			<span class="input-group-addon" id="estimator-res-desc">必要パフォーマンス<\/span>
 			<input class="form-control" id="estimator-res" disabled="disabled">
 			<span class="input-group-btn">
-				<button class="btn btn-default" id="estimator-toggle">入替</button>
-			</span>
-		</div>
-	</div>
+				<button class="btn btn-default" id="estimator-toggle">入替<\/button>
+			<\/span>
+		<\/div>
+	<\/div>
 	<div class="row" style="margin: 10px 0px;">
-		<a class="btn btn-default col-xs-offset-8 col-xs-4" rel="nofollow" onClick="window.open(encodeURI(decodeURI(this.href)),'twwindow','width=550, height=450, personalbar=0, toolbar=0, scrollbars=1'); return false;" id='estimator-tweet'>ツイート</a>
-	</div>`;
-		return `${dom}
+		<a class="btn btn-default col-xs-offset-8 col-xs-4" rel="nofollow" onClick="window.open(encodeURI(decodeURI(this.href)),'twwindow','width=550, height=450, personalbar=0, toolbar=0, scrollbars=1'); return false;" id='estimator-tweet'>ツイート<\/a>
+	<\/div>`;
+	
+	return `${dom}
 	<script>${js}</script>
 	<style>${style}</style>`;
 	}
-})();
+});
 
 //Predictor
-(() => {
-	SideMenu.appendToSideMenu(/beta.atcoder.jp\/contests\//,'Predictor',getElem);
+SideMenu.Elements.Predictor = (async () => {
+	await SideMenu.appendToSideMenu(/beta.atcoder.jp\/contests\//,'Predictor',getElem);
 	async function getElem() {
-		//NameSpace
+	//NameSpace
 	SideMenu.Predictor = {};
-	SideMenu.Predictor.historyJsonURL = `https://beta.atcoder.jp/users/${userScreenName}/history/json`
-	SideMenu.Predictor.standingsJsonURL = `https://beta.atcoder.jp/contests/${contestScreenName}/standings/json`
-	SideMenu.Predictor.aperfsJsonURL = `https://ac-predictor.azurewebsites.net/api/aperfs/${contestScreenName}`
-	
 	var maxDic =
 	    [
 	        [/^abc\d{3}$/, 1600],
 	        [/^arc\d{3}$/, 3200],
+	        [/^agc\d{3}$/, 8192],
+	        [/^apc\d{3}$/, 8192],
+			[/^cf\d{2}-final-open$/, 8192],
 	        [/^soundhound2018-summer-qual$/, 2400],
-	        [/.*/, 8192]
+	        [/.*/, -1]
 	    ];
 	SideMenu.Predictor.maxPerf = maxDic.filter(x => x[0].exec(contestScreenName))[0][1];
 	
 	if (!SideMenu.Datas.History) await SideMenu.Datas.Update.History().done(() => { isDone = true });
+	
 	var js = 
 	`(() => {
+	    \/\/各参加者の結果
+	    var eachParticipationResults = {};
+	
+	    const specialContest = ['practice', 'APG4b', 'abs'];
+	
+	    const predictorElements = ['predictor-input-rank', 'predictor-input-perf', 'predictor-input-rate', 'predictor-current', 'predictor-reload', 'predictor-tweet'];
+	    const firstContestDate = moment("2016-07-16 21:00");
+	    const Interval = 30000;
+	
+	    const ratedLimit = contestScreenName === "SoundHound Inc. Programming Contest 2018 -Masters Tournament-"
+	        ? 2000 : (\/abc\d{3}\/.test(contestScreenName) ? 1200 : (\/arc\d{3}\/.test(contestScreenName) ? 2800 : Infinity));
+	    const defaultAPerf = \/abc\d{3}\/.test(contestScreenName) ? 800 : 1600;
+	
+	    const isStandingsPage = \/standings(\\/.*)?\$\/.test(document.location);
+	
+	    \$('[data-toggle="tooltip"]').tooltip();
+	    \$('#predictor-reload').click(function () {
+	        UpdatePredictorsData();
+	    });
+	    \$('#predictor-current').click(function () {
+	        \/\/自分の順位を確認
+	        var myRank = 0;
+	
+	        var tiedList = []
+	        var lastRank = 0;
+	        var rank = 1;
+	        var isContainedMe = false;
+	        \/\/全員回して自分が出てきたら順位更新フラグを立てる
+	        SideMenu.Datas.Standings.StandingsData.forEach(function (element) {
+	            if (!element.IsRated || element.TotalResult.Count === 0) return;
+	            if (lastRank !== element.Rank) {
+	                if (isContainedMe) {
+	                    myRank = rank + (tiedList.length - 1) \/ 2;
+	                    isContainedMe = false;
+	                }
+	                rank += tiedList.length;
+	                tiedList = [];
+	            }
+	
+	            if (isContainedMe) {
+	                myRank = rank + (tiedList.length - 1) \/ 2;
+	                isContainedMe = false;
+	            }
+	
+	            if (userScreenName === element.UserScreenName) isContainedMe = true;
+	            tiedList.push(element)
+	            lastRank = element.Rank;
+	        })
+	        \/\/存在しなかったら空欄
+	        if (myRank === 0) {
+	            disabled();
+	        }
+	        else {
+	            lastUpdated = 0;
+	            drawPredictor();
+	        }
+	    });
+	    \$('#predictor-input-rank').keyup(function (event) {
+	        lastUpdated = 0;
+	        drawPredictor();
+	    });
+	    \$('#predictor-input-perf').keyup(function (event) {
+	        lastUpdated = 1;
+	        drawPredictor();
+	    });
+	    \$('#predictor-input-rate').keyup(function (event) {
+	        lastUpdated = 2;
+	        drawPredictor();
+	    });
+	
+	    var lastUpdated = 0;
+	    var isAlreadyAppendRowToStandings = false;
+	
 	    if (!startTime.isBefore()) {
-	        \$("#estimator-input-rank").attr("disabled","")
-	        \$("#estimator-input-perf").attr("disabled","")
-	        \$("#estimator-input-rate").attr("disabled","")
-	        \$("#estimator-reload").attr("disabled","")
-	        \$("#estimator-current").attr("disabled","")
-	        \$("#estimator-tweet").attr("disabled","")
-	        \$("#predictor-alert").html("<h5 class='sidemenu-txt'>コンテストは始まっていません</h5>");
+	        disabled();
+	        AddAlert('コンテストは始まっていません');
+	        return;
 	    }
-	    else {
-	        LoadAPerfs()
-	        if(!endTime.isBefore()) var loadTimer = setInterval(LoadAPerfs, 30000)
+	    if (moment(startTime) < firstContestDate) {
+	        disabled();
+	        AddAlert('現行レートシステムが始まる前のコンテストです');
+	        return;
 	    }
-	    
-	    \$('[data-toggle="tooltip"]').tooltip()
-	    function UpdatePredictor(rank,perf,rate) {
-	        \$("#estimator-input-rank").val(round(rank))
-	        \$("#estimator-input-perf").val(round(perf))
-	        \$("#estimator-input-rate").val(round(rate))
-	        updatePredictorTweetBtn()
-	        function round(val) {
-	            return Math.round(val * 100) / 100;
-	        }
+	    if (specialContest.indexOf(contestScreenName) >= 0) {
+	        disabled();
+	        AddAlert('順位表が存在しないコンテストです');
+	        return;
 	    }
-	    
-	    function UpdatePredictorFromRank(rank) {
-	        var perf = getPerf(rank)
-	        var rate = getRate(perf)
-	        lastUpdated = 0
-	        UpdatePredictor(rank,perf,rate)
+	    if (!endTime.isBefore()) {
+	        SetUpdateInterval();
+	        return;
 	    }
-	    
-	    function UpdatePredictorFromPerf(perf) {
-	        var upper = 16384
-	        var lower = 0
-	        while(upper - lower > 0.125) {
-	            if (perf > getPerf(lower + (upper - lower) / 2)) upper -= (upper - lower) / 2
-	            else lower += (upper - lower) / 2
-	        }
-	        lastUpdated = 1
-	        var rank = lower + (upper - lower) / 2;
-	        var rate = getRate(perf)
-	        UpdatePredictor(rank,perf,rate)
+	
+	    \$.when(
+	        SideMenu.DataBase.GetData("APerfs", contestScreenName),
+	        SideMenu.DataBase.GetData("Standings", contestScreenName)
+	    ).done((aperfs, standings) => {
+	        SideMenu.Datas.APerfs = aperfs;
+	        SideMenu.Datas.Standings = standings;
+	        CalcActivePerf();
+	        drawPredictor();
+	        enabled();
+	        AddAlert('ローカルストレージから取得されました。');
+	        updateResultsData();
+	        addPerfToStandings();
+	    }).fail(() => {
+	        UpdatePredictorsData();
+	    })
+	
+	    \/\/再描画をの期間を再更新する
+	    function SetUpdateInterval() {
+	        UpdatePredictorsData();
+	        if (!endTime.isBefore()) setTimeout(SetUpdateInterval, Interval);
 	    }
-	    function UpdatePredictorFromRate(rate) {
-	        var upper = 16384
-	        var lower = 0
-	        while(upper - lower > 0.125) {
-	            if (rate < getRate(lower + (upper - lower) / 2)) upper -= (upper - lower) / 2
-	            else lower += (upper - lower) / 2
-	        }
-	        lastUpdated = 2
-	        var perf = lower + (upper - lower) / 2;
-	        upper = 16384
-	        lower = 0
-	        while(upper - lower > 0.125) {
-	            if (perf > getPerf(lower + (upper - lower) / 2)) upper -= (upper - lower) / 2
-	            else lower += (upper - lower) / 2
-	        }
-	        var rank = lower + (upper - lower) / 2;
-	        UpdatePredictor(rank,perf,rate)
-	    }
-	    
+	
+	    \/\/自分のレートをパフォから求める
 	    function getRate(perf) {
 	        return positivize_rating(calc_rating(SideMenu.Datas.History.filter(x => x.IsRated).map(x => x.Performance).concat(perf).reverse()));
 	    }
-	    
+	
+	    \/\/パフォを順位から求める()
 	    function getPerf(rank) {
 	        var upper = 8192
 	        var lower = -8192
 	    
 	        while (upper - lower > 0.5) {
-	            if (rank - 0.5 > calcPerf(lower + (upper - lower) / 2)) upper -= (upper - lower) / 2
-	            else lower += (upper - lower) / 2
+	            if (rank - 0.5 > calcRankVal(lower + (upper - lower) \/ 2)) upper -= (upper - lower) \/ 2
+	            else lower += (upper - lower) \/ 2
 	        }
 	    
-	        var innerPerf = Math.round(lower + (upper - lower) / 2)
+	        var innerPerf = Math.round(lower + (upper - lower) \/ 2)
 	    
-	        return Math.min(innerPerf, SideMenu.Predictor.maxPerf)
-	    
-	        function calcPerf(X) {
-	            var res = 0;
-	            activePerf.forEach(function (APerf) {
-	                res += 1.0 / (1.0 + Math.pow(6.0, ((X - APerf) / 400.0)))
-	            })
-	            return res;
-	        }
+	        return Math.min(innerPerf, SideMenu.Predictor.maxPerf);
 	    }
-	    \$('#estimator-current').click(function () {
-	        //自分の順位を確認
-	        var myRank = 0;
-	    
-	        var tiedList = []
-	        var lastRank = 0;
-	        var rank = 1;
-	        var isContainedMe = false;
-	        //全員回して自分が出てきたら順位更新フラグを立てる
-			SideMenu.Datas.Standings.StandingsData.forEach(function (element) {
-	            if (!element.IsRated || element.TotalResult.Count === 0) return;
-	            if (lastRank !== element.Rank) {
-	                if (isContainedMe) {
-	                     myRank = rank + (tiedList.length - 1) / 2;
-	                    isContainedMe = false;
+	
+	    \/\/パフォを求める際に出てくるパフォごとの順位を求める
+	    function calcRankVal(X) {
+	        var res = 0;
+	        activePerf.forEach(function (APerf) {
+	            res += 1.0 \/ (1.0 + Math.pow(6.0, ((X - APerf) \/ 400.0)))
+	        })
+	        return res;
+	    }
+	
+	    \/\/データを更新して描画する
+	    function UpdatePredictorsData() {
+	        \$('#predictor-reload').button('loading');
+	        AddAlert('順位表読み込み中…');
+	        SideMenu.Datas.Update.APerfs().then(SideMenu.Datas.Update.Standings).then(() => {
+	            if (SideMenu.Datas.APerfs.length === 0) {
+	                disabled();
+	                AddAlert('APerfのデータが提供されていません');
+	                return;
+	            }
+	            if (SideMenu.Datas.Standings.Fixed) {
+	                SideMenu.DataBase.SetData('APerfs', contestScreenName, SideMenu.Datas.APerfs);
+	                SideMenu.DataBase.SetData('Standings', contestScreenName, SideMenu.Datas.Standings);
+	            }
+	            CalcActivePerf();
+	            if (isStandingsPage) {
+	                updateResultsData();
+	                addPerfToStandings();
+	                if (!isAlreadyAppendRowToStandings) {
+	                    (new MutationObserver(() => { console.log('a'); addPerfToStandings(); })).observe(document.getElementById('standings-tbody'), { childList: true });
+	                    \$('thead > tr').append('<th class="standings-result-th" style="width:84px;min-width:84px;">perf<\/th><th class="standings-result-th" style="width:168px;min-width:168px;">レート変化<\/th>');
+	                    isAlreadyAppendRowToStandings = true;
 	                }
-	                rank += tiedList.length;
-	                tiedList = []
 	            }
-	    
-	            if (isContainedMe) {
-	                 myRank = rank + (tiedList.length - 1) / 2;
-	                isContainedMe = false;
-	            }
-	    
-	            if(userScreenName == element.UserScreenName) isContainedMe = true;
-	            tiedList.push(element)
-	            lastRank = element.Rank;
-	        })
-	        //存在しなかったら空欄
-	        if(myRank === 0) {
-	            UpdatePredictor("","","")
-	        }
-	        else {
-	            UpdatePredictorFromRank(myRank)
-	        }
-	    })
-	    function LoadStandings() {
-			SideMenu.Datas.Update.Standings()
-			.done(() => {
-	            CalcActivePerf()
-	        })
+	            drawPredictor();
+	            enabled();
+	            AddAlert(\`最終更新 : \${moment().format('HH:mm:ss')}\`);
+	        }).fail(() => {
+	            disabled();
+	            AddAlert('データの読み込みに失敗しました');
+	        });
 	    }
-	    
+	
+	    \/\/ActivePerfの再計算
 	    function CalcActivePerf() {
-	        activePerf = []
-	        //Perf計算時に使うパフォ(Ratedオンリー)
-			SideMenu.Datas.Standings.StandingsData.forEach(function (element) {
+	        activePerf = [];
+	        var isSomebodyRated = false;
+	        \/\/Perf計算時に使うパフォ(Ratedオンリー)
+	        SideMenu.Datas.Standings.StandingsData.forEach(function (element) {
 	            if (element.IsRated && element.TotalResult.Count !== 0) {
-					if (!(SideMenu.Datas.APerfs[element.UserScreenName])) {
-	                    console.log(element.UserScreenName)
+	                if (!(SideMenu.Datas.APerfs[element.UserScreenName])) {
+	                    activePerf.push(defaultAPerf);
 	                }
 	                else {
-						activePerf.push(SideMenu.Datas.APerfs[element.UserScreenName])
+	                    isSomebodyRated = true;
+	                    activePerf.push(SideMenu.Datas.APerfs[element.UserScreenName])
 	                }
 	            }
-	        })
-	        \$('#estimator-reload').button('reset')
-	        switch(lastUpdated) {
-	            case 0:
-	                UpdatePredictorFromRank(\$("#estimator-input-rank").val())
-	                break;
-	            case 1:
-	                UpdatePredictorFromPerf(\$("#estimator-input-perf").val())
-	                break;
-	            case 2:
-	                UpdatePredictorFromRate(\$("#estimator-input-rate").val())
-	                break;
+	        });
+	
+	        if (!isSomebodyRated) {
+	            SideMenu.Datas.Standings.Fixed = false;
+	            \/\/元はRatedだったと推測できる場合、通常のRatedと同じような扱い
+	            activePerf = [];
+	            for (var i = 0; i < SideMenu.Datas.Standings.length; i++) {
+	                var element = SideMenu.Datas.Standings[i];
+	                if (element.OldRating >= ratedLimit || element.TotalResult.Count === 0) continue;
+	                SideMenu.Datas.Standings[i].IsRated = true;
+	                if (!(SideMenu.Datas.APerfs[element.UserScreenName])) {
+	                    activePerf.push(defaultAPerf);
+	                    return;
+	                }
+	                activePerf.push(APerfs[element.UserScreenName]);
+	            }
 	        }
 	    }
-	    
-	    function LoadAPerfs() {
-	        \$('#estimator-reload').button('loading')
-			SideMenu.Datas.APerfs
-			.done(() => {
-				dicLength = Object.keys(SideMenu.Datas.APerfs).length;
-	            LoadStandings()
-	        })
+	
+	    \/\/フォームを更新
+	    function drawPredictor() {
+	        switch (lastUpdated) {
+	            case 0:
+	                UpdatePredictorFromRank();
+	                break;
+	            case 1:
+	                UpdatePredictorFromPerf();
+	                break;
+	            case 2:
+	                UpdatePredictorFromRate();
+	                break;
+	        }
+	        function UpdatePredictorFromRank() {
+	            var rank = \$("#predictor-input-rank").val();
+	            var perf = getPerf(rank);
+	            var rate = getRate(perf);
+	            lastUpdated = 0;
+	            UpdatePredictor(rank, perf, rate);
+	        }
+	        function UpdatePredictorFromPerf() {
+	            var perf = \$("#predictor-input-perf").val();
+	            var upper = 16384
+	            var lower = 0
+	            while (upper - lower > 0.125) {
+	                if (perf > getPerf(lower + (upper - lower) \/ 2)) upper -= (upper - lower) \/ 2
+	                else lower += (upper - lower) \/ 2
+	            }
+	            lastUpdated = 1
+	            var rank = lower + (upper - lower) \/ 2;
+	            var rate = getRate(perf)
+	            UpdatePredictor(rank, perf, rate)
+	        }
+	        function UpdatePredictorFromRate() {
+	            var rate = \$("#predictor-input-rate").val();
+	            var upper = 16384
+	            var lower = 0
+	            while (upper - lower > 0.125) {
+	                if (rate < getRate(lower + (upper - lower) \/ 2)) upper -= (upper - lower) \/ 2
+	                else lower += (upper - lower) \/ 2
+	            }
+	            lastUpdated = 2
+	            var perf = lower + (upper - lower) \/ 2;
+	            upper = 16384
+	            lower = 0
+	            while (upper - lower > 0.125) {
+	                if (perf > getPerf(lower + (upper - lower) \/ 2)) upper -= (upper - lower) \/ 2
+	                else lower += (upper - lower) \/ 2
+	            }
+	            var rank = lower + (upper - lower) \/ 2;
+	            UpdatePredictor(rank, perf, rate)
+	        }
+	        function UpdatePredictor(rank, perf, rate) {
+	            \$("#predictor-input-rank").val(round(rank))
+	            \$("#predictor-input-perf").val(round(perf))
+	            \$("#predictor-input-rate").val(round(rate))
+	            updatePredictorTweetBtn()
+	            function round(val) {
+	                return Math.round(val * 100) \/ 100;
+	            }
+	        }
+	        
+	        \/\/ツイートボタンを更新する
+	        function updatePredictorTweetBtn() {
+	            var tweetStr =
+	                \`Rated内順位: \${\$("#predictor-input-rank").val()}位%0A
+	パフォーマンス: \${\$("#predictor-input-perf").val()}%0A
+	レート: \${\$("#predictor-input-rate").val()}\`
+	            \$('#predictor-tweet').attr("href", \`https:\/\/twitter.com\/intent\/tweet?text=\${tweetStr}\`)
+	        }
+	    }
+	
+	    \/\/最終更新などの要素を追加する
+	    function AddAlert(content) {
+	        \$("#predictor-alert").html(\`<h5 class='sidemenu-txt'>\${content}<\/h5>\`);
+	    }
+	
+	    \/\/要素のDisableadを外す
+	    function enabled() {
+	        \$('#predictor-reload').button('reset');
+	        predictorElements.forEach(element => {
+	            \$(\`#\${element}\`).removeAttr("disabled");
+	        });
+	    }
+	
+	    \/\/要素にDisableadをつける
+	    function disabled() {
+	        \$('#predictor-reload').button('reset');
+	        predictorElements.forEach(element => {
+	            \$(\`#\${element}\`).attr("disabled");
+	        });
+	    }
+	
+	    \/\/全員の結果データを更新する
+	    function updateResultsData() {
+	
+	        eachParticipationResults = {};
+	
+	        const IsFixed = SideMenu.Datas.Standings.Fixed;
+	        \/\/タイの人を入れる(順位が変わったら描画→リストを空に)
+	        var tiedList = [];
+	        var rank = 1;
+	        var lastRank = 0;
+	        var ratedCount = 0;
+	        var maxPerf = ratedLimit === Infinity ? getPerf(1) : ratedLimit + 400;
+	        var currentPerf = maxPerf - 0.5;
+	        var rankVal = calcRankVal(currentPerf);
+	        \/\/全員回す
+	        SideMenu.Datas.Standings.StandingsData.forEach(function (element) {
+	            if (lastRank !== element.Rank) {
+	                addRow();
+	                rank += ratedCount;
+	                ratedCount = 0;
+	                tiedList = [];
+	            }
+	            tiedList.push(element);
+	            lastRank = element.Rank;
+	            if (element.IsRated && element.TotalResult.Count !== 0) ratedCount++;
+	        });
+	        \/\/最後に更新してあげる
+	        addRow();
+	
+	        \/\/タイリストの人全員行追加
+	        function addRow() {
+	            var fixRank = rank + Math.max(0, ratedCount - 1) \/ 2;
+	            while (rankVal < fixRank - 0.5 && currentPerf >= -8192) {
+	                currentPerf--;
+	                rankVal = calcRankVal(currentPerf);
+	            }
+	            tiedList.forEach(e => {
+	                var isRated = e.IsRated && e.TotalResult.Count !== 0;
+	                var matches = e.Competitions - (IsFixed && isRated ? 1 : 0);
+	                var perf = currentPerf + 0.5;
+	                var oldRate = (IsFixed ? e.OldRating : e.Rating);
+	                var newRate = (IsFixed ? e.Rating : Math.floor(positivize_rating(matches !== 0 ? calc_rating_from_last(oldRate, perf, matches) : perf - 1200)));
+	                eachParticipationResults[e.UserScreenName] = { perf: perf, oldRate: oldRate, newRate: newRate, isRated: isRated, isSubmitted: e.TotalResult.Count !== 0 };
+	            });
+	        }
+	    }
+	
+	    \/\/結果データを順位表に追加する
+	    function addPerfToStandings() {
+	
+	        if (!isStandingsPage) return;
+	
+	        \$('#standings-tbody > tr').each((index, elem) => {
+	            var userName = \$('.standings-username .username', elem).text();
+	            var perfArr = eachParticipationResults[userName];
+	            if (!perfArr) {
+	                \$(elem).append(\`<td class="standings-result">-<\/td>\`);
+	                \$(elem).append(\`<td class="standings-result">-<\/td>\`);
+	                return;
+	            }
+	            var perf = perfArr.isSubmitted ? ratingSpan(perfArr.perf) : '<span class="user-unrated">-<\/span>';
+	            var oldRate = perfArr.oldRate;
+	            var newRate = perfArr.newRate;
+	            var IsRated = perfArr.isRated;
+	            \$(elem).append(\`<td class="standings-result">\${ratingSpan(perf)}<\/td>\`);
+	            \$(elem).append(\`<td class="standings-result">\${getRatingChangeStr(oldRate,newRate)}<\/td>\`);
+	            function getRatingChangeStr(oldRate, newRate) {
+	                return IsRated ? \`\${ratingSpan(oldRate)} -> \${ratingSpan(newRate)}(\${(newRate >= oldRate ? '+' : '')}\${newRate - oldRate})\` : \`\${ratingSpan(oldRate)}(unrated)\`;
+	            }
+	            function ratingSpan(rate) {
+	                return \`<span class="user-\${SideMenu.GetColor(rate)}">\${rate}<\/span>\`;
+	            }
+	        });
 	    }
 	    
-	    \$('#estimator-reload').click(function () {
-	        LoadAPerfs()
-	    })
-	    function updatePredictorTweetBtn() {
-	        var tweetStr = 
-	    \`Rated内順位: \${\$("#estimator-input-rank").val()}位%0A
-	    パフォーマンス: \${\$("#estimator-input-perf").val()}%0A
-	    レート: \${\$("#estimator-input-rate").val()}\`
-	        \$('#predictor-tweet').attr("href", \`https://twitter.com/intent/tweet?text=\${tweetStr}\`)
-	    }
-	    var lastUpdated = 0;
-	    \$('#estimator-input-rank').keyup(function(event) {
-	        UpdatePredictorFromRank(\$("#estimator-input-rank").val())
-	    });
-	    \$('#estimator-input-perf').keyup(function(event) {
-	        UpdatePredictorFromPerf(\$("#estimator-input-perf").val())
-	    });
-	    \$('#estimator-input-rate').keyup(function(event) {
-	        UpdatePredictorFromRate(\$("#estimator-input-rate").val())
-	    });
-	    })();`;
-		var style = 
+	})();`;
+	var style = 
 	``;
-		var dom = 
-	`<div id="predictor-alert"></div>
+	var dom = 
+	`<div id="predictor-alert"><h5 class='sidemenu-txt'>順位表読み込み中…<\/h5><\/div>
 	<div id="predictor-data">
 	    <div class="row">
 	        <div class="input-group col-xs-offset-1 col-xs-10">
-	            <span class="input-group-addon">順位<span class="glyphicon glyphicon-question-sign" aria-hidden="true" data-html="true" data-toggle="tooltip" data-placement="right" title="" data-original-title="Rated内の順位です。複数人同順位の際は人数を加味します(5位が4人居たら6.5位として計算)"></span></span>
-	            <input class="form-control" id="estimator-input-rank">
-	            <span class="input-group-addon">位</span>
-	        </div>
+	            <span class="input-group-addon">順位<span class="glyphicon glyphicon-question-sign" aria-hidden="true" data-html="true" data-toggle="tooltip" data-placement="right" title="" data-original-title="Rated内の順位です。複数人同順位の際は人数を加味します(5位が4人居たら6.5位として計算)"><\/span><\/span>
+	            <input class="form-control" id="predictor-input-rank">
+	            <span class="input-group-addon">位<\/span>
+	        <\/div>
 	        
 	        <div class="input-group col-xs-offset-1 col-xs-10">
-	            <span class="input-group-addon">パフォーマンス</span>
-	            <input class="form-control" id="estimator-input-perf">
-	        </div>
+	            <span class="input-group-addon">パフォーマンス<\/span>
+	            <input class="form-control" id="predictor-input-perf">
+	        <\/div>
 	
 	        <div class="input-group col-xs-offset-1 col-xs-10">
-	            <span class="input-group-addon">レーティング</span>
-	            <input class="form-control" id="estimator-input-rate">
-	        </div>
-	    </div>
-	</div>
+	            <span class="input-group-addon">レーティング<\/span>
+	            <input class="form-control" id="predictor-input-rate">
+	        <\/div>
+	    <\/div>
+	<\/div>
 	<div class="btn-group">
-	    <button class="btn btn-default" id="estimator-current">現在の順位</button>
-	    <button type="button" class="btn btn-primary" id="estimator-reload" data-loading-text="更新中…">更新</button>
-	    <a class="btn btn-default" rel="nofollow" onClick="window.open(encodeURI(decodeURI(this.href)),'twwindow','width=550, height=450, personalbar=0, toolbar=0, scrollbars=1'); return false;" id='predictor-tweet'>ツイート</a>
-	    <!--<button class="btn btn-default" id="estimator-solved" disabled>現問題AC後</button>-->
-	</div>
+	    <button class="btn btn-default" id="predictor-current">現在の順位<\/button>
+	    <button type="button" class="btn btn-primary" id="predictor-reload" data-loading-text="更新中…">更新<\/button>
+	    <a class="btn btn-default" rel="nofollow" onClick="window.open(encodeURI(decodeURI(this.href)),'twwindow','width=550, height=450, personalbar=0, toolbar=0, scrollbars=1'); return false;" id='predictor-tweet'>ツイート<\/a>
+	    <!--<button class="btn btn-default" id="predictor-solved" disabled>現問題AC後<\/button>-->
+	<\/div>
 	<div id="predictor-reload">
-	    <!--<h5 class="sidemenu-txt">更新設定</h5>-->
+	    <!--<h5 class="sidemenu-txt">更新設定<\/h5>-->
 	    <div class="row">
 	        <!--<div class="input-group col-xs-offset-1 col-xs-10">
-	            <span class="input-group-addon" id="estimator-input-desc">自動更新</span>
-	            <input type="number" class="form-control" id="estimator-input">
-	            <span class="input-group-addon">秒</span>
-	        </div>-->
-	    </div>
-	</div>`;
-		return `${dom}
+	            <span class="input-group-addon" id="predictor-input-desc">自動更新<\/span>
+	            <input type="number" class="form-control" id="predictor-input">
+	            <span class="input-group-addon">秒<\/span>
+	        <\/div>-->
+	    <\/div>
+	<\/div>`;
+	
+	return `${dom}
 	<script>${js}</script>
 	<style>${style}</style>`;
 	}
-})();
+});
 
-//Submit Status
-(() => {
-	SideMenu.appendToSideMenu(/beta.atcoder.jp/,'Submit Status',getElem);
-	async function getElem() {
-		
-	var js = 
-	``;
-		var style = 
-	``;
-		var dom = 
-	``;
-		return `${dom}
-	<script>${js}</script>
-	<style>${style}</style>`;
-	}
-})();
 
+
+SideMenu.ViewOrder.forEach(async (elem) => {
+    await SideMenu.Elements[elem]();
+});
