@@ -84,7 +84,7 @@
     }
     if (specialContest.indexOf(contestScreenName) >= 0) {
         disabled();
-        AddAlert('順位表が存在しないコンテストです');
+        AddAlert('コンテストではありません');
         return;
     }
     if (!endTime.isBefore()) {
