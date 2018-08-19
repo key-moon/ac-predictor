@@ -696,9 +696,7 @@ SideMenu.Elements.Predictor = (async () => {
 	        \$('#predictor-reload').button('loading');
 	        AddAlert('順位表読み込み中…');
 	        SideMenu.Datas.Update.APerfs().then(SideMenu.Datas.Update.Standings).then(() => {
-	            console.log(SideMenu.Datas.APerfs);
-	            console.log(SideMenu.Datas.APerfs.length);
-	            if (SideMenu.Datas.APerfs.length === 0) {
+	            if (SideMenu.Datas.APerfs.keys().length === 0) {
 	                disabled();
 	                AddAlert('APerfのデータが提供されていません');
 	                return;
