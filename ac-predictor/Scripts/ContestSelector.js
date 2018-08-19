@@ -104,6 +104,7 @@
 
             //Perf計算時に使うパフォ(Ratedオンリー)
             var activePerf = [];
+            var isAnyoneRated = false;
             const ratedLimit = contestID === "SoundHound Inc. Programming Contest 2018 -Masters Tournament-"
                 ? 2000 : (/abc\d{3}/.test(contestID) ? 1200 : (/arc\d{3}/.test(contestID) ? 2800 : Infinity));
             const defaultAPerf = /abc\d{3}/.test(contestID) ? 800 : 1600;
@@ -114,11 +115,12 @@
                     activePerf.push(defaultAPerf);
                     return;
                 }
+                isAnyoneRated = true;
                 activePerf.push(APerfs[element.UserScreenName]);
             });
 
             //要するにUnRatedコン
-            if (activePerf.length === 0) {
+            if (!isAnyoneRated) {
                 //レーティングは変動しないので、コンテスト中と同じ扱いをして良い。(逆にしないと)
                 isFixed = false;
 
@@ -127,7 +129,10 @@
                 for (var i = 0; i < Standings.length; i++) {
                     var element = Standings[i];
                     if (element.OldRating >= ratedLimit || element.TotalResult.Count === 0) continue;
-                    if (!(APerfs[element.UserScreenName])) continue;
+                    if (!(APerfs[element.UserScreenName])) {
+                        activePerf.push(defaultAPerf);
+                        continue;
+                    }
                     //Ratedフラグをオンに
                     Standings[i].IsRated = true;
                     activePerf.push(APerfs[element.UserScreenName]);
