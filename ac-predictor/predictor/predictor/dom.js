@@ -79,7 +79,7 @@
     }
     if (moment(startTime) < firstContestDate) {
         disabled();
-        AddAlert('現行レートシステムが始まる前のコンテストです');
+        AddAlert('現行レートシステム以前のコンテストです');
         return;
     }
     if (specialContest.indexOf(contestScreenName) >= 0) {
@@ -299,7 +299,7 @@
     function disabled() {
         $('#predictor-reload').button('reset');
         predictorElements.forEach(element => {
-            $(`#${element}`).attr("disabled");
+            $(`#${element}`).attr("disabled", true);
         });
     }
 
