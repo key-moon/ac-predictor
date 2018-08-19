@@ -9,20 +9,27 @@
 
     $('#show-unrated-description').tooltip();
 
-    toggleLoadingState();
+    if (localStorage.getItem('predictor-contests')) setItemToSelector(JSON.parse(localStorage.getItem('predictor-contests')));
     $.ajax({
         type: 'GET',
         dataType: 'json',
         url: '/api/aperfs'
     }).done(contests => {
-        contests.forEach((element) => {
-            $("#contest-selector").append(`<option>${element}</option>`);
-        });
-        toggleLoadingState();
+        setItemToSelector(contests);
+        localStorage.setItem('predictor-contests', JSON.stringify(contests));
     });
 
+    function setItemToSelector(items) {
+        var selected = $("#contest-selector").val();
+        $("#contest-selector").empty();
+        items.forEach((item) => {
+            $("#contest-selector").append(`<option>${item}</option>`);
+        });
+        $("#contest-selector").val(selected);
+    }
+
     function toggleLoadingState() {
-        if (state == 0) {
+        if (state === 0) {
             state = 1
             $('#confirm-btn').text('読み込み中…');
             $('#confirm-btn').prop("disabled", true);
@@ -53,7 +60,10 @@
             getContestInfo("APerfs")
         )
         .done((standings, aPerfs) => {
-            //確定していたストレージに保存する
+            //確定していたらストレージに保存する
+            for (var i = 0; i < standings.StandingsData.length; i++) {
+                delete standings.StandingsData[i].TaskResults;
+            }
             if (standings.Fixed) {
                 setData('APerfs', contestID, aPerfs);
                 setData('Standings', contestID, standings);
@@ -69,7 +79,7 @@
         function getContestInfo(type) {
             var deffer = $.Deferred();
 
-            //ストレージに存在してたらそっちを返す
+            //ストレージに存在していたらそっちを返す
             getData(type, contestID).done(aperfs => {
                 deffer.resolve(aperfs);
             }).fail(() => {
@@ -93,28 +103,36 @@
             table.empty()
 
             //Perf計算時に使うパフォ(Ratedオンリー)
-            var activePerf = []
+            var activePerf = [];
+            var isAnyoneRated = false;
+            const ratedLimit = contestID === "SoundHound Inc. Programming Contest 2018 -Masters Tournament-"
+                ? 2000 : (/abc\d{3}/.test(contestID) ? 1200 : (/arc\d{3}/.test(contestID) ? 2800 : Infinity));
+            const defaultAPerf = /abc\d{3}/.test(contestID) ? 800 : 1600;
             Standings.forEach(function (element) {
                 if (!element.IsRated || element.TotalResult.Count === 0) return;
                 if (!(APerfs[element.UserScreenName])) {
-                    //console.log(element.UserScreenName)
+                    //ここで何も追加しないと下限RatedValueが人数を下回ってしまい、こわれる
+                    activePerf.push(defaultAPerf);
                     return;
                 }
+                isAnyoneRated = true;
                 activePerf.push(APerfs[element.UserScreenName]);
             });
 
             //要するにUnRatedコン
-            if (activePerf.length === 0) {
+            if (!isAnyoneRated) {
                 //レーティングは変動しないので、コンテスト中と同じ扱いをして良い。(逆にしないと)
                 isFixed = false;
 
                 //元はRatedだったと推測できる場合、通常のRatedと同じような扱い
-                var maxRate = /abc\d{3}/.test(contestID) ? 1200 : (/arc\d{3}/.test(contestID) ? 2800 : Infinity);
                 activePerf = [];
                 for (var i = 0; i < Standings.length; i++) {
                     var element = Standings[i];
-                    if (element.OldRating >= maxRate || element.TotalResult.Count === 0) continue;
-                    if (!(APerfs[element.UserScreenName])) continue;
+                    if (element.OldRating >= ratedLimit || element.TotalResult.Count === 0) continue;
+                    if (!(APerfs[element.UserScreenName])) {
+                        activePerf.push(defaultAPerf);
+                        continue;
+                    }
                     //Ratedフラグをオンに
                     Standings[i].IsRated = true;
                     activePerf.push(APerfs[element.UserScreenName]);
@@ -122,8 +140,7 @@
             }
 
             //限界パフォーマンス(上限なしの場合は一位の人のパフォ)
-            var maxPerf = contestID === "SoundHound Inc. Programming Contest 2018 -Masters Tournament-" ? 2400 :
-                    (contestID.substr(0, 3) === "abc" ? 1600 : (contestID.substr(0, 3) === "arc" ? 3200 : Math.ceil(getPerf(1))));
+            var maxPerf = ratedLimit === Infinity ? getPerf(1) : ratedLimit + 400;
 
             //addRowを回すときのパフォ 0.5を引いているのは四捨五入が発生する境界に置くため
             var currentPerf = maxPerf - 0.5;
@@ -153,7 +170,7 @@
             //タイリストの人全員行追加
             function addRow() {
                 var fixRank = rank + Math.max(0, ratedCount - 1) / 2;
-                while (rankVal < fixRank) {
+                while (rankVal < fixRank - 0.5 && currentPerf >= -8192) {
                     currentPerf--;
                     rankVal = calcRankVal(currentPerf);
                 }
