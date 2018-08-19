@@ -12,6 +12,7 @@
         ? 2000 : (/abc\d{3}/.test(contestScreenName) ? 1200 : (/arc\d{3}/.test(contestScreenName) ? 2800 : Infinity));
     const defaultAPerf = /abc\d{3}/.test(contestScreenName) ? 800 : 1600;
 
+    const isStandingsPage = /standings(\/.*)?$/.test(document.location);
 
     $('[data-toggle="tooltip"]').tooltip();
     $('#predictor-reload').click(function () {
@@ -67,7 +68,6 @@
         lastUpdated = 2;
         UpdatePredictorForm();
     });
-    new MutationObserver(() => { console.log('a'); addPerfToStandings();}).observe(document.getElementById('standings-tbody'), { childList: true });
     $('thead > tr').append('<th class="standings-result-th" style="width:84px;min-width:84px;">perf</th><th class="standings-result-th" style="width:168px;min-width:168px;">レート変化</th>');
 
 
@@ -87,6 +87,7 @@
         AddAlert('順位表が存在しないコンテストです');
         return;
     }
+    if (isStandingsPage && document.getElementById('standings-tbody') !== null) (new MutationObserver(() => { console.log('a'); addPerfToStandings(); })).observe(document.getElementById('standings-tbody'), { childList: true });
     if (!endTime.isBefore()) {
         SetUpdateInterval();
         return;
@@ -171,7 +172,7 @@
 
     //ActivePerfの再計算
     function CalcActivePerf() {
-        activePerf = []
+        activePerf = [];
         var isSomebodyRated = false;
         //Perf計算時に使うパフォ(Ratedオンリー)
         SideMenu.Datas.Standings.StandingsData.forEach(function (element) {
@@ -190,7 +191,7 @@
             SideMenu.Datas.Standings.Fixed = false;
             //元はRatedだったと推測できる場合、通常のRatedと同じような扱い
             activePerf = [];
-            for (var i = 0; i < Standings.length; i++) {
+            for (var i = 0; i < SideMenu.Datas.Standings.length; i++) {
                 var element = SideMenu.Datas.Standings[i];
                 if (element.OldRating >= ratedLimit || element.TotalResult.Count === 0) continue;
                 SideMenu.Datas.Standings[i].IsRated = true;
@@ -336,7 +337,9 @@
 
     //結果データを順位表に追加する
     function addPerfToStandings() {
-        if (!/standings(\?.*)?$/.test(document.location)) return;
+
+        if (!isStandingsPage) return;
+
         $('#standings-tbody > tr').each((index, elem) => {
             var userName = $('.standings-username .username', elem).text();
             var perfArr = eachParticipationResults[userName];
