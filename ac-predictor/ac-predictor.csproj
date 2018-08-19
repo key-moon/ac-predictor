@@ -270,6 +270,7 @@
     <Content Include="Views\ContestResult\Index.cshtml" />
     <Content Include="Views\UserScript\Install.cshtml" />
     <Content Include="Notification\manifest.json" />
+    <Content Include="Views\UserScript\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
