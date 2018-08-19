@@ -16,7 +16,7 @@
 
     $('[data-toggle="tooltip"]').tooltip();
     $('#predictor-reload').click(function () {
-        UpdatePredictor();
+        UpdatePredictorsData();
     });
     $('#predictor-current').click(function () {
         //自分の順位を確認
@@ -53,25 +53,25 @@
         }
         else {
             lastUpdated = 0;
-            UpdatePredictorForm();
+            drawPredictor();
         }
     });
     $('#predictor-input-rank').keyup(function (event) {
         lastUpdated = 0;
-        UpdatePredictorForm();
+        drawPredictor();
     });
     $('#predictor-input-perf').keyup(function (event) {
         lastUpdated = 1;
-        UpdatePredictorForm();
+        drawPredictor();
     });
     $('#predictor-input-rate').keyup(function (event) {
         lastUpdated = 2;
-        UpdatePredictorForm();
+        drawPredictor();
     });
-    $('thead > tr').append('<th class="standings-result-th" style="width:84px;min-width:84px;">perf</th><th class="standings-result-th" style="width:168px;min-width:168px;">レート変化</th>');
-
 
     var lastUpdated = 0;
+    var isAlreadyAppendRowToStandings = false;
+
     if (!startTime.isBefore()) {
         disabled();
         AddAlert('コンテストは始まっていません');
@@ -87,7 +87,6 @@
         AddAlert('順位表が存在しないコンテストです');
         return;
     }
-    if (isStandingsPage && document.getElementById('standings-tbody') !== null) (new MutationObserver(() => { console.log('a'); addPerfToStandings(); })).observe(document.getElementById('standings-tbody'), { childList: true });
     if (!endTime.isBefore()) {
         SetUpdateInterval();
         return;
@@ -100,18 +99,18 @@
         SideMenu.Datas.APerfs = aperfs;
         SideMenu.Datas.Standings = standings;
         CalcActivePerf();
-        UpdatePredictorForm();
+        drawPredictor();
         enabled();
         AddAlert('ローカルストレージから取得されました。');
         updateResultsData();
         addPerfToStandings();
     }).fail(() => {
-        UpdatePredictor();
+        UpdatePredictorsData();
     })
 
     //再描画をの期間を再更新する
     function SetUpdateInterval() {
-        UpdatePredictor();
+        UpdatePredictorsData();
         if (!endTime.isBefore()) setTimeout(SetUpdateInterval, Interval);
     }
 
@@ -145,7 +144,7 @@
     }
 
     //データを更新して描画する
-    function UpdatePredictor() {
+    function UpdatePredictorsData() {
         $('#predictor-reload').button('loading');
         AddAlert('順位表読み込み中…');
         SideMenu.Datas.Update.APerfs().then(SideMenu.Datas.Update.Standings).then(() => {
@@ -159,9 +158,16 @@
                 SideMenu.DataBase.SetData('Standings', contestScreenName, SideMenu.Datas.Standings);
             }
             CalcActivePerf();
-            UpdatePredictorForm();
-            updateResultsData();
-            addPerfToStandings();
+            if (isStandingsPage) {
+                updateResultsData();
+                addPerfToStandings();
+                if (!isAlreadyAppendRowToStandings) {
+                    (new MutationObserver(() => { console.log('a'); addPerfToStandings(); })).observe(document.getElementById('standings-tbody'), { childList: true });
+                    $('thead > tr').append('<th class="standings-result-th" style="width:84px;min-width:84px;">perf</th><th class="standings-result-th" style="width:168px;min-width:168px;">レート変化</th>');
+                    isAlreadyAppendRowToStandings = true;
+                }
+            }
+            drawPredictor();
             enabled();
             AddAlert(`最終更新 : ${moment().format('HH:mm:ss')}`);
         }).fail(() => {
@@ -205,7 +211,7 @@
     }
 
     //フォームを更新
-    function UpdatePredictorForm() {
+    function drawPredictor() {
         switch (lastUpdated) {
             case 0:
                 UpdatePredictorFromRank();
@@ -264,6 +270,15 @@
             function round(val) {
                 return Math.round(val * 100) / 100;
             }
+        }
+        
+        //ツイートボタンを更新する
+        function updatePredictorTweetBtn() {
+            var tweetStr =
+                `Rated内順位: ${$("#predictor-input-rank").val()}位%0A
+パフォーマンス: ${$("#predictor-input-perf").val()}%0A
+レート: ${$("#predictor-input-rate").val()}`
+            $('#predictor-tweet').attr("href", `https://twitter.com/intent/tweet?text=${tweetStr}`)
         }
     }
 
@@ -362,13 +377,5 @@
             }
         });
     }
-
-    //ツイートボタンを更新する
-    function updatePredictorTweetBtn() {
-        var tweetStr = 
-`Rated内順位: ${$("#predictor-input-rank").val()}位%0A
-パフォーマンス: ${$("#predictor-input-perf").val()}%0A
-レート: ${$("#predictor-input-rate").val()}`
-        $('#predictor-tweet').attr("href", `https://twitter.com/intent/tweet?text=${tweetStr}`)
-    }
+    
 })();
