@@ -547,6 +547,7 @@ SideMenu.Elements.Predictor = (async () => {
 	`(() => {
 	    \/\/各参加者の結果
 	    var eachParticipationResults = {};
+	    var isAlreadyAppendRowToStandings = false;
 	
 	    const specialContest = ['practice', 'APG4b', 'abs'];
 	
@@ -616,7 +617,6 @@ SideMenu.Elements.Predictor = (async () => {
 	    });
 	
 	    var lastUpdated = 0;
-	    var isAlreadyAppendRowToStandings = false;
 	
 	    if (!startTime.isBefore()) {
 	        disabled();
@@ -625,7 +625,7 @@ SideMenu.Elements.Predictor = (async () => {
 	    }
 	    if (moment(startTime) < firstContestDate) {
 	        disabled();
-	        AddAlert('現行レートシステムが始まる前のコンテストです');
+	        AddAlert('現行レートシステム以前のコンテストです');
 	        return;
 	    }
 	    if (specialContest.indexOf(contestScreenName) >= 0) {
@@ -648,8 +648,10 @@ SideMenu.Elements.Predictor = (async () => {
 	        drawPredictor();
 	        enabled();
 	        AddAlert('ローカルストレージから取得されました。');
-	        updateResultsData();
-	        addPerfToStandings();
+	        if (isStandingsPage) {
+	            updateResultsData();
+	            addPerfToStandings();
+	        }
 	    }).fail(() => {
 	        UpdatePredictorsData();
 	    })
@@ -707,11 +709,6 @@ SideMenu.Elements.Predictor = (async () => {
 	            if (isStandingsPage) {
 	                updateResultsData();
 	                addPerfToStandings();
-	                if (!isAlreadyAppendRowToStandings) {
-	                    (new MutationObserver(() => { console.log('a'); addPerfToStandings(); })).observe(document.getElementById('standings-tbody'), { childList: true });
-	                    \$('thead > tr').append('<th class="standings-result-th" style="width:84px;min-width:84px;">perf<\/th><th class="standings-result-th" style="width:168px;min-width:168px;">レート変化<\/th>');
-	                    isAlreadyAppendRowToStandings = true;
-	                }
 	            }
 	            drawPredictor();
 	            enabled();
@@ -845,7 +842,7 @@ SideMenu.Elements.Predictor = (async () => {
 	    function disabled() {
 	        \$('#predictor-reload').button('reset');
 	        predictorElements.forEach(element => {
-	            \$(\`#\${element}\`).attr("disabled");
+	            \$(\`#\${element}\`).attr("disabled", true);
 	        });
 	    }
 	
@@ -898,9 +895,12 @@ SideMenu.Elements.Predictor = (async () => {
 	
 	    \/\/結果データを順位表に追加する
 	    function addPerfToStandings() {
-	
 	        if (!isStandingsPage) return;
-	
+	        if (!isAlreadyAppendRowToStandings) {
+	            (new MutationObserver(() => { console.log('a'); addPerfToStandings(); })).observe(document.getElementById('standings-tbody'), { childList: true });
+	            \$('thead > tr').append('<th class="standings-result-th" style="width:84px;min-width:84px;">perf<\/th><th class="standings-result-th" style="width:168px;min-width:168px;">レート変化<\/th>');
+	            isAlreadyAppendRowToStandings = true;
+	        }
 	        \$('#standings-tbody > tr').each((index, elem) => {
 	            var userName = \$('.standings-username .username', elem).text();
 	            var perfArr = eachParticipationResults[userName];

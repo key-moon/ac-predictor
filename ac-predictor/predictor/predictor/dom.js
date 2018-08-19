@@ -1,6 +1,7 @@
 (() => {
     //各参加者の結果
     var eachParticipationResults = {};
+    var isAlreadyAppendRowToStandings = false;
 
     const specialContest = ['practice', 'APG4b', 'abs'];
 
@@ -70,7 +71,6 @@
     });
 
     var lastUpdated = 0;
-    var isAlreadyAppendRowToStandings = false;
 
     if (!startTime.isBefore()) {
         disabled();
@@ -102,8 +102,10 @@
         drawPredictor();
         enabled();
         AddAlert('ローカルストレージから取得されました。');
-        updateResultsData();
-        addPerfToStandings();
+        if (isStandingsPage) {
+            updateResultsData();
+            addPerfToStandings();
+        }
     }).fail(() => {
         UpdatePredictorsData();
     })
@@ -161,11 +163,6 @@
             if (isStandingsPage) {
                 updateResultsData();
                 addPerfToStandings();
-                if (!isAlreadyAppendRowToStandings) {
-                    (new MutationObserver(() => { console.log('a'); addPerfToStandings(); })).observe(document.getElementById('standings-tbody'), { childList: true });
-                    $('thead > tr').append('<th class="standings-result-th" style="width:84px;min-width:84px;">perf</th><th class="standings-result-th" style="width:168px;min-width:168px;">レート変化</th>');
-                    isAlreadyAppendRowToStandings = true;
-                }
             }
             drawPredictor();
             enabled();
@@ -352,9 +349,12 @@
 
     //結果データを順位表に追加する
     function addPerfToStandings() {
-
         if (!isStandingsPage) return;
-
+        if (!isAlreadyAppendRowToStandings) {
+            (new MutationObserver(() => { console.log('a'); addPerfToStandings(); })).observe(document.getElementById('standings-tbody'), { childList: true });
+            $('thead > tr').append('<th class="standings-result-th" style="width:84px;min-width:84px;">perf</th><th class="standings-result-th" style="width:168px;min-width:168px;">レート変化</th>');
+            isAlreadyAppendRowToStandings = true;
+        }
         $('#standings-tbody > tr').each((index, elem) => {
             var userName = $('.standings-username .username', elem).text();
             var perfArr = eachParticipationResults[userName];
