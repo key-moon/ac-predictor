@@ -46,6 +46,7 @@
         }
 
         if (myRank === 0) return;
+        $('#predictor-input-rank').val(myRank);
         lastUpdated = 0;
         drawPredictor();
     });
