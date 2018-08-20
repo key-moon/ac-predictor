@@ -525,7 +525,7 @@ SideMenu.Elements.Estimator = (async () => {
 
 //Predictor
 SideMenu.Elements.Predictor = (async () => {
-	await SideMenu.appendToSideMenu(/beta.atcoder.jp\/contests\//,'Predictor',getElem);
+	await SideMenu.appendToSideMenu(/beta.atcoder.jp\/contests\/.*/,'Predictor',getElem);
 	async function getElem() {
 	//NameSpace
 	SideMenu.Predictor = {};
@@ -554,7 +554,7 @@ SideMenu.Elements.Predictor = (async () => {
 	    const predictorElements = ['predictor-input-rank', 'predictor-input-perf', 'predictor-input-rate', 'predictor-current', 'predictor-reload', 'predictor-tweet'];
 	    const firstContestDate = moment("2016-07-16 21:00");
 	    const Interval = 30000;
-	    console.log(contestScreenName);
+	
 	    const ratedLimit = contestScreenName === "SoundHound Inc. Programming Contest 2018 -Masters Tournament-"
 	        ? 2000 : (\/abc\\d{3}\/.test(contestScreenName) ? 1200 : (\/arc\\d{3}\/.test(contestScreenName) ? 2800 : Infinity));
 	    const defaultAPerf = \/abc\\d{3}\/.test(contestScreenName) ? 800 : 1600;
@@ -743,7 +743,6 @@ SideMenu.Elements.Predictor = (async () => {
 	                }
 	            }
 	        });
-	        console.log(ratedLimit);
 	        if (!isSomebodyRated) {
 	            SideMenu.Datas.Standings.Fixed = false;
 	            \/\/元はRatedだったと推測できる場合、通常のRatedと同じような扱い
@@ -905,7 +904,7 @@ SideMenu.Elements.Predictor = (async () => {
 	    function addPerfToStandings() {
 	        if (!isStandingsPage) return;
 	        if (!isAlreadyAppendRowToStandings) {
-	            (new MutationObserver(() => { console.log('a'); addPerfToStandings(); })).observe(document.getElementById('standings-tbody'), { childList: true });
+	            (new MutationObserver(() => { addPerfToStandings(); })).observe(document.getElementById('standings-tbody'), { childList: true });
 	            \$('thead > tr').append('<th class="standings-result-th" style="width:84px;min-width:84px;">perf<\/th><th class="standings-result-th" style="width:168px;min-width:168px;">レート変化<\/th>');
 	            isAlreadyAppendRowToStandings = true;
 	        }

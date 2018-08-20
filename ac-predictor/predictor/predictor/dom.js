@@ -358,7 +358,7 @@
     function addPerfToStandings() {
         if (!isStandingsPage) return;
         if (!isAlreadyAppendRowToStandings) {
-            (new MutationObserver(() => { console.log('a'); addPerfToStandings(); })).observe(document.getElementById('standings-tbody'), { childList: true });
+            (new MutationObserver(() => { addPerfToStandings(); })).observe(document.getElementById('standings-tbody'), { childList: true });
             $('thead > tr').append('<th class="standings-result-th" style="width:84px;min-width:84px;">perf</th><th class="standings-result-th" style="width:168px;min-width:168px;">レート変化</th>');
             isAlreadyAppendRowToStandings = true;
         }
