@@ -188,29 +188,28 @@
         //Perf計算時に使うパフォ(Ratedオンリー)
         SideMenu.Datas.Standings.StandingsData.forEach(function (element) {
             if (element.IsRated && element.TotalResult.Count !== 0) {
+                isSomebodyRated = true;
                 if (!(SideMenu.Datas.APerfs[element.UserScreenName])) {
                     activePerf.push(defaultAPerf);
                 }
                 else {
-                    isSomebodyRated = true;
                     activePerf.push(SideMenu.Datas.APerfs[element.UserScreenName])
                 }
             }
         });
-
         if (!isSomebodyRated) {
             SideMenu.Datas.Standings.Fixed = false;
             //元はRatedだったと推測できる場合、通常のRatedと同じような扱い
             activePerf = [];
-            for (var i = 0; i < SideMenu.Datas.Standings.length; i++) {
-                var element = SideMenu.Datas.Standings[i];
+            for (var i = 0; i < SideMenu.Datas.Standings.StandingsData.length; i++) {
+                var element = SideMenu.Datas.Standings.StandingsData[i];
                 if (element.OldRating >= ratedLimit || element.TotalResult.Count === 0) continue;
-                SideMenu.Datas.Standings[i].IsRated = true;
+                SideMenu.Datas.Standings.StandingsData[i].IsRated = true;
                 if (!(SideMenu.Datas.APerfs[element.UserScreenName])) {
                     activePerf.push(defaultAPerf);
-                    return;
+                    continue;
                 }
-                activePerf.push(APerfs[element.UserScreenName]);
+                activePerf.push(SideMenu.Datas.APerfs[element.UserScreenName]);
             }
         }
     }

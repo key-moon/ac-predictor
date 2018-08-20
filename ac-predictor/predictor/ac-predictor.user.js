@@ -554,12 +554,12 @@ SideMenu.Elements.Predictor = (async () => {
 	    const predictorElements = ['predictor-input-rank', 'predictor-input-perf', 'predictor-input-rate', 'predictor-current', 'predictor-reload', 'predictor-tweet'];
 	    const firstContestDate = moment("2016-07-16 21:00");
 	    const Interval = 30000;
-	
+	    console.log(contestScreenName);
 	    const ratedLimit = contestScreenName === "SoundHound Inc. Programming Contest 2018 -Masters Tournament-"
-	        ? 2000 : (\/abc\d{3}\/.test(contestScreenName) ? 1200 : (\/arc\d{3}\/.test(contestScreenName) ? 2800 : Infinity));
-	    const defaultAPerf = \/abc\d{3}\/.test(contestScreenName) ? 800 : 1600;
+	        ? 2000 : (\/abc\\d{3}\/.test(contestScreenName) ? 1200 : (\/arc\\d{3}\/.test(contestScreenName) ? 2800 : Infinity));
+	    const defaultAPerf = \/abc\\d{3}\/.test(contestScreenName) ? 800 : 1600;
 	
-	    const isStandingsPage = \/standings(\\/.*)?\$\/.test(document.location);
+	    const isStandingsPage = \/standings(\\\/.*)?\$\/.test(document.location);
 	
 	    \$('[data-toggle="tooltip"]').tooltip();
 	    \$('#predictor-reload').click(function () {
@@ -568,40 +568,33 @@ SideMenu.Elements.Predictor = (async () => {
 	    \$('#predictor-current').click(function () {
 	        \/\/自分の順位を確認
 	        var myRank = 0;
-	
-	        var tiedList = []
+	        
+	        var ratedCount = 0;
 	        var lastRank = 0;
 	        var rank = 1;
 	        var isContainedMe = false;
 	        \/\/全員回して自分が出てきたら順位更新フラグを立てる
 	        SideMenu.Datas.Standings.StandingsData.forEach(function (element) {
-	            if (!element.IsRated || element.TotalResult.Count === 0) return;
 	            if (lastRank !== element.Rank) {
 	                if (isContainedMe) {
-	                    myRank = rank + (tiedList.length - 1) \/ 2;
+	                    myRank = rank + Math.max(0, ratedCount - 1) \/ 2;
 	                    isContainedMe = false;
 	                }
-	                rank += tiedList.length;
-	                tiedList = [];
+	                rank += ratedCount;
+	                ratedCount = 0;
 	            }
-	
-	            if (isContainedMe) {
-	                myRank = rank + (tiedList.length - 1) \/ 2;
-	                isContainedMe = false;
-	            }
-	
 	            if (userScreenName === element.UserScreenName) isContainedMe = true;
-	            tiedList.push(element)
+	            if (element.IsRated && element.TotalResult.Count !== 0) ratedCount++;
 	            lastRank = element.Rank;
 	        })
-	        \/\/存在しなかったら空欄
-	        if (myRank === 0) {
-	            disabled();
+	        if (isContainedMe) {
+	            myRank = rank + ratedCount \/ 2;
 	        }
-	        else {
-	            lastUpdated = 0;
-	            drawPredictor();
-	        }
+	
+	        if (myRank === 0) return;
+	        \$('#predictor-input-rank').val(myRank);
+	        lastUpdated = 0;
+	        drawPredictor();
 	    });
 	    \$('#predictor-input-rank').keyup(function (event) {
 	        lastUpdated = 0;
@@ -741,29 +734,29 @@ SideMenu.Elements.Predictor = (async () => {
 	        \/\/Perf計算時に使うパフォ(Ratedオンリー)
 	        SideMenu.Datas.Standings.StandingsData.forEach(function (element) {
 	            if (element.IsRated && element.TotalResult.Count !== 0) {
+	                isSomebodyRated = true;
 	                if (!(SideMenu.Datas.APerfs[element.UserScreenName])) {
 	                    activePerf.push(defaultAPerf);
 	                }
 	                else {
-	                    isSomebodyRated = true;
 	                    activePerf.push(SideMenu.Datas.APerfs[element.UserScreenName])
 	                }
 	            }
 	        });
-	
+	        console.log(ratedLimit);
 	        if (!isSomebodyRated) {
 	            SideMenu.Datas.Standings.Fixed = false;
 	            \/\/元はRatedだったと推測できる場合、通常のRatedと同じような扱い
 	            activePerf = [];
-	            for (var i = 0; i < SideMenu.Datas.Standings.length; i++) {
-	                var element = SideMenu.Datas.Standings[i];
+	            for (var i = 0; i < SideMenu.Datas.Standings.StandingsData.length; i++) {
+	                var element = SideMenu.Datas.Standings.StandingsData[i];
 	                if (element.OldRating >= ratedLimit || element.TotalResult.Count === 0) continue;
-	                SideMenu.Datas.Standings[i].IsRated = true;
+	                SideMenu.Datas.Standings.StandingsData[i].IsRated = true;
 	                if (!(SideMenu.Datas.APerfs[element.UserScreenName])) {
 	                    activePerf.push(defaultAPerf);
-	                    return;
+	                    continue;
 	                }
-	                activePerf.push(APerfs[element.UserScreenName]);
+	                activePerf.push(SideMenu.Datas.APerfs[element.UserScreenName]);
 	            }
 	        }
 	    }
