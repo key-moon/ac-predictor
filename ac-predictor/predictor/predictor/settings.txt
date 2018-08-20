@@ -1,2 +1,2 @@
 Predictor
-beta.atcoder.jp/contests/
+beta.atcoder.jp/contests/.*
