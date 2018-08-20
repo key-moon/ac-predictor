@@ -147,6 +147,21 @@
 
     //データを更新して描画する
     function UpdatePredictorsData() {
+        if (!startTime.isBefore()) {
+            disabled();
+            AddAlert('コンテストは始まっていません');
+            return;
+        }
+        if (moment(startTime) < firstContestDate) {
+            disabled();
+            AddAlert('現行レートシステム以前のコンテストです');
+            return;
+        }
+        if (specialContest.indexOf(contestScreenName) >= 0) {
+            disabled();
+            AddAlert('コンテストではありません');
+            return;
+        }
         $('#predictor-reload').button('loading');
         AddAlert('順位表読み込み中…');
         SideMenu.Datas.Update.APerfs().then(SideMenu.Datas.Update.Standings).then(() => {
