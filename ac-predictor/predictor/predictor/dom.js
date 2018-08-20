@@ -345,11 +345,12 @@
             }
             tiedList.forEach(e => {
                 var isRated = e.IsRated && e.TotalResult.Count !== 0;
+                var isSubmitted = e.TotalResult.Count !== 0;
                 var matches = e.Competitions - (IsFixed && isRated ? 1 : 0);
                 var perf = currentPerf + 0.5;
-                var oldRate = (IsFixed ? e.OldRating : e.Rating);
+                var oldRate = (IsFixed && isSubmitted ? e.OldRating : e.Rating);
                 var newRate = (IsFixed ? e.Rating : Math.floor(positivize_rating(matches !== 0 ? calc_rating_from_last(oldRate, perf, matches) : perf - 1200)));
-                eachParticipationResults[e.UserScreenName] = { perf: perf, oldRate: oldRate, newRate: newRate, isRated: isRated, isSubmitted: e.TotalResult.Count !== 0 };
+                eachParticipationResults[e.UserScreenName] = { perf: perf, oldRate: oldRate, newRate: newRate, isRated: isRated, isSubmitted: isSubmitted };
             });
         }
     }
