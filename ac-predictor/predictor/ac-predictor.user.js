@@ -630,7 +630,7 @@ SideMenu.Elements.Predictor = (async () => {
 	    }
 	    if (specialContest.indexOf(contestScreenName) >= 0) {
 	        disabled();
-	        AddAlert('順位表が存在しないコンテストです');
+	        AddAlert('コンテストではありません');
 	        return;
 	    }
 	    if (!endTime.isBefore()) {
@@ -693,6 +693,21 @@ SideMenu.Elements.Predictor = (async () => {
 	
 	    \/\/データを更新して描画する
 	    function UpdatePredictorsData() {
+	        if (!startTime.isBefore()) {
+	            disabled();
+	            AddAlert('コンテストは始まっていません');
+	            return;
+	        }
+	        if (moment(startTime) < firstContestDate) {
+	            disabled();
+	            AddAlert('現行レートシステム以前のコンテストです');
+	            return;
+	        }
+	        if (specialContest.indexOf(contestScreenName) >= 0) {
+	            disabled();
+	            AddAlert('コンテストではありません');
+	            return;
+	        }
 	        \$('#predictor-reload').button('loading');
 	        AddAlert('順位表読み込み中…');
 	        SideMenu.Datas.Update.APerfs().then(SideMenu.Datas.Update.Standings).then(() => {
@@ -928,40 +943,30 @@ SideMenu.Elements.Predictor = (async () => {
 	var style = 
 	``;
 	var dom = 
-	`<div id="predictor-alert"><h5 class='sidemenu-txt'>順位表読み込み中…<\/h5><\/div>
-	<div id="predictor-data">
-	    <div class="row">
-	        <div class="input-group col-xs-offset-1 col-xs-10">
-	            <span class="input-group-addon">順位<span class="glyphicon glyphicon-question-sign" aria-hidden="true" data-html="true" data-toggle="tooltip" data-placement="right" title="" data-original-title="Rated内の順位です。複数人同順位の際は人数を加味します(5位が4人居たら6.5位として計算)"><\/span><\/span>
-	            <input class="form-control" id="predictor-input-rank">
-	            <span class="input-group-addon">位<\/span>
-	        <\/div>
+	`<div id="predictor-alert" class="row"><h5 class='sidemenu-txt'>順位表読み込み中…<\/h5><\/div>
+	<div id="predictor-data" class="row">
+	    <div class="input-group col-xs-offset-1 col-xs-10">
+	        <span class="input-group-addon">順位<span class="glyphicon glyphicon-question-sign" aria-hidden="true" data-html="true" data-toggle="tooltip" data-placement="right" title="" data-original-title="Rated内の順位です。複数人同順位の際は人数を加味します(5位が4人居たら6.5位として計算)"><\/span><\/span>
+	        <input class="form-control" id="predictor-input-rank">
+	        <span class="input-group-addon">位<\/span>
+	    <\/div>
 	        
-	        <div class="input-group col-xs-offset-1 col-xs-10">
-	            <span class="input-group-addon">パフォーマンス<\/span>
-	            <input class="form-control" id="predictor-input-perf">
-	        <\/div>
+	    <div class="input-group col-xs-offset-1 col-xs-10">
+	        <span class="input-group-addon">パフォーマンス<\/span>
+	        <input class="form-control" id="predictor-input-perf">
+	    <\/div>
 	
-	        <div class="input-group col-xs-offset-1 col-xs-10">
-	            <span class="input-group-addon">レーティング<\/span>
-	            <input class="form-control" id="predictor-input-rate">
-	        <\/div>
+	    <div class="input-group col-xs-offset-1 col-xs-10">
+	        <span class="input-group-addon">レーティング<\/span>
+	        <input class="form-control" id="predictor-input-rate">
 	    <\/div>
 	<\/div>
-	<div class="btn-group">
-	    <button class="btn btn-default" id="predictor-current">現在の順位<\/button>
-	    <button type="button" class="btn btn-primary" id="predictor-reload" data-loading-text="更新中…">更新<\/button>
-	    <a class="btn btn-default" rel="nofollow" onClick="window.open(encodeURI(decodeURI(this.href)),'twwindow','width=550, height=450, personalbar=0, toolbar=0, scrollbars=1'); return false;" id='predictor-tweet'>ツイート<\/a>
-	    <!--<button class="btn btn-default" id="predictor-solved" disabled>現問題AC後<\/button>-->
-	<\/div>
-	<div id="predictor-reload">
-	    <!--<h5 class="sidemenu-txt">更新設定<\/h5>-->
-	    <div class="row">
-	        <!--<div class="input-group col-xs-offset-1 col-xs-10">
-	            <span class="input-group-addon" id="predictor-input-desc">自動更新<\/span>
-	            <input type="number" class="form-control" id="predictor-input">
-	            <span class="input-group-addon">秒<\/span>
-	        <\/div>-->
+	<div class="row">
+	    <div class="btn-group col-xs-offset-1">
+	        <button class="btn btn-default" id="predictor-current">現在の順位<\/button>
+	        <button type="button" class="btn btn-primary" id="predictor-reload" data-loading-text="更新中…">更新<\/button>
+	        <a class="btn btn-default" rel="nofollow" onClick="window.open(encodeURI(decodeURI(this.href)),'twwindow','width=550, height=450, personalbar=0, toolbar=0, scrollbars=1'); return false;" id='predictor-tweet'>ツイート<\/a>
+	        <!--<button class="btn btn-default" id="predictor-solved" disabled>現問題AC後<\/button>-->
 	    <\/div>
 	<\/div>`;
 	

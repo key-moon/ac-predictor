@@ -22,40 +22,32 @@
     $('#predictor-current').click(function () {
         //自分の順位を確認
         var myRank = 0;
-
-        var tiedList = []
+        
+        var ratedCount = 0;
         var lastRank = 0;
         var rank = 1;
         var isContainedMe = false;
         //全員回して自分が出てきたら順位更新フラグを立てる
         SideMenu.Datas.Standings.StandingsData.forEach(function (element) {
-            if (!element.IsRated || element.TotalResult.Count === 0) return;
             if (lastRank !== element.Rank) {
                 if (isContainedMe) {
-                    myRank = rank + (tiedList.length - 1) / 2;
+                    myRank = rank + Math.max(0, ratedCount - 1) / 2;
                     isContainedMe = false;
                 }
-                rank += tiedList.length;
-                tiedList = [];
+                rank += ratedCount;
+                ratedCount = 0;
             }
-
-            if (isContainedMe) {
-                myRank = rank + (tiedList.length - 1) / 2;
-                isContainedMe = false;
-            }
-
             if (userScreenName === element.UserScreenName) isContainedMe = true;
-            tiedList.push(element)
+            if (element.IsRated && element.TotalResult.Count !== 0) ratedCount++;
             lastRank = element.Rank;
         })
-        //存在しなかったら空欄
-        if (myRank === 0) {
-            disabled();
+        if (isContainedMe) {
+            myRank = rank + ratedCount / 2;
         }
-        else {
-            lastUpdated = 0;
-            drawPredictor();
-        }
+
+        if (myRank === 0) return;
+        lastUpdated = 0;
+        drawPredictor();
     });
     $('#predictor-input-rank').keyup(function (event) {
         lastUpdated = 0;
