@@ -13,7 +13,7 @@
         ? 2000 : (/abc\d{3}/.test(contestScreenName) ? 1200 : (/arc\d{3}/.test(contestScreenName) ? 2800 : Infinity));
     const defaultAPerf = /abc\d{3}/.test(contestScreenName) ? 800 : 1600;
 
-    const isStandingsPage = /standings(\/.*)?$/.test(document.location);
+    const isStandingsPage = /standings(\?.*)?$/.test(document.location);
 
     $('[data-toggle="tooltip"]').tooltip();
     $('#predictor-reload').click(function () {
