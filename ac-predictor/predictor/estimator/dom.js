@@ -61,11 +61,11 @@
 	}
 
 	function updateTweetBtn() {
-		var tweetStr =
-`AtCoderのハンドルネーム: ${userScreenName}%0A
+        var tweetStr =
+            `AtCoderのハンドルネーム: ${userScreenName}%0A
 ${estimator_state == 0 ? "目標レーティング" : "パフォーマンス"}: ${$("#estimator-input").val()}%0A
-${estimator_state == 0 ? "必要パフォーマンス" : "到達レーティング"}: ${$("#estimator-res").val()}`
-		$('#estimator-tweet').attr("href", `https://twitter.com/intent/tweet?text=${tweetStr}`)
+${estimator_state == 0 ? "必要パフォーマンス" : "到達レーティング"}: ${$("#estimator-res").val()}%0A`;
+        $('#estimator-tweet').attr("href", `https://twitter.com/share?text=${tweetStr}&url=https://greasyfork.org/ja/scripts/369954-ac-predictor`);
 	}
 
 	function displayAlert(message) {

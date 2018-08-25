@@ -281,8 +281,9 @@
             var tweetStr =
                 `Rated内順位: ${$("#predictor-input-rank").val()}位%0A
 パフォーマンス: ${$("#predictor-input-perf").val()}%0A
-レート: ${$("#predictor-input-rate").val()}`
-            $('#predictor-tweet').attr("href", `https://twitter.com/intent/tweet?text=${tweetStr}`)
+レート: ${$("#predictor-input-rate").val()}%0A
+`
+            $('#predictor-tweet').attr("href", `https://twitter.com/share?text=${tweetStr}&url=https://greasyfork.org/ja/scripts/369954-ac-predictor`)
         }
     }
 
