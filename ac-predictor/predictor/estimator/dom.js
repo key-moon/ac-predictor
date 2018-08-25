@@ -1,5 +1,5 @@
 (() => {
-    var estimator_state = localStorage.getItem("sidemenu_estimator_state");
+    var estimator_state = parseInt(localStorage.getItem("sidemenu_estimator_state"));
     $("#estimator-input").val(localStorage.getItem("sidemenu_estimator_value"));
     updateInputs();
 
@@ -11,13 +11,13 @@
 		updateInputs();
     })
 
-	function updateInputs() {
+    function updateInputs() {
 		var input = $("#estimator-input").val();
 		if (!isFinite(input)) {
 			displayAlert("数字ではありません")
 			return;
 		}
-		var history = SideMenu.Datas.History.filter(x => x.IsRated)
+        var history = SideMenu.Datas.History.filter(x => x.IsRated);
 		history.sort(function (a, b) {
 			if (a.EndTime < b.EndTime) return 1;
 			if (a.EndTime > b.EndTime) return -1;
@@ -61,11 +61,11 @@
 	}
 
 	function updateTweetBtn() {
-		var tweetStr =
-`AtCoderのハンドルネーム: ${userScreenName}%0A
+        var tweetStr =
+            `AtCoderのハンドルネーム: ${userScreenName}%0A
 ${estimator_state == 0 ? "目標レーティング" : "パフォーマンス"}: ${$("#estimator-input").val()}%0A
-${estimator_state == 0 ? "必要パフォーマンス" : "到達レーティング"}: ${$("#estimator-res").val()}`
-		$('#estimator-tweet').attr("href", `https://twitter.com/intent/tweet?text=${tweetStr}`)
+${estimator_state == 0 ? "必要パフォーマンス" : "到達レーティング"}: ${$("#estimator-res").val()}%0A`;
+        $('#estimator-tweet').attr("href", `https://twitter.com/share?text=${tweetStr}&url=https://greasyfork.org/ja/scripts/369954-ac-predictor`);
 	}
 
 	function displayAlert(message) {

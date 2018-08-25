@@ -13,7 +13,7 @@
         ? 2000 : (/abc\d{3}/.test(contestScreenName) ? 1200 : (/arc\d{3}/.test(contestScreenName) ? 2800 : Infinity));
     const defaultAPerf = /abc\d{3}/.test(contestScreenName) ? 800 : 1600;
 
-    const isStandingsPage = /standings(\/.*)?$/.test(document.location);
+    const isStandingsPage = /standings(\?.*)?$/.test(document.location);
 
     $('[data-toggle="tooltip"]').tooltip();
     $('#predictor-reload').click(function () {
@@ -281,8 +281,9 @@
             var tweetStr =
                 `Rated内順位: ${$("#predictor-input-rank").val()}位%0A
 パフォーマンス: ${$("#predictor-input-perf").val()}%0A
-レート: ${$("#predictor-input-rate").val()}`
-            $('#predictor-tweet').attr("href", `https://twitter.com/intent/tweet?text=${tweetStr}`)
+レート: ${$("#predictor-input-rate").val()}%0A
+`
+            $('#predictor-tweet').attr("href", `https://twitter.com/share?text=${tweetStr}&url=https://greasyfork.org/ja/scripts/369954-ac-predictor`)
         }
     }
 
@@ -358,6 +359,7 @@
     //結果データを順位表に追加する
     function addPerfToStandings() {
         if (!isStandingsPage) return;
+        $('.standings-perf , .standings-rate').remove();
         if (!isAlreadyAppendRowToStandings) {
             (new MutationObserver(() => { addPerfToStandings(); })).observe(document.getElementById('standings-tbody'), { childList: true });
             $('thead > tr').append('<th class="standings-result-th" style="width:84px;min-width:84px;">perf</th><th class="standings-result-th" style="width:168px;min-width:168px;">レート変化</th>');
@@ -367,18 +369,18 @@
             var userName = $('.standings-username .username', elem).text();
             var perfArr = eachParticipationResults[userName];
             if (!perfArr) {
-                $(elem).append(`<td class="standings-result">-</td>`);
-                $(elem).append(`<td class="standings-result">-</td>`);
+                $(elem).append(`<td class="standings-result standings-perf">-</td>`);
+                $(elem).append(`<td class="standings-result standings-rate">-</td>`);
                 return;
             }
             var perf = perfArr.isSubmitted ? ratingSpan(perfArr.perf) : '<span class="user-unrated">-</span>';
             var oldRate = perfArr.oldRate;
             var newRate = perfArr.newRate;
             var IsRated = perfArr.isRated;
-            $(elem).append(`<td class="standings-result">${ratingSpan(perf)}</td>`);
-            $(elem).append(`<td class="standings-result">${getRatingChangeStr(oldRate,newRate)}</td>`);
+            $(elem).append(`<td class="standings-result standings-perf">${ratingSpan(perf)}</td>`);
+            $(elem).append(`<td class="standings-result standings-rate">${getRatingChangeStr(oldRate,newRate)}</td>`);
             function getRatingChangeStr(oldRate, newRate) {
-                return IsRated ? `${ratingSpan(oldRate)} -> ${ratingSpan(newRate)}(${(newRate >= oldRate ? '+' : '')}${newRate - oldRate})` : `${ratingSpan(oldRate)}(unrated)`;
+                return IsRated ? `${ratingSpan(oldRate)} -> ${ratingSpan(newRate)} (${(newRate >= oldRate ? '+' : '')}${newRate - oldRate})` : `${ratingSpan(oldRate)}(unrated)`;
             }
             function ratingSpan(rate) {
                 return `<span class="user-${SideMenu.GetColor(rate)}">${rate}</span>`;
