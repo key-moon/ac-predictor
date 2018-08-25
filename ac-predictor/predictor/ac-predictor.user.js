@@ -406,7 +406,7 @@ SideMenu.Elements.Estimator = (async () => {
 	
 	var js = 
 	`(() => {
-	    var estimator_state = localStorage.getItem("sidemenu_estimator_state");
+	    var estimator_state = parseInt(localStorage.getItem("sidemenu_estimator_state"));
 	    \$("#estimator-input").val(localStorage.getItem("sidemenu_estimator_value"));
 	    updateInputs();
 	
@@ -418,13 +418,13 @@ SideMenu.Elements.Estimator = (async () => {
 			updateInputs();
 	    })
 	
-		function updateInputs() {
+	    function updateInputs() {
 			var input = \$("#estimator-input").val();
 			if (!isFinite(input)) {
 				displayAlert("数字ではありません")
 				return;
 			}
-			var history = SideMenu.Datas.History.filter(x => x.IsRated)
+	        var history = SideMenu.Datas.History.filter(x => x.IsRated);
 			history.sort(function (a, b) {
 				if (a.EndTime < b.EndTime) return 1;
 				if (a.EndTime > b.EndTime) return -1;
@@ -468,11 +468,11 @@ SideMenu.Elements.Estimator = (async () => {
 		}
 	
 		function updateTweetBtn() {
-			var tweetStr =
-	\`AtCoderのハンドルネーム: \${userScreenName}%0A
+	        var tweetStr =
+	            \`AtCoderのハンドルネーム: \${userScreenName}%0A
 	\${estimator_state == 0 ? "目標レーティング" : "パフォーマンス"}: \${\$("#estimator-input").val()}%0A
-	\${estimator_state == 0 ? "必要パフォーマンス" : "到達レーティング"}: \${\$("#estimator-res").val()}\`
-			\$('#estimator-tweet').attr("href", \`https:\/\/twitter.com\/intent\/tweet?text=\${tweetStr}\`)
+	\${estimator_state == 0 ? "必要パフォーマンス" : "到達レーティング"}: \${\$("#estimator-res").val()}%0A\`;
+	        \$('#estimator-tweet').attr("href", \`https:\/\/twitter.com\/share?text=\${tweetStr}&url=https:\/\/greasyfork.org\/ja\/scripts\/369954-ac-predictor\`);
 		}
 	
 		function displayAlert(message) {
@@ -525,7 +525,7 @@ SideMenu.Elements.Estimator = (async () => {
 
 //Predictor
 SideMenu.Elements.Predictor = (async () => {
-	await SideMenu.appendToSideMenu(/beta.atcoder.jp\/contests\/.*/,'Predictor',getElem);
+	await SideMenu.appendToSideMenu(/beta.atcoder.jp\/contests\/.+/,'Predictor',getElem);
 	async function getElem() {
 	//NameSpace
 	SideMenu.Predictor = {};
@@ -559,7 +559,7 @@ SideMenu.Elements.Predictor = (async () => {
 	        ? 2000 : (\/abc\\d{3}\/.test(contestScreenName) ? 1200 : (\/arc\\d{3}\/.test(contestScreenName) ? 2800 : Infinity));
 	    const defaultAPerf = \/abc\\d{3}\/.test(contestScreenName) ? 800 : 1600;
 	
-	    const isStandingsPage = \/standings(\\\/.*)?\$\/.test(document.location);
+	    const isStandingsPage = \/standings(\\?.*)?\$\/.test(document.location);
 	
 	    \$('[data-toggle="tooltip"]').tooltip();
 	    \$('#predictor-reload').click(function () {
@@ -827,8 +827,9 @@ SideMenu.Elements.Predictor = (async () => {
 	            var tweetStr =
 	                \`Rated内順位: \${\$("#predictor-input-rank").val()}位%0A
 	パフォーマンス: \${\$("#predictor-input-perf").val()}%0A
-	レート: \${\$("#predictor-input-rate").val()}\`
-	            \$('#predictor-tweet').attr("href", \`https:\/\/twitter.com\/intent\/tweet?text=\${tweetStr}\`)
+	レート: \${\$("#predictor-input-rate").val()}%0A
+	\`
+	            \$('#predictor-tweet').attr("href", \`https:\/\/twitter.com\/share?text=\${tweetStr}&url=https:\/\/greasyfork.org\/ja\/scripts\/369954-ac-predictor\`)
 	        }
 	    }
 	
@@ -904,6 +905,7 @@ SideMenu.Elements.Predictor = (async () => {
 	    \/\/結果データを順位表に追加する
 	    function addPerfToStandings() {
 	        if (!isStandingsPage) return;
+	        \$('.standings-perf , .standings-rate').remove();
 	        if (!isAlreadyAppendRowToStandings) {
 	            (new MutationObserver(() => { addPerfToStandings(); })).observe(document.getElementById('standings-tbody'), { childList: true });
 	            \$('thead > tr').append('<th class="standings-result-th" style="width:84px;min-width:84px;">perf<\/th><th class="standings-result-th" style="width:168px;min-width:168px;">レート変化<\/th>');
@@ -913,18 +915,18 @@ SideMenu.Elements.Predictor = (async () => {
 	            var userName = \$('.standings-username .username', elem).text();
 	            var perfArr = eachParticipationResults[userName];
 	            if (!perfArr) {
-	                \$(elem).append(\`<td class="standings-result">-<\/td>\`);
-	                \$(elem).append(\`<td class="standings-result">-<\/td>\`);
+	                \$(elem).append(\`<td class="standings-result standings-perf">-<\/td>\`);
+	                \$(elem).append(\`<td class="standings-result standings-rate">-<\/td>\`);
 	                return;
 	            }
 	            var perf = perfArr.isSubmitted ? ratingSpan(perfArr.perf) : '<span class="user-unrated">-<\/span>';
 	            var oldRate = perfArr.oldRate;
 	            var newRate = perfArr.newRate;
 	            var IsRated = perfArr.isRated;
-	            \$(elem).append(\`<td class="standings-result">\${ratingSpan(perf)}<\/td>\`);
-	            \$(elem).append(\`<td class="standings-result">\${getRatingChangeStr(oldRate,newRate)}<\/td>\`);
+	            \$(elem).append(\`<td class="standings-result standings-perf">\${ratingSpan(perf)}<\/td>\`);
+	            \$(elem).append(\`<td class="standings-result standings-rate">\${getRatingChangeStr(oldRate,newRate)}<\/td>\`);
 	            function getRatingChangeStr(oldRate, newRate) {
-	                return IsRated ? \`\${ratingSpan(oldRate)} -> \${ratingSpan(newRate)}(\${(newRate >= oldRate ? '+' : '')}\${newRate - oldRate})\` : \`\${ratingSpan(oldRate)}(unrated)\`;
+	                return IsRated ? \`\${ratingSpan(oldRate)} -> \${ratingSpan(newRate)} (\${(newRate >= oldRate ? '+' : '')}\${newRate - oldRate})\` : \`\${ratingSpan(oldRate)}(unrated)\`;
 	            }
 	            function ratingSpan(rate) {
 	                return \`<span class="user-\${SideMenu.GetColor(rate)}">\${rate}<\/span>\`;
