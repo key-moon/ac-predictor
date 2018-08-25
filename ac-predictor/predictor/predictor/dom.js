@@ -358,6 +358,7 @@
     //結果データを順位表に追加する
     function addPerfToStandings() {
         if (!isStandingsPage) return;
+        $('.standings-perf , .standings-rate').remove();
         if (!isAlreadyAppendRowToStandings) {
             (new MutationObserver(() => { addPerfToStandings(); })).observe(document.getElementById('standings-tbody'), { childList: true });
             $('thead > tr').append('<th class="standings-result-th" style="width:84px;min-width:84px;">perf</th><th class="standings-result-th" style="width:168px;min-width:168px;">レート変化</th>');
@@ -367,18 +368,18 @@
             var userName = $('.standings-username .username', elem).text();
             var perfArr = eachParticipationResults[userName];
             if (!perfArr) {
-                $(elem).append(`<td class="standings-result">-</td>`);
-                $(elem).append(`<td class="standings-result">-</td>`);
+                $(elem).append(`<td class="standings-result standings-perf">-</td>`);
+                $(elem).append(`<td class="standings-result standings-rate">-</td>`);
                 return;
             }
             var perf = perfArr.isSubmitted ? ratingSpan(perfArr.perf) : '<span class="user-unrated">-</span>';
             var oldRate = perfArr.oldRate;
             var newRate = perfArr.newRate;
             var IsRated = perfArr.isRated;
-            $(elem).append(`<td class="standings-result">${ratingSpan(perf)}</td>`);
-            $(elem).append(`<td class="standings-result">${getRatingChangeStr(oldRate,newRate)}</td>`);
+            $(elem).append(`<td class="standings-result standings-perf">${ratingSpan(perf)}</td>`);
+            $(elem).append(`<td class="standings-result standings-rate">${getRatingChangeStr(oldRate,newRate)}</td>`);
             function getRatingChangeStr(oldRate, newRate) {
-                return IsRated ? `${ratingSpan(oldRate)} -> ${ratingSpan(newRate)}(${(newRate >= oldRate ? '+' : '')}${newRate - oldRate})` : `${ratingSpan(oldRate)}(unrated)`;
+                return IsRated ? `${ratingSpan(oldRate)} -> ${ratingSpan(newRate)} (${(newRate >= oldRate ? '+' : '')}${newRate - oldRate})` : `${ratingSpan(oldRate)}(unrated)`;
             }
             function ratingSpan(rate) {
                 return `<span class="user-${SideMenu.GetColor(rate)}">${rate}</span>`;
