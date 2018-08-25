@@ -1,5 +1,5 @@
 (() => {
-    var estimator_state = localStorage.getItem("sidemenu_estimator_state");
+    var estimator_state = parseInt(localStorage.getItem("sidemenu_estimator_state"));
     $("#estimator-input").val(localStorage.getItem("sidemenu_estimator_value"));
     updateInputs();
 
@@ -11,13 +11,13 @@
 		updateInputs();
     })
 
-	function updateInputs() {
+    function updateInputs() {
 		var input = $("#estimator-input").val();
 		if (!isFinite(input)) {
 			displayAlert("数字ではありません")
 			return;
 		}
-		var history = SideMenu.Datas.History.filter(x => x.IsRated)
+        var history = SideMenu.Datas.History.filter(x => x.IsRated);
 		history.sort(function (a, b) {
 			if (a.EndTime < b.EndTime) return 1;
 			if (a.EndTime > b.EndTime) return -1;
