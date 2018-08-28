@@ -257,4 +257,4 @@
         }
         return defferd.promise();
     }
-})();
+});
