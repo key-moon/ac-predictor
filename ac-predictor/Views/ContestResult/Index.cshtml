@@ -7,6 +7,12 @@
         <select class="form-control col-sm-6 col-md-5 col-lg-4" id="contest-selector"></select>
         <button type="button" class="btn btn-primary col-sm-3 col-md-2" id="confirm-btn">確定</button>
     </form>
+    <label>
+        <input class="form-control" id="username-search-input">
+        <button type="button" class="btn btn-primary" id="username-search-button">ユーザーを検索</button>
+    </label>
+    <div class="alert alert-warning username-search-alert no-input" style="display: none;">ユーザー名を入力してください</div>
+    <div class="alert alert-warning username-search-alert not-found" style="display: none;">ユーザー名が見つかりませんでした</div>
     <form class="form-group row">
         <div class="custom-control custom-checkbox my-1 mx-2">
             <input type="checkbox" class="custom-control-input" id="show-unrated">
@@ -37,4 +43,5 @@
 {
     @Scripts.Render("https://koba-e964.github.io/atcoder-rating-estimator/atcoder_rating.js")
     @Scripts.Render("/scripts/contestselector.js")
+    @Scripts.Render("/scripts/usernamesearch.js")
 }
