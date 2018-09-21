@@ -21,29 +21,39 @@
 
     //ユーザー名検索
     $('#username-search-button').click(() => {
-        // 現在のメッセージを削除
-        $('.username-search-alert').css('display', 'none');
+        clearAlert();
         const searchName = $('#username-search-input').val();
         if (searchName === '') {
-            $('.username-search-alert.no-input').css('display', 'block');
-        } else {
-            let found = false;
-            $('#standings-body a[class^=user]').each((_, elem) => {  // :contains()ではダメ
-                if ($(elem).text() === searchName) {
-                    found = true;
-                    // 現在の枠線を削除
-                    $('#standings-body > tr').css('border', 'none');
-                    // 枠線をつける
-                    $(elem).parent().parent().css('border', 'solid 3px #dd289a');
-                    // スクロール
-                    $("html,body").animate({
-                        scrollTop: $(elem).offset().top - $(window).height() / 2
-                    });
-                }
-            });
-            if (!found) {
-                $('.username-search-alert.not-found').css('display', 'block');
+            setAlert("ユーザー名を入力してください");
+            return;
+        }
+
+        let found = false;
+        $('#standings-body a[class^=user]').each((_, elem) => {
+            if (!found && $(elem).text() === searchName) {
+                // 現在の枠線を削除
+                $('#standings-body > tr').css('border', 'none');
+                // 枠線をつける
+                $(elem).parent().parent().css('border', 'solid 3px #dd289a');
+                // スクロール
+                $("html,body").animate({
+                    scrollTop: $(elem).offset().top - $(window).height() / 2
+                });
+                found = true;
             }
+        });
+
+        if (!found) {
+            setAlert("ユーザー名が見つかりませんでした");
+        }
+        
+        function setAlert(val) {
+            $('#username-search-input').addClass('is-invalid');
+            $('#username-search-alert').text(val);
+        }
+        function clearAlert() {
+            $('#username-search-input').removeClass('is-invalid');
+            $('#username-search-alert').empty();
         }
     });
     $('#username-search-input').keypress(pressedKey => {
