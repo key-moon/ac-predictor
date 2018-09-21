@@ -3,14 +3,14 @@
     ViewBag.Title = "Index";
 }
 <div class="my-2">
-    <form class="form-group row my-0">
+    <form class="form-row my-0">
         <select class="form-control col-sm-6 col-md-5 col-lg-4" id="contest-selector"></select>
-        <button type="button" class="btn btn-primary col-sm-3 col-md-2" id="confirm-btn">確定</button>
+        <button type="button" class="btn col-sm-3 col-md-2 btn-primary" id="confirm-btn">確定</button>
     </form>
-    <label>
-        <input class="form-control" id="username-search-input">
-        <button type="button" class="btn btn-primary" id="username-search-button">ユーザーを検索</button>
-    </label>
+    <form class="form-row my-0">
+        <input class="form-control col-sm-6 col-md-5 col-lg-4" id="username-search-input">
+        <button type="button" class="btn  col-sm-3 col-md-2 btn-outline-secondary" id="username-search-button">ユーザーを検索</button>
+    </form>
     <div class="alert alert-warning username-search-alert no-input" style="display: none;">ユーザー名を入力してください</div>
     <div class="alert alert-warning username-search-alert not-found" style="display: none;">ユーザー名が見つかりませんでした</div>
     <form class="form-group row">
