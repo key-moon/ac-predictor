@@ -1,44 +1,24 @@
 ﻿using System;
-using System.IO;
-using System.Linq;
-using System.Runtime;
-using System.Reflection;
-using System.Diagnostics;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Text.RegularExpressions;
-using static System.Math;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Configuration;
+using System.Web.Http;
+using System.Web.Http.Results;
+using Newtonsoft.Json;
+using ac_predictor.MongoDB;
+using ac_predictor.AtCoder;
 
-
-class P
+namespace ac_predictor.API
 {
-    static void Main()
+    public class StandingsController : ApiController
     {
-        int n = int.Parse(Console.ReadLine());
-        //2つずつ
-        List<int> hoge = new List<int>();
-        for (int i = 1; i < 1000; i++)
+        [Route("api/standings/{contestID}")]
+        public JsonResult<Standings> Get(string contestID)
         {
-            if (n == (i * (i - 1)) / 2)
-            {
-                Console.WriteLine("Yes");
-                Console.WriteLine(i);
-                List<int>[] res = Enumerable.Repeat(0, i).Select(_ => new List<int>()).ToArray();
-                int p = 0;
-                for (int j = 0; j < i - 1; j++)
-                {
-                    for (int k = j + 1; k < i; k++)
-                    {
-                        res[j].Add(p);
-                        res[k].Add(p);
-                        p++;
-                    }
-                }
-                Console.WriteLine(string.Join("\n", res.Select(x => $"{res[0].Count} {string.Join(" ", x)}")));
-                return;
-            }
+            Standings result = Standings.GetStandings(contestID);
+            return Json(result);
         }
-        Console.WriteLine("No");
     }
 }
