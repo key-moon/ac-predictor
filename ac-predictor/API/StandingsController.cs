@@ -25,7 +25,7 @@ class P
                 Console.WriteLine("Yes");
                 Console.WriteLine(i);
                 List<int>[] res = Enumerable.Repeat(0, i).Select(_ => new List<int>()).ToArray();
-                int p = 1;
+                int p = 0;
                 for (int j = 0; j < i - 1; j++)
                 {
                     for (int k = j + 1; k < i; k++)
