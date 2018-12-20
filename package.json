@@ -1,0 +1,23 @@
+{
+  "name": "ac-predictor.user.js",
+  "version": "1.0.0",
+  "description": "パフォーマンス予測機能を主とした、AtCoder関連のツールを提供します。",
+  "main": "ac-predictor/main.js",
+  "dependencies": {},
+  "devDependencies": {
+    "webpack-cli": "^3.1.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/key-moon/ac-predictor.user.js.git"
+  },
+  "author": "keymoon",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://twitter.com/intent/tweet?screen_name=kymn_"
+  },
+  "homepage": "https://github.com/key-moon/ac-predictor.user.js/wiki"
+}

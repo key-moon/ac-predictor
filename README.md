@@ -18,7 +18,7 @@
 │
 ├ jquery
 ├ header.js
-└ scripts.js
+└ main.js
 ```
 
 # 説明
