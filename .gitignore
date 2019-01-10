@@ -2,3 +2,7 @@
 node_modules/
 
 \.idea/
+/.vs
+/bin
+/obj
+/ac-predictor.user.js.njsproj
