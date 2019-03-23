@@ -33,10 +33,9 @@ export class SyncedData {
      * データのアップデートをする関数です。
      */
     async update() {
-        this.data = this.getNewData();
+        this.data = await this.getNewData();
         setLS(this.lsKey, this.data);
         this.onUpdate();
-        return;
     }
 }
 
@@ -51,10 +50,8 @@ export class JsonData extends SyncedData {
      * @param {Function} [onUpdate] 更新の際に呼ばれる関数です。
      */
     constructor(dataURL, lsKey, onUpdate) {
-        super(() => {
-            let data;
-            $.ajax(dataURL).done(x => { data = x; });
-            return data;
+        super(async () => {
+            return await $.ajax(dataURL);
         }, lsKey, onUpdate);
     }
 }
