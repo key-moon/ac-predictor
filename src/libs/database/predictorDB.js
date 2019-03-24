@@ -1,6 +1,6 @@
 ﻿import { DataBase } from './database';
 
-export StoreKeys = { aperfs: "APerfs", standings: "Standings" };
+export const StoreKeys = { aperfs: "APerfs", standings: "Standings" };
 export class PredictorDB extends DataBase {
     version = 1;
     name = "PredictorDB";
