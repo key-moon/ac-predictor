@@ -1,8 +1,4 @@
-﻿SideMenu.DataBase = {};
-SideMenu.DataBase.Name = "PredictorDB";
-SideMenu.DataBase.StoreNames = ["APerfs", "Standings"];
-
-class DataBase {
+﻿export class DataBase {
     name;
     constructor(name, version) {
         this.name = name;
