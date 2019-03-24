@@ -272,55 +272,6 @@ function unpositivize_rating(r) {
 })();
 
 
-//IndexedDB
-SideMenu.DataBase = {};
-SideMenu.DataBase.Name = "PredictorDB";
-SideMenu.DataBase.StoreNames = ["APerfs", "Standings"];
-indexedDB.open(SideMenu.DataBase.Name, SideMenu.Version).onupgradeneeded = (event) => {
-    var db = event.target.result;
-    SideMenu.DataBase.StoreNames.forEach(store => {
-        db.createObjectStore(store, { keyPath: "id" });
-    });
-};
-SideMenu.DataBase.SetData = (store, key, value) => {
-    var defferd = $.Deferred();
-    try {
-        indexedDB.open(SideMenu.DataBase.Name).onsuccess = (e) => {
-            var db = e.target.result;
-            var trans = db.transaction(store, 'readwrite');
-            var objStore = trans.objectStore(store);
-            var data = { id: key, data: value };
-            var putReq = objStore.put(data);
-            putReq.onsuccess = function () {
-                defferd.resolve();
-            }
-        }
-    }
-    catch (e) {
-        defferd.reject(e);
-    }
-    return defferd.promise();
-};
-SideMenu.DataBase.GetData = (store, key) => {
-    var defferd = $.Deferred();
-    try {
-        indexedDB.open(SideMenu.DataBase.Name).onsuccess = (e) => {
-            var db = e.target.result;
-            var trans = db.transaction(store, 'readwrite');
-            var objStore = trans.objectStore(store);
-            objStore.get(key).onsuccess = function (event) {
-                var result = event.target.result;
-                if (!result) defferd.reject("key was not found");
-                else defferd.resolve(result.data);
-            };
-        }
-    }
-    catch (e) {
-        defferd.reject(e);
-    }
-    return defferd.promise();
-};
-
 SideMenu.Files = {};
 SideMenu.Files.Save = (value, name) => {
     var blob = new Blob([value], { type: 'text/plain' })
