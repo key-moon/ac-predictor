@@ -1,4 +1,4 @@
-﻿import JsonData from './data';
+﻿import { JsonData } from './data';
 
 export class APerfsData extends JsonData {
     constructor(contestScreenName, onUpdate) {

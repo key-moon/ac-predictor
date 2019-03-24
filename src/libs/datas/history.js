@@ -1,4 +1,4 @@
-﻿import JsonData from './data';
+﻿import { JsonData } from './data';
 
 /**
  * ユーザのパフォーマンス履歴を取得し、他のタブと同期的にデータを扱います。
