@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2046
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "ac-predictor.user.js", "ac-predictor.user.js.njsproj", "{CD46F458-C2D2-4BC0-B802-75323E7959AA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CD46F458-C2D2-4BC0-B802-75323E7959AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD46F458-C2D2-4BC0-B802-75323E7959AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD46F458-C2D2-4BC0-B802-75323E7959AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD46F458-C2D2-4BC0-B802-75323E7959AA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DFD4DD3F-D8E3-4F9D-9E23-42E1E4F9028A}
+	EndGlobalSection
+EndGlobal
