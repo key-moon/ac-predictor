@@ -6,3 +6,4 @@ node_modules/
 /bin
 /obj
 /ac-predictor.user.js.njsproj
+/dist/bundle.js
