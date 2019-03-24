@@ -1,4 +1,4 @@
-﻿import { getLS, setLS } from '../atcoder-lib/utils';
+﻿import { getLS, setLS } from '../../atcoder-lib/utils';
 import * as $ from 'jquery';
 
 /**
