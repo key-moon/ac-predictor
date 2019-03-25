@@ -1,4 +1,4 @@
-import initializeID from '/libs/tabID';
+import { initializeID } from './libs/tabID';
 
 initializeID();
 
