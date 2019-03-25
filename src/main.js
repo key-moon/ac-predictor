@@ -84,14 +84,6 @@ SideMenu.appendToSideMenu = async function (match, title, elemFunc) {
 import { generateSideMenu } from './libs/sidemenu/generate'
 generateSideMenu();
 
-SideMenu.Files = {};
-SideMenu.Files.Save = (value, name) => {
-    var blob = new Blob([value], { type: 'text/plain' })
-    window.navigator.msSaveBlob(blob, name);
-};
-SideMenu.Files.Load = (async () => {
-    //todo
-})
 
 
 //サイドメニュー要素の入れ物
