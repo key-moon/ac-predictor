@@ -29,12 +29,12 @@ export class DataBase {
         var promise = new Promise((resolve, reject) => {
             try {
                 indexedDB.open(this.name).onsuccess = (e) => {
-                    var db = e.target.result;
+                    const db = e.target.result;
                     if (!dp.objectStore.Names.contains(storeName)) db.createObjectStore(storeName, { keyPath: 'id' });
-                    var trans = db.transaction(storeName, 'readwrite');
-                    var objStore = trans.objectStore(storeName);
-                    var data = { id: key, data: value };
-                    var putReq = objStore.put(data);
+					const trans = db.transaction(storeName, 'readwrite');
+					const objStore = trans.objectStore(storeName);
+					const data = { id: key, data: value };
+					const putReq = objStore.put(data);
                     putReq.onsuccess = () => {
                         db.close();
                         resolve();
@@ -58,11 +58,11 @@ export class DataBase {
         var promise = new Promise((resolve, reject) => {
             try {
                 indexedDB.open(this.name).onsuccess = (openEvent) => {
-                    var db = openEvent.target.result;
-                    var trans = db.transaction(storeName, 'readwrite');
-                    var objStore = trans.objectStore(storeName);
+					const db = openEvent.target.result;
+					const trans = db.transaction(storeName, 'readwrite');
+					const objStore = trans.objectStore(storeName);
                     objStore.get(key).onsuccess = (getEvent) => {
-                        var result = getEvent.target.result;
+						const result = getEvent.target.result;
                         db.close();
                         if (!result) reject(`key '${key}' not found in store '${storeName}'`);
                         else resolve();
