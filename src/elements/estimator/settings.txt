@@ -1,2 +1,0 @@
-Estimator
-beta.atcoder.jp

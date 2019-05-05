@@ -1,2 +1,0 @@
-Predictor
-beta.atcoder.jp/contests/.+
