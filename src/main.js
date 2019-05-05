@@ -55,32 +55,6 @@ SideMenu.Notifications.CanSend = false;
 
 SideMenu.appendLibrary("https://koba-e964.github.io/atcoder-rating-estimator/atcoder_rating.js");
 
-//サイドメニュー追加(将来仕様変更が起きる可能性大)
-SideMenu.appendToSideMenu = async function (match, title, elemFunc) {
-    var defferd = $.Deferred();
-    try {
-        if (!match.test(location.href)) return;
-        //アコーディオンメニュー
-        var dom =
-            `<div class="menu-wrapper">
-	<div class="menu-header">
-		<h4 class="sidemenu-txt">${title}<span class="glyphicon glyphicon-menu-up" style="float: right"></span></h4>
-	</div>
-	<div class="menu-box"><div class="menu-content">${await elemFunc()}</div></div>
-</div>`
-        $('#sidemenu').append(dom);
-        var contents = $('.menu-content');
-        var contentElem = contents[contents.length - 1];
-        $(contentElem).parents('.menu-box').css('height', contentElem.scrollHeight)
-        defferd.resolve();
-    }
-    catch (e) {
-        console.error(e);
-        defferd.reject();
-    }
-    return defferd.promise();
-};
-
 import { generateSideMenu } from './libs/sidemenu/generate'
 generateSideMenu();
 

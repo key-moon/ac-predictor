@@ -4,25 +4,38 @@ import sidemenuHtml from './sidemenu.html';
 import { SideMenuElement } from './element';
 
 class SideMenu {
-	constructor() {
+    constructor() {
+        this.Generate();
+    }
 
-	}
+    Generate() {
+        $('#main-div').append(sidemenuHtml);
+        resizeSidemenuHeight();
+        $('#sidemenu-key').click(function () {
+            $('#sidemenu-key').toggleClass('glyphicon-menu-left glyphicon-menu-right');
+            $('#menu_wrap').toggleClass('sidemenu-active');
+        });
+        $(window).resize(resizeSidemenuHeight);
+        $('#sidemenu').on('click', '.menu-header', (event) => {
+            $(event.target).parents('.menu-wrapper').find('.menu-box').toggleClass('menu-box-collapse');
+            $(event.target).find('.glyphicon').toggleClass('glyphicon-menu-down glyphicon-menu-up');
+        });
 
-	Generate() {
-		$('#main-div').append(sidemenuHtml);
-		resizeSidemenuHeight();
-		$('#sidemenu-key').click(function () {
-			$('#sidemenu-key').toggleClass('glyphicon-menu-left glyphicon-menu-right');
-			$('#menu_wrap').toggleClass('sidemenu-active');
-		});
-		$(window).resize(resizeSidemenuHeight);
-		$('#sidemenu').on('click', '.menu-header', (event) => {
-			$(event.target).parents('.menu-wrapper').find('.menu-box').toggleClass('menu-box-collapse');
-			$(event.target).find('.glyphicon').toggleClass('glyphicon-menu-down glyphicon-menu-up');
-		});
+        function resizeSidemenuHeight() {
+            $('#sidemenu').height($(window).height());
+        }
+    }
 
-		function resizeSidemenuHeight() {
-			$('#sidemenu').height($(window).height());
-		}
-	}
+    /**
+     * サイドメニューに要素を追加します
+     * @param {SideMenuElement} [element] 追加する要素
+     */
+    AddElement(element) {
+        const elementHtml = $(element.GetHTML());
+        $('#sidemenu').append(elementHtml);
+        elementHtml.ready(() => {
+            const content = $('.menu-content', elementHtml);
+            content.parents('.menu-box').css('height', content.scrollHeight)
+        })
+    }
 }
