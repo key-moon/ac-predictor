@@ -4,15 +4,17 @@ import {HistoryData} from "../../libs/datas/history";
 import {StandingsData} from "../../libs/datas/standings";
 import {APerfsData} from "../../libs/datas/aperfs";
 import {getColor} from "../../libs/utils/ratingColor";
+import {calc_rating, calc_rating_from_last, positivize_rating} from "../../libs/utils/atcoder_rating";
 
 export let predictor = new SideMenuElement('predictor','Predictor',/atcoder.jp\/contests\/.+/, document, afterAppend);
 
-function afterAppend() {
+async function afterAppend() {
     const historyData = new HistoryData(userScreenName,() => {});
     const standingsData = new StandingsData(contestScreenName,() => {});
     const aperfsData = new APerfsData(contestScreenName,() => {});
-    standingsData.update();
-    aperfsData.update();
+    await standingsData.update();
+    await aperfsData.update();
+    await historyData.update();
     const maxDic =
         [
             [/^abc\d{3}$/, 1600],
@@ -33,6 +35,8 @@ function afterAppend() {
         ];
 
     const maxPerf = maxDic.filter(x => x[0].exec(contestScreenName))[0][1];
+
+    let activePerf = [];
 
     let eachParticipationResults = {};
     let isAlreadyAppendRowToStandings = false;
@@ -62,7 +66,7 @@ function afterAppend() {
         let rank = 1;
         let isContainedMe = false;
         //全員回して自分が出てきたら順位更新フラグを立てる
-        standingsData.data.forEach(function (element) {
+        standingsData.data.StandingsData.forEach(function (element) {
             if (lastRank !== element.Rank) {
                 if (isContainedMe) {
                     myRank = rank + Math.max(0, ratedCount - 1) / 2;
@@ -217,10 +221,10 @@ function afterAppend() {
 
     //ActivePerfの再計算
     function CalcActivePerf() {
-        let activePerf = [];
+        activePerf = [];
         let isSomebodyRated = false;
         //Perf計算時に使うパフォ(Ratedオンリー)
-        standingsData.data.forEach(function (element) {
+        standingsData.data.StandingsData.forEach(function (element) {
             if (element.IsRated && element.TotalResult.Count !== 0) {
                 isSomebodyRated = true;
                 if (!(aperfsData.data[element.UserScreenName])) {
@@ -384,7 +388,7 @@ function afterAppend() {
                 let matches = e.Competitions - (IsFixed && isRated ? 1 : 0);
                 let perf = currentPerf + 0.5;
                 let oldRate = (IsFixed && isSubmitted ? e.OldRating : e.Rating);
-                let newRate = (IsFixed ? e.Rating : Math.floor(positivize_rating(matches !== 0 ? calc_rating_from_last(oldRate, perf, matches) : perf - 1200)));
+                let newRate = Math.floor(matches !== 0 ? calc_rating_from_last(oldRate, perf, matches) : perf - 1200);
                 eachParticipationResults[e.UserScreenName] = { perf: perf, oldRate: oldRate, newRate: newRate, isRated: isRated, isSubmitted: isSubmitted };
             });
         }
