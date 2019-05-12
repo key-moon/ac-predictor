@@ -2,12 +2,9 @@ import { initializeID } from './libs/tabID';
 
 initializeID();
 
-//NameSpace
-SideMenu = {};
-
 //ライブラリを追加するやつ
-SideMenu.appendLibrary = function (source) {
-    var defferd = $.Deferred();
+function appendLibrary (source) {
+    let defferd = $.Deferred();
     $.ajax({
         url: source
     }).done(((src) => {
@@ -19,7 +16,7 @@ SideMenu.appendLibrary = function (source) {
     return defferd.promise();
 };
 
-//モーダル関連
+/*//モーダル関連
 SideMenu.Modal = {}
 $('body').append('<div class="modal-standing"></div>');
 SideMenu.Modal.SetContent = ((content) => {
@@ -51,21 +48,14 @@ SideMenu.Notifications.CanSend = false;
         });
         if (!Notification.permission) return;
     }
-})();
-
-SideMenu.appendLibrary("https://koba-e964.github.io/atcoder-rating-estimator/atcoder_rating.js");
-
-import { generateSideMenu } from './libs/sidemenu/generate'
-generateSideMenu();
+})();*/
 
 
+import {SideMenu} from "./libs/sidemenu/sidemenu";
+import {predictor} from "./elements/predictor/script";
+import {estimator} from "./elements/estimator/script";
 
-//サイドメニュー要素の入れ物
-SideMenu.Elements = {};
-SideMenu.ViewOrder = ["Predictor", "Estimator"];
 
-//%elements%
-
-SideMenu.ViewOrder.forEach(async (elem) => {
-    await SideMenu.Elements[elem]();
-});
+let sidemenu = new SideMenu();
+if (predictor.ElementShouldDisplayed(document.location.href)) sidemenu.AddElement(predictor);
+if (estimator.ElementShouldDisplayed(document.location.href)) sidemenu.AddElement(estimator);
