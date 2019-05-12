@@ -3,11 +3,6 @@
  * @property {RegExp} [match]
  */
 export class SideMenuElement {
-    id;
-    title;
-    match;
-    document;
-    afterAppend;
 
     /**
      * オブジェクト生成用のコンストラクタです
@@ -26,7 +21,7 @@ export class SideMenuElement {
     }
 
     ElementShouldDisplayed(url) {
-        return this.match.match(url);
+		return this.match.match(url);
     }
 
     GetHTML() {

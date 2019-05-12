@@ -6,11 +6,6 @@ import * as $ from 'jquery';
  */
 export class DataBase {
     /**
-     * データが格納されます。
-     */
-    data;
-
-    /**
      * オブジェクト生成用のコンストラクタです
      * @param {Function} [getNewData] 更新の際に新たなデータオブジェクトを返す関数です。
      * @param {string} [lsKey] 保存に用いるローカルストレージのkeyです。
