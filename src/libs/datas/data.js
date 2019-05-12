@@ -4,11 +4,11 @@ import * as $ from 'jquery';
 /**
  * ローカルストレージを用いて他のタブと同期的にデータを保存/更新するためのクラスです。
  */
-export class SyncedData {
+export class DataBase {
     /**
      * データが格納されます。
      */
-    data = {};
+    data;
 
     /**
      * オブジェクト生成用のコンストラクタです
@@ -20,13 +20,6 @@ export class SyncedData {
         this.getNewData = getNewData;
         this.lsKey = lsKey;
         this.onUpdate = onUpdate;
-        this.data = getNewData();
-
-        window.addEventListener('storage', event => {
-            if (event.key !== lsKey) return;
-            this.data = getLS(this.lsKey);
-            this.onUpdate();
-        });
     }
 
     /**
@@ -34,7 +27,6 @@ export class SyncedData {
      */
     async update() {
         this.data = await this.getNewData();
-        setLS(this.lsKey, this.data);
         this.onUpdate();
     }
 }
@@ -42,7 +34,7 @@ export class SyncedData {
 /**
  * GETでJSONデータを取得し、他のタブと同期的にデータを扱います。
  */
-export class JsonData extends SyncedData {
+export class JsonData extends DataBase {
     /**
      * オブジェクト生成用のコンストラクタです
      * @param {string} [dataURL] データ取得先のURLです。
