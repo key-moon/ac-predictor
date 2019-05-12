@@ -1,9 +1,9 @@
 ﻿import './sidemenu.scss';
-import * as $ from 'jQuery';
+import * as $ from 'jquery';
 import sidemenuHtml from './sidemenu.html';
 import { SideMenuElement } from './element';
 
-class SideMenu {
+export class SideMenu {
     constructor() {
         this.Generate();
     }
@@ -35,7 +35,8 @@ class SideMenu {
         $('#sidemenu').append(elementHtml);
         elementHtml.ready(() => {
             const content = $('.menu-content', elementHtml);
-            content.parents('.menu-box').css('height', content.scrollHeight)
+            content.parents('.menu-box').css('height', content.scrollHeight);
+            element.afterAppend();
         })
     }
 }
