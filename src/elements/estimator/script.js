@@ -1,12 +1,14 @@
 import document from "./dom.html"
 import {SideMenuElement} from "../../libs/sidemenu/element";
+import {HistoryData} from "../../libs/datas/history";
+
+
 
 export let estimator = new SideMenuElement('estimator','Estimator',/atcoder.jp/, document, afterAppend);
 
 
 function afterAppend() {
-    $("#estimator-input").val(localStorage.getItem("sidemenu_estimator_value"));
-
+    const historyData = new HistoryData(userScreenName,() => {});
     var estimator_state = parseInt(localStorage.getItem("sidemenu_estimator_state"));
     $("#estimator-input").val(localStorage.getItem("sidemenu_estimator_value"));
     updateInputs();
@@ -25,7 +27,8 @@ function afterAppend() {
             displayAlert("数字ではありません")
             return;
         }
-        var history = SideMenu.Datas.History.filter(x => x.IsRated);
+
+        var history = historyData.data.filter(x => x.IsRated);
         history.sort(function (a, b) {
             if (a.EndTime < b.EndTime) return 1;
             if (a.EndTime > b.EndTime) return -1;
