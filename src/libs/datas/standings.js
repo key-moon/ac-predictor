@@ -6,7 +6,7 @@
 export class StandingsData extends JsonData {
     constructor(contestScreenName, onUpdate) {
         super(
-            `https://beta.atcoder.jp/contests/${contestScreenName}/standings/json`,
+            `https://atcoder.jp/contests/${contestScreenName}/standings/json`,
             `predictor-standings-${contestScreenName}`,
             onUpdate
         );

@@ -6,7 +6,7 @@
 export class HistoryData extends JsonData {
     constructor(userScreenName, onUpdate) {
         super(
-            `https://beta.atcoder.jp/users/${userScreenName}/history/json`,
+            `https://atcoder.jp/users/${userScreenName}/history/json`,
             `predictor-history-${userScreenName}`,
             onUpdate
         );
