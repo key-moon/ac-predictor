@@ -13,8 +13,8 @@ async function afterAppend() {
     const standingsData = new StandingsData(contestScreenName,() => {});
     const aperfsData = new APerfsData(contestScreenName,() => {});
     //await standingsData.update();
-    //await aperfsData.update();
     //await historyData.update();
+    //await aperfsData.update();
     const maxDic =
         [
             [/^abc\d{3}$/, colorBounds.cyan],
@@ -34,21 +34,19 @@ async function afterAppend() {
             [/.*/, Infinity]
         ];
 
-    const maxPerf = maxDic.filter(x => x[0].exec(contestScreenName))[0][1] + 400;
+    const ratedLimit = maxDic.filter(x => x[0].exec(contestScreenName))[0][1];
+    const maxPerf = ratedLimit + 400;
 
     let activePerf = [];
-
     let eachParticipationResults = {};
+
     let isAlreadyAppendRowToStandings = false;
 
     const specialContest = ['practice', 'APG4b', 'abs'];
-
     const predictorElements = ['predictor-input-rank', 'predictor-input-perf', 'predictor-input-rate', 'predictor-current', 'predictor-reload', 'predictor-tweet'];
     const firstContestDate = moment("2016-07-16 21:00");
-    const Interval = 30000;
 
-    const ratedLimit = contestScreenName === "SoundHound Inc. Programming Contest 2018 -Masters Tournament-"
-        ? 2000 : (/abc\d{3}/.test(contestScreenName) ? 1200 : (/arc\d{3}/.test(contestScreenName) ? 2800 : Infinity));
+    const Interval = 30000;
     const defaultAPerf = /abc\d{3}/.test(contestScreenName) ? 800 : 1600;
 
     const isStandingsPage = /standings(\?.*)?$/.test(document.location);
