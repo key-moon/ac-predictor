@@ -3,7 +3,7 @@ export class EstimatorModel{
         this.inputDesc = "";
         this.resultDesc = "";
         this.perfHistory = perfHistory;
-        this.updateInput();
+        this.updateInput(inputValue);
     }
 
     updateInput(value){
