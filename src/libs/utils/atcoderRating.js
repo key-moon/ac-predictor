@@ -84,13 +84,13 @@ export function unpositivizeRating(rating) {
  * @returns {number} performance
  */
 export function calcRequiredPerformance(targetRating, history) {
-    let invalid = -10000.0;
-    let valid = 10000.0;
+    let upper = 10000.0;
+    let under = -10000.0;
     for (let i = 0; i < 100; ++i) {
-        const mid = (valid + invalid) / 2;
+        const mid = (under + under) / 2;
         const rating = calcRatingFromHistory([mid].concat(history));
-        if (rating >= targetRating) valid = mid;
-        else invalid = mid;
+        if (targetRating <= rating) upper = mid;
+        else upper = mid;
     }
-    return valid;
+    return under;
 }
