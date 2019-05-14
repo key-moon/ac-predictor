@@ -3,8 +3,8 @@ import {SideMenuElement} from "../../libs/sidemenu/element";
 import {HistoryData} from "../../libs/datas/history";
 import {StandingsData} from "../../libs/datas/standings";
 import {APerfsData} from "../../libs/datas/aperfs";
-import {getColor} from "../../libs/utils/ratingColor";
-import {calc_rating, calc_rating_from_last, positivize_rating} from "../../libs/utils/atcoder_rating";
+import {colorBounds, getColor} from "../../libs/utils/ratingColor";
+import {calcRatingFromHistory, calcRatingFromLast, positivizeRating} from "../../libs/utils/atcoderRating";
 
 export let predictor = new SideMenuElement('predictor','Predictor',/atcoder.jp\/contests\/.+/, document, afterAppend);
 
@@ -12,29 +12,29 @@ async function afterAppend() {
     const historyData = new HistoryData(userScreenName,() => {});
     const standingsData = new StandingsData(contestScreenName,() => {});
     const aperfsData = new APerfsData(contestScreenName,() => {});
-    await standingsData.update();
-    await aperfsData.update();
-    await historyData.update();
+    //await standingsData.update();
+    //await aperfsData.update();
+    //await historyData.update();
     const maxDic =
         [
-            [/^abc\d{3}$/, 1600],
-            [/^arc\d{3}$/, 3200],
-            [/^agc\d{3}$/, 8192],
-            [/^apc\d{3}$/, 8192],
-            [/^cf\d{2}-final-open$/, 8192],
-            [/^soundhound2018-summer-qual$/, 2400],
-            [/^caddi2018$/, 3200],
-            [/^caddi2018b$/, 1600],
-            [/^aising2019$/, 2400],
-            [/^keyence2019$/, 3200],
-            [/^nikkei2019-qual$/, 3200],
-            [/^exawizards2019$/, 3200],
-            [/^tenka1-2019$/, 3200],
-            [/^tenka1-2019-beginner$/, 1600],
-            [/.*/, 8192]
+            [/^abc\d{3}$/, colorBounds.cyan],
+            [/^arc\d{3}$/, colorBounds.red],
+            [/^agc\d{3}$/, Infinity],
+            [/^apc\d{3}$/, Infinity],
+            [/^cf\d{2}-final-open$/, Infinity],
+            [/^soundhound2018-summer-qual$/, colorBounds.yellow],
+            [/^caddi2018$/, colorBounds.red],
+            [/^caddi2018b$/, colorBounds.cyan],
+            [/^aising2019$/, colorBounds.yellow],
+            [/^keyence2019$/, colorBounds.red],
+            [/^nikkei2019-qual$/, colorBounds.red],
+            [/^exawizards2019$/, colorBounds.red],
+            [/^tenka1-2019$/, colorBounds.red],
+            [/^tenka1-2019-beginner$/, colorBounds.cyan],
+            [/.*/, Infinity]
         ];
 
-    const maxPerf = maxDic.filter(x => x[0].exec(contestScreenName))[0][1];
+    const maxPerf = maxDic.filter(x => x[0].exec(contestScreenName))[0][1] + 400;
 
     let activePerf = [];
 
@@ -147,7 +147,7 @@ async function afterAppend() {
 
     //自分のレートをパフォから求める
     function getRate(perf) {
-        return positivize_rating(calc_rating(historyData.data.filter(x => x.IsRated).map(x => x.Performance).concat(perf).reverse()));
+        return positivizeRating(calcRatingFromHistory(historyData.data.filter(x => x.IsRated).map(x => x.Performance).concat(perf).reverse()));
     }
 
     //パフォを順位から求める()
@@ -388,7 +388,7 @@ async function afterAppend() {
                 let matches = e.Competitions - (IsFixed && isRated ? 1 : 0);
                 let perf = currentPerf + 0.5;
                 let oldRate = (IsFixed && isSubmitted ? e.OldRating : e.Rating);
-                let newRate = Math.floor(matches !== 0 ? calc_rating_from_last(oldRate, perf, matches) : perf - 1200);
+                let newRate = Math.floor(matches !== 0 ? calcRatingFromLast(oldRate, perf, matches) : perf - 1200);
                 eachParticipationResults[e.UserScreenName] = { perf: perf, oldRate: oldRate, newRate: newRate, isRated: isRated, isSubmitted: isSubmitted };
             });
         }
