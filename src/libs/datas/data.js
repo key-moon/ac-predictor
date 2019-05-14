@@ -1,4 +1,3 @@
-﻿import { getLS, setLS } from '../../atcoder-lib/utils';
 import * as $ from 'jquery';
 
 /**
@@ -8,12 +7,10 @@ export class DataBase {
     /**
      * オブジェクト生成用のコンストラクタです
      * @param {Function} [getNewData] 更新の際に新たなデータオブジェクトを返す関数です。
-     * @param {string} [lsKey] 保存に用いるローカルストレージのkeyです。
      * @param {Function} [onUpdate] 更新の際に呼ばれる関数です。
      */
-    constructor(getNewData, lsKey, onUpdate) {
+    constructor(getNewData, onUpdate) {
         this.getNewData = getNewData;
-        this.lsKey = lsKey;
         this.onUpdate = onUpdate;
     }
 
@@ -33,12 +30,11 @@ export class JsonData extends DataBase {
     /**
      * オブジェクト生成用のコンストラクタです
      * @param {string} [dataURL] データ取得先のURLです。
-     * @param {string} [lsKey] 保存に用いるローカルストレージのkeyです。
      * @param {Function} [onUpdate] 更新の際に呼ばれる関数です。
      */
-    constructor(dataURL, lsKey, onUpdate) {
+    constructor(dataURL, onUpdate) {
         super(async () => {
             return await $.ajax(dataURL);
-        }, lsKey, onUpdate);
+        }, onUpdate);
     }
 }
