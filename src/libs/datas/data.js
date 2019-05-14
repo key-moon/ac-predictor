@@ -1,4 +1,4 @@
-/**
+﻿/**
  * データを保存/更新するためのクラスです。
  */
 export class Data {
@@ -18,6 +18,7 @@ export class Data {
     async update() {
         this.data = await this.getNewData();
         this.onUpdate();
+        return this.data;
     }
 }
 
