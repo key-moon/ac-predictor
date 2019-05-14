@@ -1,9 +1,7 @@
-import * as $ from 'jquery';
-
 /**
- * ローカルストレージを用いて他のタブと同期的にデータを保存/更新するためのクラスです。
+ * データを保存/更新するためのクラスです。
  */
-export class DataBase {
+export class Data {
     /**
      * オブジェクト生成用のコンストラクタです
      * @param {Function} [getNewData] 更新の際に新たなデータオブジェクトを返す関数です。
@@ -26,7 +24,7 @@ export class DataBase {
 /**
  * GETでJSONデータを取得し、他のタブと同期的にデータを扱います。
  */
-export class JsonData extends DataBase {
+export class JsonData extends Data {
     /**
      * オブジェクト生成用のコンストラクタです
      * @param {string} [dataURL] データ取得先のURLです。
