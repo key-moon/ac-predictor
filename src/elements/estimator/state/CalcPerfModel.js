@@ -1,6 +1,6 @@
 import {EstimatorModel} from "./EstimatorModel";
 import {CalcRatingModel} from "./CalcRatingModel";
-import {calcRequiredPerformance} from "../../../libs/utils/atcoderRating";
+import {calcRequiredPerformance, unpositivizeRating} from "../../../libs/utils/atcoderRating";
 
 export class CalcPerfModel extends EstimatorModel{
     constructor(inputValue, perfHistory){
@@ -13,6 +13,6 @@ export class CalcPerfModel extends EstimatorModel{
         return new CalcRatingModel(this.resultValue, this.perfHistory);
     }
     calcResult(input){
-        return calcRequiredPerformance(input, this.perfHistory);
+        return calcRequiredPerformance(unpositivizeRating(input), this.perfHistory);
     }
 }
