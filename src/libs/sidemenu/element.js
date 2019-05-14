@@ -21,7 +21,7 @@ export class SideMenuElement {
     }
 
     ElementShouldDisplayed(url) {
-		return this.match.match(url);
+		return this.match.test(url);
     }
 
     GetHTML() {
