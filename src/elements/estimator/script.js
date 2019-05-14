@@ -42,12 +42,15 @@ async function afterAppend() {
 
     /** modelを元にviewを更新 */
     function updateView() {
+        const roundedInput = roundVal(model.inputValue, 2);
+        const roundedResult = roundVal(model.resultValue, 2);
+
         $("#estimator-input-desc").text(model.inputDesc);
         $("#estimator-res-desc").text(model.resultDesc);
-        estimatorInputSelector.val(roundVal(model.inputValue, 2));
-        estimatorResultSelector.val(roundVal(model.resultValue, 2));
+        estimatorInputSelector.val(roundVal(roundedInput, 2));
+        estimatorResultSelector.val(roundVal(roundedResult, 2));
 
-        const tweetStr = `AtCoderのハンドルネーム: ${userScreenName}\n${model.inputDesc}: ${model.inputValue}\n${model.resultDesc}: ${model.resultValue}\n`;
+        const tweetStr = `AtCoderのハンドルネーム: ${userScreenName}\n${model.inputDesc}: ${roundedInput}\n${model.resultDesc}: ${roundedResult}\n`;
         $('#estimator-tweet').attr("href", GetEmbedTweetLink(tweetStr, "https://greasyfork.org/ja/scripts/369954-ac-predictor"));
 
         function roundVal(value, digit) {
