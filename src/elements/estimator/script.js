@@ -47,8 +47,8 @@ async function afterAppend() {
 
         $("#estimator-input-desc").text(model.inputDesc);
         $("#estimator-res-desc").text(model.resultDesc);
-        estimatorInputSelector.val(roundVal(roundedInput, 2));
-        estimatorResultSelector.val(roundVal(roundedResult, 2));
+        estimatorInputSelector.val(roundedInput);
+        estimatorResultSelector.val(roundedResult);
 
         const tweetStr = `AtCoderのハンドルネーム: ${userScreenName}\n${model.inputDesc}: ${roundedInput}\n${model.resultDesc}: ${roundedResult}\n`;
         $('#estimator-tweet').attr("href", GetEmbedTweetLink(tweetStr, "https://greasyfork.org/ja/scripts/369954-ac-predictor"));
