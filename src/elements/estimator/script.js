@@ -73,6 +73,8 @@ async function GetHistory(){
     });
 }
 
+const models = [CalcPerfModel, CalcRatingModel];
+
 /**
  * LocalStorageに保存されたステートコードから状態を復元します
  * @param {string} [state] ステートを示す文字列(型名)
@@ -81,10 +83,7 @@ async function GetHistory(){
  * @return {EstimatorModel} 構築されたモデル
  */
 function GetModelFromStateCode(state, value, history) {
-    let res ={
-        "CalcRatingState": CalcRatingModel,
-        "CalcPerfState": CalcPerfModel
-    }[state];
-    if (!res) res = CalcPerfModel;
-    return new res(value, history);
+    let model = models.find(model => model.name === state);
+    if (!model) model = CalcPerfModel;
+    return new model(value, history);
 }
