@@ -28,7 +28,8 @@ module.exports = {
         modules: [path.resolve(__dirname, 'src')]
     },
     externals: {
-        jquery: 'jQuery'
+        jquery: 'jQuery',
+        moment: 'moment'
     },
     optimization: {
         minimize: false
