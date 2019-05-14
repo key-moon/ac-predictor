@@ -13,6 +13,7 @@ async function afterAppend() {
     const estimatorInputSelector = $("#estimator-input");
     const estimatorResultSelector = $("#estimator-res");
     let model = GetModelFromStateCode(getLS("sidemenu_estimator_state"), getLS("sidemenu_estimator_value"), await GetHistory());
+    updateView();
 
     $("#estimator-toggle").click(function () {
         model = model.toggle();
@@ -28,7 +29,7 @@ async function afterAppend() {
     /** modelをinputの値に応じて更新 */
     function updateModel() {
         const inputString = estimatorInputSelector.val();
-        if (!inputString || !isFinite(inputString)) return;
+        if (!isFinite(inputString)) return;
         const inputNumber = parseInt(inputString);
         model.updateInput(inputNumber);
     }
