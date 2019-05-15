@@ -1,10 +1,9 @@
 ﻿import { JsonData } from './data';
 
 export class APerfsData extends JsonData {
-    constructor(contestScreenName, onUpdate) {
+    constructor(contestScreenName) {
         super(
-            `https://ac-predictor.azurewebsites.net/api/aperfs/${contestScreenName}`,
-            onUpdate
+            `https://ac-predictor.azurewebsites.net/api/aperfs/${contestScreenName}`
         );
     }
 }

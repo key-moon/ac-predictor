@@ -5,11 +5,9 @@ export class Data {
     /**
      * オブジェクト生成用のコンストラクタです
      * @param {Function} [getNewData] 更新の際に新たなデータオブジェクトを返す関数です。
-     * @param {Function} [onUpdate] 更新の際に呼ばれる関数です。
      */
-    constructor(getNewData, onUpdate) {
+    constructor(getNewData) {
         this.getNewData = getNewData;
-        this.onUpdate = onUpdate;
     }
 
     /**
@@ -17,7 +15,6 @@ export class Data {
      */
     async update() {
         this.data = await this.getNewData();
-        this.onUpdate();
         return this.data;
     }
 }
@@ -29,11 +26,10 @@ export class JsonData extends Data {
     /**
      * オブジェクト生成用のコンストラクタです
      * @param {string} [dataURL] データ取得先のURLです。
-     * @param {Function} [onUpdate] 更新の際に呼ばれる関数です。
      */
-    constructor(dataURL, onUpdate) {
+    constructor(dataURL) {
         super(async () => {
             return await $.ajax(dataURL);
-        }, onUpdate);
+        });
     }
 }
