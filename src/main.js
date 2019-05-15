@@ -2,20 +2,6 @@ import { initializeID } from './libs/tabID';
 
 initializeID();
 
-//ライブラリを追加するやつ
-function appendLibrary (source) {
-    let defferd = $.Deferred();
-    $.ajax({
-        url: source
-    }).done(((src) => {
-        $('head').append(`<script>${src}</script>`);
-        defferd.resolve();
-    })(() => {
-        defferd.fail();
-    }));
-    return defferd.promise();
-};
-
 /*//モーダル関連
 SideMenu.Modal = {}
 $('body').append('<div class="modal-standing"></div>');
