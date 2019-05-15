@@ -1,4 +1,4 @@
-﻿import './sidemenu.scss';
+import './sidemenu.scss';
 import * as $ from 'jquery';
 import sidemenuHtml from './sidemenu.html';
 import { SideMenuElement } from './element';
@@ -35,7 +35,7 @@ export class SideMenu {
         $('#sidemenu').append(elementHtml);
         elementHtml.ready(() => {
             const content = $('.menu-content', elementHtml);
-            content.parents('.menu-box').css('height', content.scrollHeight);
+            content.parents('.menu-box').css('height', content.outerHeight(true));
             element.afterAppend();
         })
     }
