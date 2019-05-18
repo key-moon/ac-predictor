@@ -20,9 +20,9 @@ export class Data {
 }
 
 /**
- * GETでJSONデータを取得し、他のタブと同期的にデータを扱います。
+ * GETでデータを取得します。
  */
-export class JsonData extends Data {
+export class WebData extends Data {
     /**
      * オブジェクト生成用のコンストラクタです
      * @param {string} [dataURL] データ取得先のURLです。
