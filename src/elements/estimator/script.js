@@ -65,7 +65,7 @@ async function afterAppend() {
  */
 async function GetHistory(){
     return new Promise((resolve) => {
-        new HistoryData(userScreenName,() => {}).update().then((data) => {
+        new HistoryData(userScreenName).update().then((data) => {
             resolve(data.filter(x => x.IsRated)
                 .sort((a, b) => moment(b.EndTime) - moment(a.EndTime))
                 .map(x => x.Performance));
