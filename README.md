@@ -7,7 +7,7 @@ ac-predictorのUserScript([ac-predictor](https://greasyfork.org/ja/scripts/36995
 # 開発
 
 ## 環境構築
-まず、node.jsとnpmをインストールしてください。
+まず、`node.js`と`npm`をインストールしてください。
 その後、`npm install`を`package.json`の存在するディレクトリ(=リポジトリのルートディレクトリ)上で実行することにより開発環境が構築できます。
 
 ## ビルド
@@ -24,7 +24,7 @@ ac-predictorのUserScript([ac-predictor](https://greasyfork.org/ja/scripts/36995
 // @description 開発用のスクリプトです。ローカルからビルド済みスクリプトをロードします。
 // @author      keymoon
 // @license     MIT
-// @require     file://[path of the repository directory]/ac-predictor.user.js/dist/bundle.js
+// @require     file://[リポジトリの親ディレクトリへのパス]/ac-predictor.user.js/dist/bundle.js
 // @supportURL  https://github.com/key-moon/ac-predictor.user.js/issues
 // @match       https://atcoder.jp/*
 // @exclude     https://atcoder.jp/*/json
