@@ -31,7 +31,7 @@ export class SideMenu {
      * @param {SideMenuElement} [element] 追加する要素
      */
     addElement(element) {
-        if (element.shouldDisplayed(document.location.href)) return;
+        if (!element.shouldDisplayed(document.location.href)) return;
         const elementHtml = $(element.GetHTML());
         $('#sidemenu').append(elementHtml);
         elementHtml.ready(() => {
