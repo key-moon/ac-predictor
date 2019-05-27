@@ -2,9 +2,13 @@
 
 export const StoreKeys = { aperfs: "APerfs", standings: "Standings" };
 export class PredictorDB extends DataBase {
-    version = 1;
-    name = "PredictorDB";
     constructor() {
-        super(this.name, this.version);
+        super("PredictorDB", 1, (event) => {
+            const db = event.target.result;
+            const storeNames = ["APerfs", "Standings"];
+            storeNames.forEach(store => {
+                db.createObjectStore(store, { keyPath: "id" });
+            });
+        });
     }
 }

@@ -6,16 +6,16 @@
  * @param {Function} [onUpdate] 更新の際に呼ばれる関数です。
  */
 export class DataBase {
-    name;
 
     /**
      * オブジェクト生成用のコンストラクタです
      * @param {string} [name] indexedDBにアクセスする際に用いる名前です。 
      * @param {Number} [version] indexedDBにアクセスする際に用いるバージョンです。 
      */
-    constructor(name, version) {
+    constructor(name, version, update) {
         this.name = name;
         this.version = version;
+        indexedDB.open(name, version).onupgradeneeded = update;
     }
 
     /**
@@ -26,26 +26,23 @@ export class DataBase {
      * @returns {Promise} 非同期のpromiseです。
      */
     async setData(storeName, key, value) {
-        var promise = new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             try {
                 indexedDB.open(this.name).onsuccess = (e) => {
                     const db = e.target.result;
-                    if (!dp.objectStore.Names.contains(storeName)) db.createObjectStore(storeName, { keyPath: 'id' });
-					const trans = db.transaction(storeName, 'readwrite');
-					const objStore = trans.objectStore(storeName);
-					const data = { id: key, data: value };
-					const putReq = objStore.put(data);
+                    const trans = db.transaction(storeName, 'readwrite');
+                    const objStore = trans.objectStore(storeName);
+                    const data = {id: key, data: value};
+                    const putReq = objStore.put(data);
                     putReq.onsuccess = () => {
                         db.close();
                         resolve();
                     };
                 };
-            }
-            catch (e) {
+            } catch (e) {
                 reject(e);
             }
         });
-        return promise;
     }
 
     /**
@@ -55,24 +52,22 @@ export class DataBase {
      * @returns {Promise} 非同期のpromiseです。
      */
     async getData(storeName, key) {
-        var promise = new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             try {
                 indexedDB.open(this.name).onsuccess = (openEvent) => {
-					const db = openEvent.target.result;
-					const trans = db.transaction(storeName, 'readwrite');
-					const objStore = trans.objectStore(storeName);
+                    const db = openEvent.target.result;
+                    const trans = db.transaction(storeName, 'readwrite');
+                    const objStore = trans.objectStore(storeName);
                     objStore.get(key).onsuccess = (getEvent) => {
-						const result = getEvent.target.result;
+                        const result = getEvent.target.result;
                         db.close();
                         if (!result) reject(`key '${key}' not found in store '${storeName}'`);
-                        else resolve();
+                        else resolve(result);
                     };
                 };
-            }
-            catch (e) {
-                defferd.reject(e);
+            } catch (e) {
+                reject(e);
             }
         });
-        return promise;
     }
 }
