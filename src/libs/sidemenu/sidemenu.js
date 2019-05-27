@@ -30,13 +30,14 @@ export class SideMenu {
      * サイドメニューに要素を追加します
      * @param {SideMenuElement} [element] 追加する要素
      */
-    AddElement(element) {
+    addElement(element) {
+        if (element.shouldDisplayed(document.location.href)) return;
         const elementHtml = $(element.GetHTML());
         $('#sidemenu').append(elementHtml);
         elementHtml.ready(() => {
             const content = $('.menu-content', elementHtml);
             content.parents('.menu-box').css('height', content.outerHeight(true));
             element.afterAppend();
-        })
+        });
     }
 }

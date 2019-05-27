@@ -46,6 +46,7 @@ export function calcRatingFromHistory(history) {
  * @returns {number} estimated unpositivized rating
  */
 export function calcRatingFromLast(last, perf, ratedMatches) {
+    if (ratedMatches === 0) return perf - 1200;
     last += f(ratedMatches);
     const weight = 9 - 9 * 0.9 ** ratedMatches;
     const numerator = weight * (2 ** (last / 800.0)) + 2 ** (perf / 800.0);

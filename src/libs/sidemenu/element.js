@@ -20,7 +20,7 @@ export class SideMenuElement {
         this.afterAppend = afterAppend;
     }
 
-    ElementShouldDisplayed(url) {
+    shouldDisplayed(url) {
 		return this.match.test(url);
     }
 

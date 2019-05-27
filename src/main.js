@@ -43,5 +43,5 @@ import {estimator} from "./elements/estimator/script";
 
 let sidemenu = new SideMenu();
 
-if (predictor.ElementShouldDisplayed(document.location.href)) sidemenu.AddElement(predictor);
-if (estimator.ElementShouldDisplayed(document.location.href)) sidemenu.AddElement(estimator);
+sidemenu.addElement(predictor);
+sidemenu.addElement(estimator);
