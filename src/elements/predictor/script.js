@@ -226,6 +226,7 @@ async function afterAppend() {
     //全員の結果データを更新する
     async function updateResultsData() {
         if (contest.standings.Fixed){
+            let lastPerformance = contest.perfLimit;
             results = new FixedResults(
                 (await new ResultsData(contestScreenName).update()).map((result, index) => {
                 let data = contest.standings.StandingsData[index];
@@ -233,12 +234,12 @@ async function afterAppend() {
                     result.IsRated,
                     data.TotalResult.Count !== 0,
                     data.UserScreenName,
-                    result.place,
+                    result.Place,
                     -1,
                     result.OldRating,
                     result.NewRating,
                     0,
-                    result.Performance,
+                    result.IsRated ? lastPerformance = result.Performance : lastPerformance,
                     result.InnerPerformance
                 );
             }));
