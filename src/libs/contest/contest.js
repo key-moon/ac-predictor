@@ -10,12 +10,17 @@ export class Contest{
         const analyzedData = analyzeStandingsData(standings.Fixed, standings.StandingsData, aPerfs, {2000: 800, 2800: 1000, Infinity: 1200}[this.ratedLimit] || 1200, this.ratedLimit);
         this.contestantAPerf = analyzedData.contestantAPerf;
         this.templateResults = analyzedData.templateResults;
+        this.IsRated = analyzedData.isRated;
 
-        /** @return {{contestantAPerf: number[], templateResults: Object<string, Result>}} */
+        /** @return {{contestantAPerf: number[], templateResults: Object<string, Result>, isRated: boolean}} */
         function analyzeStandingsData(fixed, standingsData, aPerfs, defaultAPerf, ratedLimit) {
-            let data = analyze((data) => data.IsRated && data.TotalResult.Count !== 0);
-            if (data.contestantAPerf.length === 0) data = analyze((data) => data.OldRating < ratedLimit && data.TotalResult.Count !== 0);
-            return data;
+            let analyzedData = analyze((data) => data.IsRated && data.TotalResult.Count !== 0);
+            analyzedData.isRated = true;
+            if (analyzedData.contestantAPerf.length === 0) {
+                analyzedData = analyze((data) => data.OldRating < ratedLimit && data.TotalResult.Count !== 0);
+                analyzedData.isRated = false;
+            }
+            return analyzedData;
 
             /** @return {{contestantAPerf: number[], templateResults: Object.<string, Result>}}*/
             function analyze(isUserRated) {
