@@ -1,9 +1,12 @@
+import {Contest} from "../../../libs/contest/contest";
 
 export class PredictorModel{
     /**
      * @param {PredictorModel} [model]
      */
     constructor(model){
+        this.contest = model.contest;
+        this.history = model.history;
         this.updateInformation(model.information);
         this.updateInformation(model.rankValue, model.perfValue, model.rateValue);
     }
