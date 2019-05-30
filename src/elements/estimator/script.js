@@ -1,18 +1,19 @@
 import document from "./dom.html"
 import moment from "moment";
 import {SideMenuElement} from "../../libs/sidemenu/element";
-import {HistoryData} from "../../libs/datas/history";
+import {getRatedContestPerformanceHistory, HistoryData} from "../../libs/datas/history";
 import {CalcPerfModel} from "./state/CalcPerfModel";
 import {CalcRatingModel} from "./state/CalcRatingModel";
 import {getLS, setLS} from "../../atcoder-lib/utils";
 import {GetEmbedTweetLink} from "../../libs/utils/twitter";
+import {roundValue} from "../../libs/utils/roundValue";
 
 export let estimator = new SideMenuElement('estimator','Estimator',/atcoder.jp/, document, afterAppend);
 
 async function afterAppend() {
     const estimatorInputSelector = $("#estimator-input");
     const estimatorResultSelector = $("#estimator-res");
-    let model = GetModelFromStateCode(getLS("sidemenu_estimator_state"), getLS("sidemenu_estimator_value"), await GetHistory());
+    let model = GetModelFromStateCode(getLS("sidemenu_estimator_state"), getLS("sidemenu_estimator_value"), await getRatedContestPerformanceHistory());
     updateView();
 
     $("#estimator-toggle").click(function () {
@@ -42,8 +43,8 @@ async function afterAppend() {
 
     /** modelを元にviewを更新 */
     function updateView() {
-        const roundedInput = roundVal(model.inputValue, 2);
-        const roundedResult = roundVal(model.resultValue, 2);
+        const roundedInput = roundValue(model.inputValue, 2);
+        const roundedResult = roundValue(model.resultValue, 2);
 
         $("#estimator-input-desc").text(model.inputDesc);
         $("#estimator-res-desc").text(model.resultDesc);
@@ -52,25 +53,7 @@ async function afterAppend() {
 
         const tweetStr = `AtCoderのハンドルネーム: ${userScreenName}\n${model.inputDesc}: ${roundedInput}\n${model.resultDesc}: ${roundedResult}\n`;
         $('#estimator-tweet').attr("href", GetEmbedTweetLink(tweetStr, "https://greasyfork.org/ja/scripts/369954-ac-predictor"));
-
-        function roundVal(value, digit) {
-            return Math.round(value * (10 ** digit)) / (10 ** digit);
-        }
     }
-}
-
-/**
- * パフォーマンス履歴を取得し、いい感じで整形して返します
- * @return {Promise<Number[]>} パフォーマンス履歴を返すpromise
- */
-async function GetHistory(){
-    return new Promise((resolve) => {
-        new HistoryData(userScreenName).update().then((data) => {
-            resolve(data.filter(x => x.IsRated)
-                .sort((a, b) => moment(b.EndTime) - moment(a.EndTime))
-                .map(x => x.Performance));
-        })
-    });
 }
 
 const models = [CalcPerfModel, CalcRatingModel];
