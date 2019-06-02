@@ -62,7 +62,7 @@ export class DataBase {
                         const result = getEvent.target.result;
                         db.close();
                         if (!result) reject(`key '${key}' not found in store '${storeName}'`);
-                        else resolve(result);
+                        else resolve(result.data);
                     };
                 };
             } catch (e) {
