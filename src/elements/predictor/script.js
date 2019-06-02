@@ -1,20 +1,23 @@
 import dom from "./dom.html"
-import * as moment from "moment";
+import moment from "moment";
 import {SideMenuElement} from "../../libs/sidemenu/element";
-import {HistoryData} from "../../libs/datas/history";
+import {getRatedContestPerformanceHistory} from "../../libs/datas/history";
 import {StandingsData} from "../../libs/datas/standings";
 import {APerfsData} from "../../libs/datas/aperfs";
 import {getColor} from "../../libs/utils/ratingColor";
-import {calcRatingFromHistory, positivizeRating} from "../../libs/utils/atcoderRating";
 import {fetchContestInformation} from "../../libs/contest/fetchContestInformation";
 import {Results} from "../../libs/contest/results/results";
-import {GetEmbedTweetLink} from "../../libs/utils/twitter";
 import {PredictorDB} from "../../libs/database/predictorDB";
 import {Contest} from "../../libs/contest/contest";
 import {OnDemandResults} from "../../libs/contest/results/standingsResults";
 import {FixedResults} from "../../libs/contest/results/fIxedResults";
 import {ResultsData} from "../../libs/datas/results";
 import {Result} from "../../libs/contest/results/result";
+import {PredictorModel} from "./model/PredictorModel";
+import {CalcFromRankModel} from "./model/calcFromRankModel";
+import {CalcFromPerfModel} from "./model/calcFromPerfModel";
+import {CalcFromRateModel} from "./model/calcFromRateModel";
+import {roundValue} from "../../libs/utils/roundValue";
 
 export let predictor = new SideMenuElement('predictor','Predictor',/atcoder.jp\/contests\/.+/, dom, afterAppend);
 
@@ -24,203 +27,197 @@ const predictorElements = ['predictor-input-rank', 'predictor-input-perf', 'pred
 async function afterAppend() {
     const isStandingsPage = /standings([^\/]*)?$/.test(document.location.href);
     const predictorDB = new PredictorDB();
-    const historyData = new HistoryData(userScreenName);
     const standingsData = new StandingsData(contestScreenName);
     const aperfsData = new APerfsData(contestScreenName);
-
-    await historyData.update();
+    const historyData = await getRatedContestPerformanceHistory();
 
     const contestInformation = await fetchContestInformation(contestScreenName);
-
-    let hasStandingsPageNotIniitialized = true;
-
-    let lastUpdated = 0;
 
     /** @type Results */
     let results;
 
     /** @type Contest */
     let contest;
+
+    /** @type PredictorModel */
+    let model = new PredictorModel({rankValue:0, perfValue:0, rateValue:0, enabled:false, history: historyData});
+
     $('[data-toggle="tooltip"]').tooltip();
-    $('#predictor-reload').click(function () {
-        UpdatePredictorsData();
-    });
-    $('#predictor-current').click(function () {
-        const myResult = contest.templateResults[userScreenName];
-        if (!myResult) return;
-        $('#predictor-input-rank').val(myResult.RatedRank);
-        lastUpdated = 0;
-        drawPredictor();
-    });
-    $('#predictor-input-rank').keyup(function (event) {
-        lastUpdated = 0;
-        drawPredictor();
-    });
-    $('#predictor-input-perf').keyup(function (event) {
-        lastUpdated = 1;
-        drawPredictor();
-    });
-    $('#predictor-input-rate').keyup(function (event) {
-        lastUpdated = 2;
-        drawPredictor();
 
-    });
+    if (!shouldEnabledPredictor().verdict) {
+        model.updateInformation(shouldEnabledPredictor().message);
+        updateView();
+        return;
+    }
 
-    Promise.all(
-        [predictorDB.getData("APerfs", contestScreenName),
-            predictorDB.getData("Standings", contestScreenName)]
-    ).then(async (result) => {
-        aperfsData.data = result[0].data;
-        standingsData.data = result[1].data;
-        CalcActivePerf();
-        drawPredictor();
-        enabled();
-        AddAlert('ローカルストレージから取得されました。');
-        if (isStandingsPage) {
-            if (hasStandingsPageNotIniitialized){
-                initStandings();
+    try{
+        await initPredictor();
+    }
+    catch(e){
+        model.updateInformation(e.message);
+        model.setEnable(false);
+        updateView();
+    }
+
+    subscribeEvents();
+
+    function subscribeEvents() {
+        $('#predictor-reload').click(async () => {
+            model.updateInformation('読み込み中…');
+            $('#predictor-reload').button('loading');
+            updateView();
+            await updateStandingsFromAPI();
+            $('#predictor-reload').button('reset');
+            updateView();
+        });
+        $('#predictor-current').click(function () {
+            const myResult = contest.templateResults[userScreenName];
+            if (!myResult) return;
+            model = new CalcFromRankModel(model);
+            model.updateData(myResult.RatedRank, model.perfValue, model.rateValue);
+            updateView();
+        });
+        $('#predictor-input-rank').keyup(function (event) {
+            const inputString = $('#predictor-input-rank').val();
+            if (!isFinite(inputString)) return;
+            const inputNumber = parseInt(inputString);
+            model = new CalcFromRankModel(model);
+            model.updateData(inputNumber, 0, 0);
+            updateView();
+        });
+        $('#predictor-input-perf').keyup(function (event) {
+            const inputString = $('#predictor-input-perf').val();
+            if (!isFinite(inputString)) return;
+            const inputNumber = parseInt(inputString);
+            model = new CalcFromPerfModel(model);
+            model.updateData(0, inputNumber, 0);
+            updateView();
+        });
+        $('#predictor-input-rate').keyup(function (event) {
+            const inputString = $('#predictor-input-rate').val();
+            if (!isFinite(inputString)) return;
+            const inputNumber = parseInt(inputString);
+            model = new CalcFromRateModel(model);
+            model.updateData(0, 0, inputNumber);
+            updateView();
+        });
+    }
+
+    async function initPredictor(){
+        if(isStandingsPage) {
+            $('thead > tr').append('<th class="standings-result-th" style="width:84px;min-width:84px;">perf</th><th class="standings-result-th" style="width:168px;min-width:168px;">レート変化</th>');
+            new MutationObserver(addPerfToStandings).observe(document.getElementById('standings-tbody'), { childList: true });
+        }
+
+        let aPerfs;
+        let standings;
+
+        try{
+            standings = await standingsData.update();
+        }
+        catch {
+            throw new Error('順位表の取得に失敗しました。');
+        }
+
+        if (standings.Fixed) {
+            try {
+                aPerfs = (await predictorDB.getData("APerfs", contestScreenName));
+                model.updateInformation('保存されたAPerfから計算しています。');
             }
-            await updateResultsData();
+            catch {
+                try {
+                    aPerfs = await aperfsData.update();
+                    model.updateInformation(`最終更新 : ${moment().format('HH:mm:ss')}`);
+                }
+                catch {
+                    throw new Error('APerfの取得に失敗しました。');
+                }
+            }
+        }
+        else {
+            try {
+                aPerfs = await aperfsData.update();
+                model.updateInformation(`最終更新 : ${moment().format('HH:mm:ss')}`);
+            }
+            catch {
+                try {
+                    aPerfs = (await predictorDB.getData("APerfs", contestScreenName));
+                    model.updateInformation('保存されたAPerfから計算しています。');
+                }
+                catch {
+                    throw new Error('データの取得に失敗しました。');
+                }
+            }
+        }
+        await updateData(aPerfs, standings);
+        model.setEnable(true);
+        updateView();
+    }
+
+    async function updateStandingsFromAPI(){
+        try{
+            const shouldEnabled = shouldEnabledPredictor();
+            if (!shouldEnabled.verdict) throw new Error(shouldEnabled.message);
+            const standings = await standingsData.update();
+            await updateData(contest.aPerfs, standings);
+            model.updateInformation(`最終更新 : ${moment().format('HH:mm:ss')}`);
+            model.setEnable(true);
+        }
+        catch(e){
+            model.updateInformation(e.message);
+            model.setEnable(false);
+        }
+    }
+
+    async function updateData(aperfs, standings) {
+        if (Object.keys(aperfs).length === 0) {
+            throw new Error('APerfのデータが提供されていません');
+        }
+        predictorDB.setData('APerfs', contestScreenName, aperfs);
+        contest = new Contest(contestScreenName, contestInformation, standings, aperfs);
+        model.contest = contest;
+        console.log(model);
+        await updateResultsData();
+    }
+
+    function updateView() {
+        const roundedRankValue = isFinite(model.rankValue) ? roundValue(model.rankValue, 2) : '';
+        const roundedPerfValue = isFinite(model.perfValue) ? roundValue(model.perfValue, 2) : '';
+        const roundedRateValue = isFinite(model.rateValue) ? roundValue(model.rateValue, 2) : '';
+        $("#predictor-input-rank").val(roundedRankValue);
+        $("#predictor-input-perf").val(roundedPerfValue);
+        $("#predictor-input-rate").val(roundedRateValue);
+
+        $("#predictor-alert").html(`<h5 class='sidemenu-txt'>${model.information}</h5>`);
+
+        if (model.enabled) enabled();
+        else disabled();
+
+        if (isStandingsPage) {
             addPerfToStandings();
         }
-    }).catch(() => {
-        UpdatePredictorsData();
-    });
-
-    //データを更新して描画する
-    function UpdatePredictorsData() {
-        if (!startTime.isBefore()) {
-            disabled();
-            AddAlert('コンテストは始まっていません');
-            return;
+        function enabled() {
+            $('#predictor-reload').button('reset');
+            predictorElements.forEach(element => {
+                $(`#${element}`).removeAttr("disabled");
+            });
         }
-        if (moment(startTime) < firstContestDate) {
-            disabled();
-            AddAlert('現行レートシステム以前のコンテストです');
-            return;
-        }
-        if (contestInformation.RatedRange[0] > contestInformation.RatedRange[1]) {
-            disabled();
-            AddAlert('ratedなコンテストではありません');
-            return;
-        }
-        $('#predictor-reload').button('loading');
-        AddAlert('順位表読み込み中…');
-        Promise.all(
-            [aperfsData.update(),
-            standingsData.update()]
-        ).then(async () => {
-            if (Object.keys(aperfsData.data).length === 0) {
-                disabled();
-                AddAlert('APerfのデータが提供されていません');
-                return;
-            }
-            if (standingsData.data.Fixed) {
-                predictorDB.setData('APerfs', contestScreenName, aperfsData.data);
-                predictorDB.setData('Standings', contestScreenName, standingsData.data);
-            }
-            CalcActivePerf();
-            if (isStandingsPage) {
-                if (hasStandingsPageNotIniitialized){
-                    initStandings();
-                    hasStandingsPageNotIniitialized = false;
-                }
-                await updateResultsData();
-                addPerfToStandings();
-            }
-            drawPredictor();
-            enabled();
-            AddAlert(`最終更新 : ${moment().format('HH:mm:ss')}`);
-        }).catch(() => {
-            disabled();
-            AddAlert('データの読み込みに失敗しました。');
-        });
-    }
-
-    //ActivePerfの再計算
-    function CalcActivePerf() {
-        contest = new Contest(contestScreenName, contestInformation, standingsData.data, aperfsData.data);
-    }
-
-    //フォームを更新
-    function drawPredictor() {
-        switch (lastUpdated) {
-            case 0:
-                UpdatePredictorFromRank();
-                break;
-            case 1:
-                UpdatePredictorFromPerf();
-                break;
-            case 2:
-                UpdatePredictorFromRate();
-                break;
-        }
-        function UpdatePredictorFromRank() {
-            let rank = $("#predictor-input-rank").val();
-            lastUpdated = 0;
-            let perf = contest.getPerf(rank);
-            let rate = getRate(perf);
-            UpdatePredictor(rank, perf, rate);
-        }
-        function UpdatePredictorFromPerf() {
-            let perf = $("#predictor-input-perf").val();
-            lastUpdated = 1;
-            let rank = contest.getRatedRank(perf);
-            let rate = getRate(perf);
-            UpdatePredictor(rank, perf, rate)
-        }
-        function UpdatePredictorFromRate() {
-            let rate = $("#predictor-input-rate").val();
-            lastUpdated = 2;
-            let upper = 10000;
-            let lower = -10000;
-            while (upper - lower > 0.125) {
-                const mid = (upper + lower) / 2;
-                if (rate < getRate(mid)) upper = mid;
-                else lower = mid;
-            }
-            let perf = (upper + lower) / 2;
-            let rank = contest.getRatedRank(perf);
-            UpdatePredictor(rank, perf, rate);
-        }
-        function UpdatePredictor(rank, perf, rate) {
-            $("#predictor-input-rank").val(round(rank));
-            $("#predictor-input-perf").val(round(perf));
-            $("#predictor-input-rate").val(round(rate));
-            updatePredictorTweetBtn();
-            function round(val) {
-                return Math.round(val * 100) / 100;
-            }
-        }
-        function getRate(perf) {
-            return positivizeRating(calcRatingFromHistory(historyData.data.filter(x => x.IsRated).map(x => x.Performance).concat(perf).reverse()));
-        }
-        //ツイートボタンを更新する
-        function updatePredictorTweetBtn() {
-            let tweetStr = `Rated内順位: ${$("#predictor-input-rank").val()}位\nパフォーマンス: ${$("#predictor-input-perf").val()}\nレート: ${$("#predictor-input-rate").val()}\n`;
-            $('#predictor-tweet').attr("href", GetEmbedTweetLink(tweetStr, "https://greasyfork.org/ja/scripts/369954-ac-predictor"));
+        function disabled() {
+            $('#predictor-reload').button('reset');
+            predictorElements.forEach(element => {
+                $(`#${element}`).attr("disabled", true);
+            });
         }
     }
 
-    //最終更新などの要素を追加する
-    function AddAlert(content) {
-        $("#predictor-alert").html(`<h5 class='sidemenu-txt'>${content}</h5>`);
-    }
-
-    //要素のDisabledを外す
-    function enabled() {
-        $('#predictor-reload').button('reset');
-        predictorElements.forEach(element => {
-            $(`#${element}`).removeAttr("disabled");
-        });
-    }
-
-    //要素にDisabledをつける
-    function disabled() {
-        $('#predictor-reload').button('reset');
-        predictorElements.forEach(element => {
-            $(`#${element}`).attr("disabled", true);
-        });
+    function shouldEnabledPredictor(){
+        if (!startTime.isBefore())
+            return  {'verdict':false ,'message':'コンテストは始まっていません'};
+        if (moment(startTime) < firstContestDate)
+            return  {'verdict':false ,'message':'現行レートシステム以前のコンテストです'};
+        if (contestInformation.RatedRange[0] > contestInformation.RatedRange[1])
+            return {'verdict':false ,'message':'ratedなコンテストではありません'};
+        return {'verdict':true ,'message':''};
     }
 
     //全員の結果データを更新する
@@ -247,13 +244,6 @@ async function afterAppend() {
         else{
             results = new OnDemandResults(contest, contest.templateResults);
         }
-        console.log(results);
-    }
-
-    function initStandings() {
-        $('thead > tr').append('<th class="standings-result-th" style="width:84px;min-width:84px;">perf</th><th class="standings-result-th" style="width:168px;min-width:168px;">レート変化</th>');
-        new MutationObserver(addPerfToStandings).observe(document.getElementById('standings-tbody'), { childList: true });
-        hasStandingsPageNotIniitialized = false;
     }
 
     //結果データを順位表に追加する
