@@ -5,6 +5,7 @@ export class Contest{
         this.ratedLimit = contestInformation.RatedRange[1] + 1;
         this.perfLimit = this.ratedLimit + 400;
         this.standings = standings;
+        this.aPerfs = aPerfs;
         this.rankMemo = {};
 
         const analyzedData = analyzeStandingsData(standings.Fixed, standings.StandingsData, aPerfs, {2000: 800, 2800: 1000, Infinity: 1200}[this.ratedLimit] || 1200, this.ratedLimit);
