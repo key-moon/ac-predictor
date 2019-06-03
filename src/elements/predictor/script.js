@@ -223,23 +223,43 @@ async function afterAppend() {
     //全員の結果データを更新する
     async function updateResultsData() {
         if (contest.standings.Fixed && contest.IsRated){
+            let rawResult = await new ResultsData(contestScreenName).update();
+            rawResult.sort((a, b) => a.Place !== b.Place ? a.Place - b.Place : b.OldRating - a.OldRating);
+            let sortedStandingsData = Array.from(contest.standings.StandingsData).filter(x => x.TotalResult.Count !== 0);
+            sortedStandingsData.sort(
+                (a, b) =>
+                    a.TotalResult.Count === 0 && b.TotalResult.Count === 0 ? 0 :
+                    a.TotalResult.Count === 0 ? 1 :
+                    b.TotalResult.Count === 0 ? -1 :
+                    a.Rank !== b.Rank ? a.Rank - b.Rank :
+                    b.OldRating !== a.OldRating ? b.OldRating - a.OldRating :
+                    a.UserIsDeleted ? -1 :
+                    b.UserIsDeleted ? 1 : 0
+            );
+
             let lastPerformance = contest.perfLimit;
+            let deletedCount = 0;
             results = new FixedResults(
-                (await new ResultsData(contestScreenName).update()).map((result, index) => {
-                let data = contest.standings.StandingsData[index];
-                return new Result(
-                    result.IsRated,
-                    data.TotalResult.Count !== 0,
-                    data.UserScreenName,
-                    result.Place,
-                    -1,
-                    result.OldRating,
-                    result.NewRating,
-                    0,
-                    result.IsRated ? lastPerformance = result.Performance : lastPerformance,
-                    result.InnerPerformance
-                );
-            }));
+                sortedStandingsData.map((data, index) => {
+                    let result = rawResult[index - deletedCount];
+                    if (!result || data.OldRating !== result.OldRating) {
+                        deletedCount++;
+                        result = null;
+                    }
+                    return new Result(
+                        result ? result.IsRated : false,
+                        data.TotalResult.Count !== 0,
+                        data.UserScreenName,
+                        data.Rank,
+                        -1,
+                        data.OldRating,
+                        result ? result.NewRating : 0,
+                        0,
+                        result && result.IsRated ? lastPerformance = result.Performance : lastPerformance,
+                        result ? result.InnerPerformance : 0
+                    );
+                })
+            );
         }
         else{
             results = new OnDemandResults(contest, contest.templateResults);
