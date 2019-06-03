@@ -104,11 +104,6 @@ async function afterAppend() {
     }
 
     async function initPredictor(){
-        if(isStandingsPage) {
-            $('thead > tr').append('<th class="standings-result-th" style="width:84px;min-width:84px;">perf</th><th class="standings-result-th" style="width:168px;min-width:168px;">レート変化</th>');
-            new MutationObserver(addPerfToStandings).observe(document.getElementById('standings-tbody'), { childList: true });
-        }
-
         let aPerfs;
         let standings;
 
@@ -151,6 +146,10 @@ async function afterAppend() {
         }
         await updateData(aPerfs, standings);
         model.setEnable(true);
+        if(isStandingsPage) {
+            $('thead > tr').append('<th class="standings-result-th" style="width:84px;min-width:84px;">perf</th><th class="standings-result-th" style="width:168px;min-width:168px;">レート変化</th>');
+            new MutationObserver(addPerfToStandings).observe(document.getElementById('standings-tbody'), { childList: true });
+        }
         updateView();
     }
 
