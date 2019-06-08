@@ -1,5 +1,6 @@
-﻿import { WebData } from './data';
-import moment from "moment";
+﻿import moment from "moment";
+import { WebData } from './data';
+import { userScreenName } from "../../atcoder-lib/global";
 
 class HistoryData extends WebData {
     constructor(userScreenName) {
