@@ -30,7 +30,40 @@ module.exports = {
     },
     externals: {
         jquery: 'jQuery',
-        moment: 'moment'
+        moment: 'moment',
+
+        //AtCoder's Global Variables
+        LANG: "LANG",
+        userScreenName: 'userScreenName',
+        //only contest page
+        contestScreenName: 'typeof contestScreenName !== "undefined" ? contestScreenName : ""',
+        startTime: 'typeof startTime !== "undefined" ? startTime : ""',
+        endTime: 'typeof endTime !== "undefined" ? endTime : ""',
+
+        //utils.js
+        has: "has",
+
+        arrayToSet: "arrayToSet",
+        setToArray: "setToArray",
+
+        setCookie: "setCookie",
+        getCookie: "getCookie",
+        getCookieBool: "getCookieBool",
+        delCookie: "delCookie",
+
+        setLS: "setLS",
+        getLS: "getLS",
+        delLS: "delLS",
+
+        getServerTime: "getServerTime",
+
+        rand: "rand",
+
+        copy: "copy",
+
+        storeFavs: "storeFavs",
+        reloadFavs: "reloadFavs",
+        toggleFav: "toggleFav",
     },
     optimization: {
         minimize: false
