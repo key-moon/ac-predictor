@@ -265,13 +265,7 @@ async function afterAppend() {
         $('.standings-perf , .standings-rate').remove();
 
         $('#standings-tbody > tr').each((index, elem) => {
-            if (elem.childNodes.length <= 3) {
-                let unparticipatedResultCell = elem.getElementsByClassName("standings-result")[0];
-                unparticipatedResultCell.setAttribute("colspan", parseInt(unparticipatedResultCell.getAttribute("colspan")) + 2);
-                return;
-            }
-            const userName = $('.standings-username .username', elem).text();
-            const result = results.getUserResult(userName);
+            const result = results.getUserResult($('.standings-username .username', elem).text());
             const perfElem = !result || !result.IsSubmitted ? '-' : getRatingSpan(result.Performance);
             const rateElem = !result ? '-' : result.IsRated && contest.IsRated ? getRatingChangeElem(result.OldRating, result.NewRating) : getUnratedElem(result.OldRating);
             $(elem).append(`<td class="standings-result standings-perf">${perfElem}</td>`);
