@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        ac-predictor
 // @namespace   http://ac-predictor.azurewebsites.net/
-// @version     1.1.1
+// @version     1.2.1
 // @description コンテスト中にAtCoderのパフォーマンスを予測します
 // @author      keymoon
 // @license     MIT
