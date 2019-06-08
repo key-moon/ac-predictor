@@ -1,8 +1,6 @@
 import {Result} from "./result";
 import {Results} from "./results";
 
-const defaultResult = new Result(false, false, "", 0 , 0 , 0 ,0 ,0,0,0);
-
 export class FixedResults extends Results{
     /**
      * @param {Result[]} results
@@ -19,6 +17,6 @@ export class FixedResults extends Results{
      * @return {Result}
      */
     getUserResult(userScreenName){
-        return this.resultsDic[userScreenName] || defaultResult;
+        return this.resultsDic[userScreenName] || null;
     }
 }
