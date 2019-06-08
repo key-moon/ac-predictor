@@ -36,9 +36,9 @@ module.exports = {
         LANG: "LANG",
         userScreenName: 'userScreenName',
         //only contest page
-        contestScreenName: 'typeof contestScreenName !== "undefined" ? contestScreenName : ""',
-        startTime: 'typeof startTime !== "undefined" ? startTime : ""',
-        endTime: 'typeof endTime !== "undefined" ? endTime : ""',
+        contestScreenName: '(typeof contestScreenName !== "undefined" ? contestScreenName : null)',
+        startTime: '(typeof startTime !== "undefined" ? startTime : null)',
+        endTime: '(typeof endTime !== "undefined" ? endTime : null)',
 
         //utils.js
         has: "has",
