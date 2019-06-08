@@ -1,8 +1,8 @@
 import LANG from "LANG";
 import userScreenName from 'userScreenName';
 //only contest page
-import contestScreenName from 'typeof contestScreenName !== "undefined" ? contestScreenName : ""';
-import startTime from 'typeof startTime !== "undefined" ? startTime : ""';
-import endTime from 'typeof endTime !== "undefined" ? endTime : ""';
+import contestScreenName from 'contestScreenName';
+import startTime from 'startTime';
+import endTime from 'endTime';
 
 export {LANG, userScreenName, contestScreenName, startTime, endTime};
