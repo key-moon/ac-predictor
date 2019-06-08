@@ -18,11 +18,14 @@ import {CalcFromRankModel} from "./model/calcFromRankModel";
 import {CalcFromPerfModel} from "./model/calcFromPerfModel";
 import {CalcFromRateModel} from "./model/calcFromRateModel";
 import {roundValue} from "../../libs/utils/roundValue";
+import {getLS, setLS} from "../../atcoder-lib/utils";
 
 export let predictor = new SideMenuElement('predictor','Predictor',/atcoder.jp\/contests\/.+/, dom, afterAppend);
 
 const firstContestDate = moment("2016-07-16 21:00");
 const predictorElements = ['predictor-input-rank', 'predictor-input-perf', 'predictor-input-rate', 'predictor-current', 'predictor-reload', 'predictor-tweet'];
+const aPerfUpdatedTimeKey = "predictor-aperf-last-updated";
+const updateDuration = 10 * 60 * 1000;
 
 async function afterAppend() {
     const isStandingsPage = /standings([^\/]*)?$/.test(document.location.href);
@@ -115,29 +118,29 @@ async function afterAppend() {
         }
 
         try {
-            let result =
-                await (standings.Fixed ?
+            const lastUpdated = getLS(aPerfUpdatedTimeKey);
+            const now = Date.now();
+            aPerfs =
+                await (standings.Fixed || now - lastUpdated <= updateDuration ?
                     getAPerfsFromLocalData().catch(() => getAPerfsFromAPI()) :
                     getAPerfsFromAPI().catch(() => getAPerfsFromLocalData()));
-            aPerfs = result.data;
-            model.updateInformation(result.message);
         }
         catch (e) {
             throw new Error('APerfの取得に失敗しました。');
         }
 
         async function getAPerfsFromAPI(){
-            let data = await aperfsData.update();
-            return  {data : data, message : `最終更新 : ${moment().format('HH:mm:ss')}`};
+            setLS(aPerfUpdatedTimeKey, Date.now());
+            return await aperfsData.update();
         }
         async function getAPerfsFromLocalData(){
-            let data = await predictorDB.getData("APerfs", contestScreenName);
-            return  {data : data, message : '保存されたAPerfから計算しています。'};
+            return await predictorDB.getData("APerfs", contestScreenName);
         }
-
 
         await updateData(aPerfs, standings);
         model.setEnable(true);
+        model.updateInformation(`最終更新 : ${moment().format('HH:mm:ss')}`);
+
         if(isStandingsPage) {
             $('thead > tr').append('<th class="standings-result-th" style="width:84px;min-width:84px;">perf</th><th class="standings-result-th" style="width:168px;min-width:168px;">レート変化</th>');
             new MutationObserver(addPerfToStandings).observe(document.getElementById('standings-tbody'), { childList: true });
