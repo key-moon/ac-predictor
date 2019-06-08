@@ -1,5 +1,4 @@
-import document from "./dom.html"
-import moment from "moment";
+import document from "./dom.html";
 import {SideMenuElement} from "../../libs/sidemenu/element";
 import {getRatedContestPerformanceHistory, HistoryData} from "../../libs/datas/history";
 import {CalcPerfModel} from "./state/CalcPerfModel";
@@ -7,6 +6,7 @@ import {CalcRatingModel} from "./state/CalcRatingModel";
 import {getLS, setLS} from "../../atcoder-lib/utils";
 import {GetEmbedTweetLink} from "../../libs/utils/twitter";
 import {roundValue} from "../../libs/utils/roundValue";
+import {userScreenName} from "../../atcoder-lib/global";
 
 export let estimator = new SideMenuElement('estimator','Estimator',/atcoder.jp/, document, afterAppend);
 

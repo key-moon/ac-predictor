@@ -18,6 +18,7 @@ import {CalcFromRankModel} from "./model/calcFromRankModel";
 import {CalcFromPerfModel} from "./model/calcFromPerfModel";
 import {CalcFromRateModel} from "./model/calcFromRateModel";
 import {roundValue} from "../../libs/utils/roundValue";
+import {userScreenName, contestScreenName, startTime} from "../../atcoder-lib/global";
 import {getLS, setLS} from "../../atcoder-lib/utils";
 
 export let predictor = new SideMenuElement('predictor','Predictor',/atcoder.jp\/contests\/.+/, dom, afterAppend);
