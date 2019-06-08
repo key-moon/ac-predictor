@@ -53,7 +53,7 @@ async function afterAppend() {
     try{
         await initPredictor();
     }
-    catch(e){
+    catch (e){
         model.updateInformation(e.message);
         model.setEnable(false);
         updateView();
@@ -110,40 +110,32 @@ async function afterAppend() {
         try{
             standings = await standingsData.update();
         }
-        catch {
+        catch (e){
             throw new Error('順位表の取得に失敗しました。');
         }
 
-        if (standings.Fixed) {
-            try {
-                aPerfs = (await predictorDB.getData("APerfs", contestScreenName));
-                model.updateInformation('保存されたAPerfから計算しています。');
-            }
-            catch {
-                try {
-                    aPerfs = await aperfsData.update();
-                    model.updateInformation(`最終更新 : ${moment().format('HH:mm:ss')}`);
-                }
-                catch {
-                    throw new Error('APerfの取得に失敗しました。');
-                }
-            }
+        try {
+            let result =
+                await (standings.Fixed ?
+                    getAPerfsFromLocalData().catch(() => getAPerfsFromAPI()) :
+                    getAPerfsFromAPI().catch(() => getAPerfsFromLocalData()));
+            aPerfs = result.data;
+            model.updateInformation(result.message);
         }
-        else {
-            try {
-                aPerfs = await aperfsData.update();
-                model.updateInformation(`最終更新 : ${moment().format('HH:mm:ss')}`);
-            }
-            catch {
-                try {
-                    aPerfs = (await predictorDB.getData("APerfs", contestScreenName));
-                    model.updateInformation('保存されたAPerfから計算しています。');
-                }
-                catch {
-                    throw new Error('データの取得に失敗しました。');
-                }
-            }
+        catch (e) {
+            throw new Error('APerfの取得に失敗しました。');
         }
+
+        async function getAPerfsFromAPI(){
+            let data = await aperfsData.update();
+            return  {data : data, message : `最終更新 : ${moment().format('HH:mm:ss')}`};
+        }
+        async function getAPerfsFromLocalData(){
+            let data = await predictorDB.getData("APerfs", contestScreenName);
+            return  {data : data, message : '保存されたAPerfから計算しています。'};
+        }
+
+
         await updateData(aPerfs, standings);
         model.setEnable(true);
         if(isStandingsPage) {
@@ -175,7 +167,6 @@ async function afterAppend() {
         predictorDB.setData('APerfs', contestScreenName, aperfs);
         contest = new Contest(contestScreenName, contestInformation, standings, aperfs);
         model.contest = contest;
-        console.log(model);
         await updateResultsData();
     }
 
