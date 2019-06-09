@@ -168,7 +168,6 @@ async function afterAppend() {
         if (Object.keys(aperfs).length === 0) {
             throw new Error('APerfのデータが提供されていません');
         }
-        predictorDB.setData('APerfs', contestScreenName, aperfs);
         contest = new Contest(contestScreenName, contestInformation, standings, aperfs);
         model.contest = contest;
         await updateResultsData();
@@ -265,6 +264,11 @@ async function afterAppend() {
         $('.standings-perf , .standings-rate').remove();
 
         $('#standings-tbody > tr').each((index, elem) => {
+            if (elem.firstElementChild.textContent === '-') {
+                let longCell = elem.getElementsByClassName("standings-result")[0];
+                longCell.setAttribute("colspan", parseInt(longCell.getAttribute("colspan")) + 2);
+                return;
+            }
             const result = results.getUserResult($('.standings-username .username', elem).text());
             const perfElem = !result || !result.IsSubmitted ? '-' : getRatingSpan(result.Performance);
             const rateElem = !result ? '-' : result.IsRated && contest.IsRated ? getRatingChangeElem(result.OldRating, result.NewRating) : getUnratedElem(result.OldRating);
