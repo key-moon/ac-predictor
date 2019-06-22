@@ -145,6 +145,12 @@ async function afterAppend() {
         if(isStandingsPage) {
             $('thead > tr').append('<th class="standings-result-th" style="width:84px;min-width:84px;">perf</th><th class="standings-result-th" style="width:168px;min-width:168px;">レート変化</th>');
             new MutationObserver(addPerfToStandings).observe(document.getElementById('standings-tbody'), { childList: true });
+            new MutationObserver(async mutationRecord => {
+                var isDisabled = mutationRecord[0].target.classList.contains("disabled");
+                if (isDisabled){
+                    await updateStandingsFromAPI();
+                }
+            }).observe(document.getElementById('refresh'), { attributes: true, attributeFilter: ["class"] });
         }
         updateView();
     }
