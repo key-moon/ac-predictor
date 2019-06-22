@@ -25,6 +25,12 @@ module.exports = {
             }
         ]
     },
+    stats: {
+        all: false,
+        timings: true,
+        builtAt: true,
+        assets: true
+    },
     resolve: {
         modules: [path.resolve(__dirname, 'src')]
     },
