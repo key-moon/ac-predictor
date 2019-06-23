@@ -2,7 +2,6 @@ import * as $ from "jquery";
 import dom from "./dom.html";
 import moment from "moment";
 import {SideMenuElement} from "atcoder-sidemenu";
-import {Results} from "../../libs/contest/results/results";
 import {PredictorDB} from "../../libs/database/predictorDB";
 import {Contest} from "../../libs/contest/contest";
 import {OnDemandResults} from "../../libs/contest/results/standingsResults";
@@ -19,7 +18,7 @@ import {
     getPerformanceHistories, getResultsData,
     getStandingsData
 } from "atcoder-userscript-libs/src/libs/data";
-import {contestScreenName, getLS, setLS, userScreenName} from "atcoder-userscript-libs/src/libs/global";
+import {contestScreenName, startTime, getLS, setLS, userScreenName} from "atcoder-userscript-libs/src/libs/global";
 import {fetchContestInformation} from "atcoder-userscript-libs/src/libs/contestInformation";
 import {getColor} from "atcoder-userscript-libs/src/libs/rating";
 
@@ -31,7 +30,7 @@ const aPerfUpdatedTimeKey = "predictor-aperf-last-updated";
 const updateDuration = 10 * 60 * 1000;
 
 async function afterAppend() {
-    const isStandingsPage = /standings([^\/]*)?$/.test(document.location.href);
+    const isStandingsPage = /standings([^/]*)?$/.test(document.location.href);
     const predictorDB = new PredictorDB();
     const contestInformation = await fetchContestInformation(contestScreenName);
 

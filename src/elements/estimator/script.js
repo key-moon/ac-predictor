@@ -1,10 +1,11 @@
+import * as $ from "jquery"
 import document from "./dom.html";
 import {SideMenuElement} from "atcoder-sidemenu";
 import {CalcPerfModel} from "./model/CalcPerfModel";
 import {CalcRatingModel} from "./model/CalcRatingModel";
 import {GetEmbedTweetLink} from "../../libs/utils/twitter";
 import {roundValue} from "../../libs/utils/roundValue";
-import {getLS, setLS} from "atcoder-userscript-libs/src/libs/global";
+import {getLS, setLS, userScreenName} from "atcoder-userscript-libs/src/libs/global";
 import {getMyHistoryData, getPerformanceHistories} from "atcoder-userscript-libs/src/libs/data";
 
 export let estimator = new SideMenuElement('estimator','Estimator',/atcoder.jp/, document, afterAppend);
@@ -50,7 +51,7 @@ async function afterAppend() {
         estimatorInputSelector.val(roundedInput);
         estimatorResultSelector.val(roundedResult);
 
-        const tweetStr = `AtCoderのハンドルネーム: ${global.userScreenName}\n${model.inputDesc}: ${roundedInput}\n${model.resultDesc}: ${roundedResult}\n`;
+        const tweetStr = `AtCoderのハンドルネーム: ${userScreenName}\n${model.inputDesc}: ${roundedInput}\n${model.resultDesc}: ${roundedResult}\n`;
         $('#estimator-tweet').attr("href", GetEmbedTweetLink(tweetStr, "https://greasyfork.org/ja/scripts/369954-ac-predictor"));
     }
 }
