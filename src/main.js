@@ -12,11 +12,9 @@
 // @exclude     https://atcoder.jp/*/json
 // ==/UserScript==
 
-import {initializeID} from './libs/tabID';
 import {sidemenu} from "atcoder-sidemenu";
 import {predictor} from "./elements/predictor/script";
 import {estimator} from "./elements/estimator/script";
 
-initializeID();
 sidemenu.addElement(predictor);
 sidemenu.addElement(estimator);
