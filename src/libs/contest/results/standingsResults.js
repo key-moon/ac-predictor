@@ -1,6 +1,5 @@
 import {Results} from "./results";
-import {calcRatingFromLast, positivizeRating, unpositivizeRating} from "../../utils/atcoderRating";
-
+import {calcRatingFromLast, positivizeRating, unpositivizeRating} from "atcoder-userscript-libs/src/libs/rating";
 
 export class OnDemandResults extends Results{
     /**

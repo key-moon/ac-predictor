@@ -1,6 +1,6 @@
 import {EstimatorModel} from "./EstimatorModel";
 import {CalcRatingModel} from "./CalcRatingModel";
-import {calcRequiredPerformance, unpositivizeRating} from "../../../libs/utils/atcoderRating";
+import {calcRequiredPerformance, unpositivizeRating} from "atcoder-userscript-libs/src/libs/rating";
 
 export class CalcPerfModel extends EstimatorModel{
     constructor(inputValue, perfHistory){

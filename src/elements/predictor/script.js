@@ -1,25 +1,21 @@
-import dom from "./dom.html"
+import * as $ from "jquery";
+import dom from "./dom.html";
 import moment from "moment";
 import {SideMenuElement} from "../../libs/sidemenu/element";
-import {getRatedContestPerformanceHistory} from "../../libs/datas/history";
-import {StandingsData} from "../../libs/datas/standings";
-import {APerfsData} from "../../libs/datas/aperfs";
-import {getColor} from "../../libs/utils/ratingColor";
-import {fetchContestInformation} from "../../libs/contest/fetchContestInformation";
 import {Results} from "../../libs/contest/results/results";
 import {PredictorDB} from "../../libs/database/predictorDB";
 import {Contest} from "../../libs/contest/contest";
 import {OnDemandResults} from "../../libs/contest/results/standingsResults";
 import {FixedResults} from "../../libs/contest/results/fIxedResults";
-import {ResultsData} from "../../libs/datas/results";
 import {Result} from "../../libs/contest/results/result";
 import {PredictorModel} from "./model/PredictorModel";
 import {CalcFromRankModel} from "./model/calcFromRankModel";
 import {CalcFromPerfModel} from "./model/calcFromPerfModel";
 import {CalcFromRateModel} from "./model/calcFromRateModel";
 import {roundValue} from "../../libs/utils/roundValue";
-import {userScreenName, contestScreenName, startTime} from "../../atcoder-lib/global";
-import {getLS, setLS} from "../../atcoder-lib/utils";
+import {getAPerfsData, getStandingsData} from "atcoder-userscript-libs/src/libs/data";
+import {contestScreenName, getLS, setLS, userScreenName} from "atcoder-userscript-libs/src/libs/global";
+import {fetchContestInformation} from "atcoder-userscript-libs/src/libs/contestInformation";
 
 export let predictor = new SideMenuElement('predictor','Predictor',/atcoder.jp\/contests\/.+/, dom, afterAppend);
 
@@ -31,10 +27,6 @@ const updateDuration = 10 * 60 * 1000;
 async function afterAppend() {
     const isStandingsPage = /standings([^\/]*)?$/.test(document.location.href);
     const predictorDB = new PredictorDB();
-    const standingsData = new StandingsData(contestScreenName);
-    const aperfsData = new APerfsData(contestScreenName);
-    const historyData = await getRatedContestPerformanceHistory();
-
     const contestInformation = await fetchContestInformation(contestScreenName);
 
     /** @type Results */
@@ -81,7 +73,7 @@ async function afterAppend() {
             model.updateData(myResult.RatedRank, model.perfValue, model.rateValue);
             updateView();
         });
-        $('#predictor-input-rank').keyup(function (event) {
+        $('#predictor-input-rank').keyup(function () {
             const inputString = $('#predictor-input-rank').val();
             if (!isFinite(inputString)) return;
             const inputNumber = parseInt(inputString);
@@ -89,7 +81,7 @@ async function afterAppend() {
             model.updateData(inputNumber, 0, 0);
             updateView();
         });
-        $('#predictor-input-perf').keyup(function (event) {
+        $('#predictor-input-perf').keyup(function () {
             const inputString = $('#predictor-input-perf').val();
             if (!isFinite(inputString)) return;
             const inputNumber = parseInt(inputString);
@@ -97,7 +89,7 @@ async function afterAppend() {
             model.updateData(0, inputNumber, 0);
             updateView();
         });
-        $('#predictor-input-rate').keyup(function (event) {
+        $('#predictor-input-rate').keyup(function () {
             const inputString = $('#predictor-input-rate').val();
             if (!isFinite(inputString)) return;
             const inputNumber = parseInt(inputString);
@@ -112,7 +104,7 @@ async function afterAppend() {
         let standings;
 
         try{
-            standings = await standingsData.update();
+            standings = await getStandingsData(contestScreenName);
         }
         catch (e){
             throw new Error('順位表の取得に失敗しました。');
@@ -132,7 +124,7 @@ async function afterAppend() {
 
         async function getAPerfsFromAPI(){
             setLS(aPerfUpdatedTimeKey, Date.now());
-            return await aperfsData.update();
+            return await getAPerfsData(contestScreenName);
         }
         async function getAPerfsFromLocalData(){
             return await predictorDB.getData("APerfs", contestScreenName);
@@ -146,7 +138,7 @@ async function afterAppend() {
             $('thead > tr').append('<th class="standings-result-th" style="width:84px;min-width:84px;">perf</th><th class="standings-result-th" style="width:168px;min-width:168px;">レート変化</th>');
             new MutationObserver(addPerfToStandings).observe(document.getElementById('standings-tbody'), { childList: true });
             new MutationObserver(async mutationRecord => {
-                var isDisabled = mutationRecord[0].target.classList.contains("disabled");
+                const isDisabled = mutationRecord[0].target.classList.contains("disabled");
                 if (isDisabled){
                     await updateStandingsFromAPI();
                 }
@@ -159,7 +151,7 @@ async function afterAppend() {
         try{
             const shouldEnabled = shouldEnabledPredictor();
             if (!shouldEnabled.verdict) throw new Error(shouldEnabled.message);
-            const standings = await standingsData.update();
+            const standings = await getStandingsData(contestScreenName);
             await updateData(contest.aPerfs, standings);
             model.updateInformation(`最終更新 : ${moment().format('HH:mm:ss')}`);
             model.setEnable(true);
@@ -222,7 +214,7 @@ async function afterAppend() {
     //全員の結果データを更新する
     async function updateResultsData() {
         if (contest.standings.Fixed && contest.IsRated){
-            let rawResult = await new ResultsData(contestScreenName).update();
+            let rawResult = await updateResultsData(contestScreenName);
             rawResult.sort((a, b) => a.Place !== b.Place ? a.Place - b.Place : b.OldRating - a.OldRating);
             let sortedStandingsData = Array.from(contest.standings.StandingsData).filter(x => x.TotalResult.Count !== 0);
             sortedStandingsData.sort(
