@@ -1,7 +1,7 @@
 import document from "./dom.html";
 import {SideMenuElement} from "atcoder-sidemenu";
-import {CalcPerfModel} from "./state/CalcPerfModel";
-import {CalcRatingModel} from "./state/CalcRatingModel";
+import {CalcPerfModel} from "./model/CalcPerfModel";
+import {CalcRatingModel} from "./model/CalcRatingModel";
 import {GetEmbedTweetLink} from "../../libs/utils/twitter";
 import {roundValue} from "../../libs/utils/roundValue";
 import {getLS, setLS} from "atcoder-userscript-libs/src/libs/global";
