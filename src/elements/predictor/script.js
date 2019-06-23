@@ -1,7 +1,7 @@
 import * as $ from "jquery";
 import dom from "./dom.html";
 import moment from "moment";
-import {SideMenuElement} from "../../libs/sidemenu/element";
+import {SideMenuElement} from "atcoder-sidemenu";
 import {Results} from "../../libs/contest/results/results";
 import {PredictorDB} from "../../libs/database/predictorDB";
 import {Contest} from "../../libs/contest/contest";

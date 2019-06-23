@@ -1,5 +1,5 @@
 import document from "./dom.html";
-import {SideMenuElement} from "../../libs/sidemenu/element";
+import {SideMenuElement} from "atcoder-sidemenu";
 import {CalcPerfModel} from "./state/CalcPerfModel";
 import {CalcRatingModel} from "./state/CalcRatingModel";
 import {GetEmbedTweetLink} from "../../libs/utils/twitter";
