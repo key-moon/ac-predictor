@@ -25,6 +25,7 @@
   },
   "scripts": {
     "build": "webpack",
+    "format": "eslint *.js /src/** --fix",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
