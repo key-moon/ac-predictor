@@ -1,8 +1,8 @@
-export class Results{
-    constructor(){}
+export class Results {
+    constructor() {}
     /**
      * @param {string} userScreenName
      * @return {Result}
      */
-    getUserResult(userScreenName){}
+    getUserResult(userScreenName) {}
 }

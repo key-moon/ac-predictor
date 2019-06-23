@@ -1,4 +1,4 @@
-export class Result{
+export class Result {
     /***
      * @param {boolean} isRated
      * @param {boolean} isSubmitted
@@ -11,7 +11,18 @@ export class Result{
      * @param {number} oldRating
      * @param {number} newRating
      */
-    constructor(isRated, isSubmitted, userScreenName, place, ratedRank, oldRating, newRating, competitions, performance, innerPerformance){
+    constructor(
+        isRated,
+        isSubmitted,
+        userScreenName,
+        place,
+        ratedRank,
+        oldRating,
+        newRating,
+        competitions,
+        performance,
+        innerPerformance
+    ) {
         this.IsRated = isRated;
         this.IsSubmitted = isSubmitted;
         this.UserScreenName = userScreenName;

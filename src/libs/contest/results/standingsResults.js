@@ -1,13 +1,16 @@
-import {Results} from "./results";
-import {calcRatingFromLast, positivizeRating, unpositivizeRating} from "../../utils/atcoderRating";
+import { Results } from "./results";
+import {
+    calcRatingFromLast,
+    positivizeRating,
+    unpositivizeRating
+} from "atcoder-userscript-libs/src/libs/rating";
 
-
-export class OnDemandResults extends Results{
+export class OnDemandResults extends Results {
     /**
      * @param {Contest} contest
      * @param {Results[]} templateResults
      */
-    constructor(contest, templateResults){
+    constructor(contest, templateResults) {
         super();
         this.Contest = contest;
         this.TemplateResults = templateResults;
@@ -16,13 +19,26 @@ export class OnDemandResults extends Results{
      * @param {string} userScreenName
      * @return {Result}
      */
-    getUserResult(userScreenName){
+    getUserResult(userScreenName) {
         const baseResults = this.TemplateResults[userScreenName];
         if (!baseResults) return null;
         if (!baseResults.Performance) {
-            baseResults.InnerPerformance = this.Contest.getInnerPerf(baseResults.RatedRank);
-            baseResults.Performance = Math.min(baseResults.InnerPerformance, this.Contest.perfLimit);
-            baseResults.NewRating = Math.round(positivizeRating(calcRatingFromLast(unpositivizeRating(baseResults.OldRating), baseResults.Performance, baseResults.Competitions)));
+            baseResults.InnerPerformance = this.Contest.getInnerPerf(
+                baseResults.RatedRank
+            );
+            baseResults.Performance = Math.min(
+                baseResults.InnerPerformance,
+                this.Contest.perfLimit
+            );
+            baseResults.NewRating = Math.round(
+                positivizeRating(
+                    calcRatingFromLast(
+                        unpositivizeRating(baseResults.OldRating),
+                        baseResults.Performance,
+                        baseResults.Competitions
+                    )
+                )
+            );
         }
         return baseResults;
     }

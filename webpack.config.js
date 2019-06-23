@@ -1,11 +1,11 @@
-﻿const path = require('path');
+﻿const path = require("path");
 
 module.exports = {
     mode: "production",
-    entry: path.resolve(__dirname, 'src/main.js'),
+    entry: path.resolve(__dirname, "src/main.js"),
     output: {
-        path: path.resolve(__dirname, 'dist'),
-        filename: 'bundle.js'
+        path: path.resolve(__dirname, "dist"),
+        filename: "bundle.js"
     },
     module: {
         rules: [
@@ -19,54 +19,25 @@ module.exports = {
             },
             {
                 test: /\.(html)$/,
-                use: [
-                    'html-loader'
-                ]
+                use: ["html-loader"]
             }
         ]
     },
     resolve: {
-        modules: [path.resolve(__dirname, 'src')]
+        modules: [path.resolve(__dirname, "src")]
     },
     externals: {
-        jquery: 'jQuery',
-        moment: 'moment',
-
-        //AtCoder's Global Variables
-        LANG: "LANG",
-        userScreenName: 'userScreenName',
-        //only contest page
-        contestScreenName: '(typeof contestScreenName !== "undefined" ? contestScreenName : null)',
-        startTime: '(typeof startTime !== "undefined" ? startTime : null)',
-        endTime: '(typeof endTime !== "undefined" ? endTime : null)',
-
-        //utils.js
-        has: "has",
-
-        arrayToSet: "arrayToSet",
-        setToArray: "setToArray",
-
-        setCookie: "setCookie",
-        getCookie: "getCookie",
-        getCookieBool: "getCookieBool",
-        delCookie: "delCookie",
-
-        setLS: "setLS",
-        getLS: "getLS",
-        delLS: "delLS",
-
-        getServerTime: "getServerTime",
-
-        rand: "rand",
-
-        copy: "copy",
-
-        storeFavs: "storeFavs",
-        reloadFavs: "reloadFavs",
-        toggleFav: "toggleFav",
+        jquery: "jQuery",
+        moment: "moment",
+        "atcoder-sidemenu": "sidemenu",
+        "atcoder-userscript-libs": "usLibs",
+        "atcoder-userscript-libs/src/libs/data": "usLibs.data",
+        "atcoder-userscript-libs/src/libs/rating": "usLibs.rating",
+        "atcoder-userscript-libs/src/libs/global": "usLibs.global",
+        "atcoder-userscript-libs/src/libs/contestInformation":
+            "usLibs.contestInformation"
     },
     optimization: {
         minimize: false
     }
 };
-

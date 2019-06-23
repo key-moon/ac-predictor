@@ -1,21 +1,23 @@
-export class EstimatorModel{
-    constructor(inputValue, perfHistory){
+export class EstimatorModel {
+    constructor(inputValue, perfHistory) {
         this.inputDesc = "";
         this.resultDesc = "";
         this.perfHistory = perfHistory;
         this.updateInput(inputValue);
     }
 
-    updateInput(value){
+    updateInput(value) {
         this.inputValue = value;
         this.resultValue = this.calcResult(value);
     }
 
-    toggle(){}
+    toggle() {}
 
     /**
      * @param {Number} [input]
      * @return {Number}
      */
-    calcResult(input){ return input }
+    calcResult(input) {
+        return input;
+    }
 }

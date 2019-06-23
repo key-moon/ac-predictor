@@ -1,14 +1,13 @@
-import {Result} from "./result";
-import {Results} from "./results";
+import { Results } from "./results";
 
-export class FixedResults extends Results{
+export class FixedResults extends Results {
     /**
      * @param {Result[]} results
      */
-    constructor(results){
+    constructor(results) {
         super();
         this.resultsDic = {};
-        results.forEach((result) => {
+        results.forEach(result => {
             this.resultsDic[result.UserScreenName] = result;
         });
     }
@@ -16,7 +15,7 @@ export class FixedResults extends Results{
      * @param {string} userScreenName
      * @return {Result}
      */
-    getUserResult(userScreenName){
+    getUserResult(userScreenName) {
         return this.resultsDic[userScreenName] || null;
     }
 }
