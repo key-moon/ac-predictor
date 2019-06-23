@@ -37,39 +37,7 @@ module.exports = {
     externals: {
         jquery: 'jQuery',
         moment: 'moment',
-
-        //AtCoder's Global Variables
-        LANG: "LANG",
-        userScreenName: 'userScreenName',
-        //only contest page
-        contestScreenName: '(typeof contestScreenName !== "undefined" ? contestScreenName : null)',
-        startTime: '(typeof startTime !== "undefined" ? startTime : null)',
-        endTime: '(typeof endTime !== "undefined" ? endTime : null)',
-
-        //utils.js
-        has: "has",
-
-        arrayToSet: "arrayToSet",
-        setToArray: "setToArray",
-
-        setCookie: "setCookie",
-        getCookie: "getCookie",
-        getCookieBool: "getCookieBool",
-        delCookie: "delCookie",
-
-        setLS: "setLS",
-        getLS: "getLS",
-        delLS: "delLS",
-
-        getServerTime: "getServerTime",
-
-        rand: "rand",
-
-        copy: "copy",
-
-        storeFavs: "storeFavs",
-        reloadFavs: "reloadFavs",
-        toggleFav: "toggleFav",
+        'atcoder-userscript-libs': 'usLibs'
     },
     optimization: {
         minimize: false
