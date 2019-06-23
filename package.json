@@ -4,6 +4,7 @@
   "description": "パフォーマンス予測機能を主とした、AtCoder関連のツールを提供します。",
   "main": "ac-predictor/main.js",
   "dependencies": {
+    "atcoder-userscript-libs": "^0.1.1",
     "jquery": "^1.9.1",
     "moment": "^2.24.0"
   },
