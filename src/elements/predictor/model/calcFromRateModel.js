@@ -1,5 +1,5 @@
 import {PredictorModel} from "./PredictorModel";
-import {calcRatingFromHistory, calcRequiredPerformance, unpositivizeRating} from "../../../libs/utils/atcoderRating";
+import {calcRequiredPerformance, unpositivizeRating} from "atcoder-userscript-libs/src/libs/rating";
 
 export class CalcFromRateModel extends PredictorModel{
     updateData(rankValue, perfValue, rateValue) {

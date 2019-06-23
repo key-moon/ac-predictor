@@ -16,6 +16,7 @@ import {roundValue} from "../../libs/utils/roundValue";
 import {getAPerfsData, getStandingsData} from "atcoder-userscript-libs/src/libs/data";
 import {contestScreenName, getLS, setLS, userScreenName} from "atcoder-userscript-libs/src/libs/global";
 import {fetchContestInformation} from "atcoder-userscript-libs/src/libs/contestInformation";
+import {getColor} from "atcoder-userscript-libs/src/libs/rating";
 
 export let predictor = new SideMenuElement('predictor','Predictor',/atcoder.jp\/contests\/.+/, dom, afterAppend);
 
