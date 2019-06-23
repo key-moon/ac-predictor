@@ -13,7 +13,12 @@ import {CalcFromRankModel} from "./model/calcFromRankModel";
 import {CalcFromPerfModel} from "./model/calcFromPerfModel";
 import {CalcFromRateModel} from "./model/calcFromRateModel";
 import {roundValue} from "../../libs/utils/roundValue";
-import {getAPerfsData, getStandingsData} from "atcoder-userscript-libs/src/libs/data";
+import {
+    getAPerfsData,
+    getMyHistoryData,
+    getPerformanceHistories, getResultsData,
+    getStandingsData
+} from "atcoder-userscript-libs/src/libs/data";
 import {contestScreenName, getLS, setLS, userScreenName} from "atcoder-userscript-libs/src/libs/global";
 import {fetchContestInformation} from "atcoder-userscript-libs/src/libs/contestInformation";
 import {getColor} from "atcoder-userscript-libs/src/libs/rating";
@@ -37,7 +42,7 @@ async function afterAppend() {
     let contest;
 
     /** @type PredictorModel */
-    let model = new PredictorModel({rankValue:0, perfValue:0, rateValue:0, enabled:false, history: historyData});
+    let model = new PredictorModel({rankValue:0, perfValue:0, rateValue:0, enabled:false, history: getPerformanceHistories(await getMyHistoryData())});
 
     $('[data-toggle="tooltip"]').tooltip();
 
@@ -215,7 +220,7 @@ async function afterAppend() {
     //全員の結果データを更新する
     async function updateResultsData() {
         if (contest.standings.Fixed && contest.IsRated){
-            let rawResult = await updateResultsData(contestScreenName);
+            let rawResult = await getResultsData(contestScreenName);
             rawResult.sort((a, b) => a.Place !== b.Place ? a.Place - b.Place : b.OldRating - a.OldRating);
             let sortedStandingsData = Array.from(contest.standings.StandingsData).filter(x => x.TotalResult.Count !== 0);
             sortedStandingsData.sort(
