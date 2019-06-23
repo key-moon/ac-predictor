@@ -12,9 +12,9 @@
 // @exclude     https://atcoder.jp/*/json
 // ==/UserScript==
 
-import {sidemenu} from "atcoder-sidemenu";
-import {predictor} from "./elements/predictor/script";
-import {estimator} from "./elements/estimator/script";
+import { sidemenu } from "atcoder-sidemenu";
+import { predictor } from "./elements/predictor/script";
+import { estimator } from "./elements/estimator/script";
 
 sidemenu.addElement(predictor);
 sidemenu.addElement(estimator);
