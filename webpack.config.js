@@ -31,6 +31,7 @@ module.exports = {
     externals: {
         jquery: 'jQuery',
         moment: 'moment',
+        'atcoder-sidemenu': 'sidemenu',
         'atcoder-userscript-libs': 'usLibs',
         'atcoder-userscript-libs/src/libs/data': 'usLibs.data',
         'atcoder-userscript-libs/src/libs/rating': 'usLibs.rating',
