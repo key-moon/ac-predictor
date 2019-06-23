@@ -1,5 +1,3 @@
-import {Contest} from "../../../libs/contest/contest";
-
 export class PredictorModel{
     /**
      * @param {PredictorModel} [model]

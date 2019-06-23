@@ -1,4 +1,3 @@
-import {Result} from "./result";
 import {Results} from "./results";
 
 export class FixedResults extends Results{
