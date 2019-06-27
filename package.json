@@ -6,7 +6,7 @@
   "dependencies": {
     "atcoder-sidemenu": "^0.1.2",
     "atcoder-userscript-libs": "^0.1.1",
-    "jquery": "^1.12.4",
+    "jquery": "^3.4.0",
     "moment": "^2.24.0"
   },
   "devDependencies": {
