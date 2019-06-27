@@ -348,9 +348,11 @@ async function afterAppend() {
                 );
                 return;
             }
-            const result = results.getUserResult(
-                $(".standings-username .username", elem).text()
-            );
+            const result = results
+                ? results.getUserResult(
+                      $(".standings-username .username", elem).text()
+                  )
+                : null;
             const perfElem =
                 !result || !result.IsSubmitted
                     ? "-"
