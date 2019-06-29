@@ -24,8 +24,11 @@ ac-predictorのUserScript([ac-predictor](https://greasyfork.org/ja/scripts/36995
 // @description 開発用のスクリプトです。ローカルからビルド済みスクリプトをロードします。
 // @author      keymoon
 // @license     MIT
+// @require     https://greasyfork.org/scripts/386715-atcoder-sidemenu/code/atcoder-sidemenu.js
+// @require     https://greasyfork.org/scripts/386712-atcoder-userscript-libs/code/atcoder-userscript-libs.js
 // @require     file://[リポジトリの親ディレクトリへのパス]/ac-predictor.user.js/dist/bundle.js
 // @supportURL  https://github.com/key-moon/ac-predictor.user.js/issues
+// @run-at      document-end
 // @match       https://atcoder.jp/*
 // @exclude     https://atcoder.jp/*/json
 // ==/UserScript==
