@@ -180,6 +180,7 @@ async function afterAppend() {
                 );
                 if (isDisabled) {
                     await updateStandingsFromAPI();
+                    updateView();
                 }
             }).observe(document.getElementById("refresh"), {
                 attributes: true,
