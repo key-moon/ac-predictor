@@ -48,9 +48,9 @@ namespace AtCoder.Web
         }
 
         public Task<CompetitionResult[]> GetCompetitionHistoryAsync(string userScreenName)
-            => GetParsedJsonResponseAsync<CompetitionResult[]>($"/users/{userScreenName}/history/json");
+            => GetParsedJsonResponseAsync<CompetitionResult[]>($"/users/{Uri.EscapeDataString(userScreenName)}/history/json");
     
         public Task<Standings> GetStandingsAsync(string contestScreenName)
-            => GetParsedJsonResponseAsync<Standings>($"/contests/{contestScreenName}/standings/json");
+            => GetParsedJsonResponseAsync<Standings>($"/contests/{Uri.EscapeDataString(contestScreenName)}/standings/json");
     }
 }
