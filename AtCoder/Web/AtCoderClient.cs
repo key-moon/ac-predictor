@@ -52,5 +52,9 @@ namespace AtCoder.Web
     
         public Task<Standings> GetStandingsAsync(string contestScreenName)
             => GetParsedJsonResponseAsync<Standings>($"/contests/{Uri.EscapeDataString(contestScreenName)}/standings/json");
+
+        public Task<CompetitionResult[]> GetReslutsAsync(string contestScreenName)
+            => GetParsedJsonResponseAsync<CompetitionResult[]>($"/contests/{Uri.EscapeDataString(contestScreenName)}/resuls/json");
+
     }
 }
