@@ -8,53 +8,76 @@ using System.Linq;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
 using System.Reflection;
+using System.Net;
+using Microsoft.Extensions.Configuration;
 
 namespace AtCoder.Web.Tests
 {
     [TestFixture()]
     public class AtCoderClientTests
     {
-        [Test()]
-        public void LoginTest()
+        static IConfiguration Configuration { get; set; } = new ConfigurationBuilder()
+                .AddUserSecrets<AtCoderClientTests>().Build();
+
+        static TestCaseData[] LoginWithSessionTestCases = new[]
         {
-            Assert.Fail();
+            new TestCaseData(Configuration["RevelSession"], Configuration["UserScreenName"])
+            .SetName("session-valid"),
+            new TestCaseData("invalid session", null)
+            .SetName("session-invalid")
+        };
+        [TestCaseSource("LoginWithSessionTestCases")]
+        public void LoginWithSessionTest(string revelSession, string userScreenName)
+        {
+            var client = new AtCoderClient();
+            client.LoginAsync(revelSession).Wait();
+            Assert.AreEqual(userScreenName, client.LoggedInUserScreenName);
         }
 
-        [Test()]
-        public void LoginTest1()
+        static TestCaseData[] LoginWithPassTestCases = new[]
         {
-            Assert.Fail();
+            new TestCaseData(Configuration["UserScreenName"], Configuration["Password"], true)
+            .SetName("pass-valid"),
+            new TestCaseData("keymoon", "invalid pass", false)
+            .SetName("pass-invalid")
+        };
+        [TestCaseSource("LoginWithPassTestCases")]
+        public void LoginWithPassTest(string userScreenName, string pass, bool shouldSuccess)
+        {
+            var client = new AtCoderClient();
+            client.LoginAsync(userScreenName, pass).Wait();
+            Assert.AreEqual(userScreenName == client.LoggedInUserScreenName, shouldSuccess);
         }
 
-        static IEnumerable<string> GetFields(Type T)
-            => T.GetFields().Select(x => x.Name);
         static TestCaseData[] CompetitionHistoryAsyncTestCases = new[]
         {
-            new TestCaseData("keymoon", JsonConvert.DeserializeObject<CompetitionResult>("{\"IsRated\":true,\"Place\":17,\"OldRating\":0,\"NewRating\":400,\"Performance\":1600,\"InnerPerformance\":1833,\"ContestScreenName\":\"abc078.contest.atcoder.jp\",\"ContestName\":\"AtCoder Beginner Contest 078\",\"ContestNameEn\":\"\",\"EndTime\":\"2017-11-11T22:40:00+09:00\"}")).SetName("normal data"),
-            new TestCaseData("keymoon?&", null).SetName("invalid charactors"),
+            new TestCaseData("keymoon", 1833).SetName("history-normal"),
+            new TestCaseData("keymoon?&", null).SetName("history-invalid charactors"),
         };
 
         [TestCaseSource("CompetitionHistoryAsyncTestCases")]
-        public void GetCompetitionHistoryAsyncTest(string userScreenName, CompetitionResult expected)
+        public void GetCompetitionHistoryAsyncTest(string userScreenName, int? firstInnerPerformance)
         {
-            var result = new AtCoderClient().GetCompetitionHistoryAsync(userScreenName).Result?.First();
-            Assert.IsTrue(result == expected || 
-                (result != null && expected != null &&
-                result.ContestName == expected.ContestName &&
-                result.ContestScreenName == expected.ContestScreenName &&
-                result.EndTime == expected.EndTime &&
-                result.InnerPerfomance == expected.InnerPerfomance &&
-                result.IsRated == expected.IsRated &&
-                result.NewRating == expected.NewRating &&
-                result.Perfomance == expected.Perfomance &&
-                result.Place == expected.Place &&
-                result.OldRating == expected.OldRating));
+            var firstHistory = new AtCoderClient().GetCompetitionHistoryAsync(userScreenName).Result?.FirstOrDefault();
+            Assert.AreEqual(firstInnerPerformance, firstHistory?.InnerPerformance);
         }
 
-        [Test()]
-        public void GetStandingsAsyncTest()
+        [TestCase("agc001", "cgy4ever")]
+        public void GetStandingsAsyncTest(string contestScreenName, string topScreenName)
         {
-            Assert.Fail();
+            var client = new AtCoderClient();
+            client.LoginAsync(Configuration["RevelSession"]).Wait();
+            var standings = client.GetStandingsAsync(contestScreenName).Result;
+            Assert.AreEqual(topScreenName, standings.StandingsData[0].UserScreenName);
+        }
+
+        [TestCase("agc001", "cgy4ever")]
+        public void GetResultsAsyncTest(string contestScreenName, string topScreenName)
+        {
+            var client = new AtCoderClient();
+            client.LoginAsync(Configuration["RevelSession"]).Wait();
+            var results = client.GetReslutsAsync(contestScreenName).Result;
+            Assert.AreEqual(topScreenName, results[0].UserScreenName);
         }
     }
 }
