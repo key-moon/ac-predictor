@@ -1,17 +1,9 @@
-﻿using NUnit.Framework;
-using AtCoder.Web;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Runtime.InteropServices;
-using System.Linq;
-using Newtonsoft.Json;
-using System.Threading.Tasks;
-using System.Reflection;
-using System.Net;
+﻿using System.Linq;
+using NUnit.Framework;
 using Microsoft.Extensions.Configuration;
 
-namespace AtCoder.Web.Tests
+
+namespace AtCoder.Client.Tests
 {
     [TestFixture()]
     public class AtCoderClientTests
