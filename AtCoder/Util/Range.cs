@@ -8,7 +8,7 @@ namespace AtCoder
     {
         public readonly static Range All = new Range() { Start = int.MinValue, End = int.MaxValue };
         public readonly static Range None = new Range() { Start = 0, End = -1 };
-        public static Range ParseRangeStr(string s)
+        public static Range Parse(string s)
         {
             s = s.Trim();
             if (s == "All") return All;
