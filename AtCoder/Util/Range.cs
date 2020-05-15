@@ -14,10 +14,10 @@ namespace AtCoder
             if (s == "All") return All;
             if (s == "-") return None;
             var splitted = s.Split('~');
-            int rangeStart, rangeEnd;
+            int rangeStart = 0, rangeEnd = int.MaxValue;
             if (splitted.Length != 2 ||
-                !int.TryParse(splitted[0].Trim(), out rangeStart) ||
-                !int.TryParse(splitted[1].Trim(), out rangeEnd))
+                (splitted[0].Length != 0 && !int.TryParse(splitted[0].Trim(), out rangeStart)) ||
+                (splitted[1].Length != 0 && !int.TryParse(splitted[1].Trim(), out rangeEnd)))
                 throw new FormatException();
             return new Range() { Start = rangeStart, End = rangeEnd };
         }
