@@ -33,7 +33,7 @@ namespace AtCoder.Client
                 res.Duration = new TimeSpan(int.Parse(durationHourAndMin[0]), int.Parse(durationHourAndMin[1]), 0);
 
                 var ratedRange = tds[3].TextContent;
-                res.RatedRange = Range.Parse(ratedRange);
+                res.RatedRange = RatingRange.Parse(ratedRange);
 
                 yield return res;
             }
