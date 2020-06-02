@@ -11,11 +11,9 @@ namespace AzureFunctions
         public const string Repo = "ac-predictor-data";
         public static readonly string Token = Secrets.GetSecret("GitHubToken");
         public static readonly Committer Comitter = new Committer("ac-predictor", "kymn0116+predictor@gmail.com", DateTimeOffset.Now);
-        public static GitHubClient GetClient()
+        public static readonly GitHubClient Client = new GitHubClient(new ProductHeaderValue("ac-predictor-function"))
         {
-            var client = new GitHubClient(new ProductHeaderValue("ac-predictor-function"));
-            client.Credentials = new Credentials(Token);
-            return client;
-        }
+            Credentials = new Credentials(Token)
+        };
     }
 }

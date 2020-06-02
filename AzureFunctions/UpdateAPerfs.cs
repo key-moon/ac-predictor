@@ -21,7 +21,7 @@ namespace AzureFunctions
         public static async Task<bool> Run([ActivityTrigger] string contestScreenName, ILogger log)
         {
             log.LogInformation("start updating {0}", contestScreenName);
-            var ghClient = GitHubUtil.GetClient();
+            var ghClient = GitHubUtil.Client;
             var acClient = new AtCoderClient();
 
             var session = Secrets.GetSecret("AtCoderSession");
