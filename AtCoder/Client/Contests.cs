@@ -51,6 +51,17 @@ namespace AtCoder.Client
         }
 
         //TODO:Add Filter
+        public async Task<IEnumerable<ContestInfo>> GetRunningContestsAsync()
+        {
+            var body = await Client.GetStringAsync("/contests");
+            var document = await new HtmlParser().ParseDocumentAsync(body);
+            var upcomingDiv = document.GetElementById("contest-table-upcoming");
+            var tbody = upcomingDiv.GetElementsByTagName("tbody")[0];
+
+            return ParseContestInfosFromTable(tbody);
+        }
+
+        //TODO:Add Filter
         public async Task<IEnumerable<ContestInfo>> GetPastContestsAsync(int page)
         {
             var body = await Client.GetStringAsync($"/contests/archive?page={page}");
