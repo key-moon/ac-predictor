@@ -1,7 +1,9 @@
-﻿
-@{
-    ViewBag.Title = "Index";
-}
+﻿---
+title: Home
+styles: [base.css, standingstable.css]
+scripts: [base.js, contestselector.js]
+---
+
 <div class="my-2">
     <div class="form-row my-0">
         <select class="form-control col-sm-6 col-md-5 col-lg-4" id="contest-selector"></select>
@@ -9,7 +11,7 @@
     </div>
     <div class="form-row my-0">
         <input class="form-control col-sm-6 col-md-5 col-lg-4" id="username-search-input">
-        <button type="button" class="btn  col-sm-3 col-md-2 btn-outline-secondary" id="username-search-button">ユーザーを検索</button>
+        <button type="button" class="btn col-sm-3 col-md-2 btn-outline-secondary" id="username-search-button">ユーザーを検索</button>
         <div class="invalid-feedback" id="username-search-alert"></div>
     </div>
     <div class="form-group row">
@@ -25,7 +27,6 @@
             <tr>
                 <th style="width:3%;white-space:nowrap;">順位</th>
                 <th>ユーザ</th>
-                <th style="width:84px;min-width:84px">得点</th>
                 <th style="width:84px;min-width:84px">パフォ</th>
                 <th style="width:168px;min-width:168px">レート変化</th>
             </tr>
@@ -33,13 +34,3 @@
         <tbody id="standings-body"></tbody>
     </table>
 </div>
-
-@section Styles
-{
-    @Styles.Render("/Content/standingstable.css")
-}
-@section Scripts
-{
-    @Scripts.Render("https://koba-e964.github.io/atcoder-rating-estimator/atcoder_rating.js")
-    @Scripts.Render("/scripts/contestselector.js")
-}
