@@ -61,6 +61,8 @@ function unpositivize_rating(r) {
     return 400.0 + 400.0 * Math.log(r / 400.0);
 }
 
+const apiURL = "https://key-moon.github.io/ac-predictor-data"
+
 $(() => {
     indexedDB.open("PredictorDB", 1).onupgradeneeded = function (event) {
         var db = event.target.result;
@@ -76,7 +78,7 @@ $(() => {
     $.ajax({
         type: 'GET',
         dataType: 'json',
-        url: '/api/aperfs'
+        url: apiURL + '/contests.json'
     }).done(contests => {
         setItemToSelector(contests);
         localStorage.setItem('predictor-contests', JSON.stringify(contests));
@@ -192,11 +194,11 @@ $(() => {
                 deffer.resolve(aperfs);
             }).fail(() => {
                 $.ajax({
-                    type: 'GET', dataType: 'json', url: `/api/${type}/${contestID}`
+                    type: 'GET', dataType: 'json', url: apiURL + `/${type}/${contestID}.json`
                 }).done(aperfs => {
                     deffer.resolve(aperfs);
                 }).fail(() => {
-                        deffer.reject();
+                    deffer.reject();
                 });
             });
             return deffer.promise();
