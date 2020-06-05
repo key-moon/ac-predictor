@@ -3,15 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ac-predictor", "ac-predictor\ac-predictor.csproj", "{A54B0A40-3B69-426C-90FC-F1C7F027708C}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureFunctions", "AzureFunctions\AzureFunctions.csproj", "{A1E3E739-3D25-4656-B14B-E77743F0835E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AtCoder", "AtCoder\AtCoder.csproj", "{5695D8C7-9413-4E57-BFFF-5278E9972081}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AtCoder.Test", "AtCoder.Test\AtCoder.Test.csproj", "{3AE55108-23FB-4710-82C5-75D1D50B63D1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureFunctions.Test", "AzureFunctions.Test\AzureFunctions.Test.csproj", "{76644EAD-677B-40AD-AD16-B49E324857C1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureFunctions.Test", "AzureFunctions.Test\AzureFunctions.Test.csproj", "{76644EAD-677B-40AD-AD16-B49E324857C1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,10 +17,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A54B0A40-3B69-426C-90FC-F1C7F027708C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A54B0A40-3B69-426C-90FC-F1C7F027708C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A54B0A40-3B69-426C-90FC-F1C7F027708C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A54B0A40-3B69-426C-90FC-F1C7F027708C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A1E3E739-3D25-4656-B14B-E77743F0835E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A1E3E739-3D25-4656-B14B-E77743F0835E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A1E3E739-3D25-4656-B14B-E77743F0835E}.Release|Any CPU.ActiveCfg = Release|Any CPU
