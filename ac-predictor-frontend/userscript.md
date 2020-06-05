@@ -1,7 +1,5 @@
-﻿---
+---
 title: UserScript
-styles: []
-scripts: []
 ---
 
 UserScript版の`ac-predictor`をインストールすることで、AtCoderページ上にて推定パフォーマンス/レート変化等を確認できます。
