@@ -1,4 +1,4 @@
-﻿---
+---
 title: Home
 styles: [base.css, standingstable.css]
 scripts: [base.js, contestselector.js]

@@ -1,0 +1,22 @@
+title: ac-predictor
+baseurl: "/ac-predictor"
+url: "https://key-moon.github.io"
+
+collections:
+  docs:
+    permalink: "/:collection/:path/"
+    output: true
+  posts:
+    permalink: "/news/:year/:month/:day/:title/"
+    output: true
+  tutorials:
+    output: true
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
+
+exclude:
+  - ".gitignore"
