@@ -8,18 +8,16 @@
     <title>{{ page.title }} | {{ site.title }}</title>
 
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/css/base.css" rel="stylesheet">
-    <link href="/css/standingstable.css" rel="stylesheet">
 
-    {% for src in site.styles %}
-    <link href="{{ "/scripts/" | append: src | relative_url }}" rel="stylesheet">
+    {% for src in page.styles %}
+    <link href="{{ "/css/" | append: src | relative_url }}" rel="stylesheet">
     {% endfor %}
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
 
-    {% for src in site.scripts %}
+    {% for src in page.scripts %}
     <script src="{{ "/js/" | append: src | relative_url }}"></script>
     {% endfor %}
 </head>
