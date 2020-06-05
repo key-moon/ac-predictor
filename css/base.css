@@ -1,0 +1,36 @@
+﻿/*body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+Set padding to keep content from hitting the edges 
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+Set width on the form input elements since they're 100% wide by default 
+input,
+select,
+textarea {
+    max-width: 280px;
+}*/
+
+/*色*/
+.user-red {color:#FF0000;}
+.user-orange {color:#FF8000;}
+.user-yellow {color:#C0C000;}
+.user-blue {color:#0000FF;}
+.user-cyan {color:#00C0C0;}
+.user-green {color:#008000;}
+.user-brown {color:#804000;}
+.user-gray {color:#808080;}
+.user-unrated {color:#000000;}
+.user-admin {color:#C000C0;}
+
+/*見出しとか*/
+h3 {
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 420;
+}
