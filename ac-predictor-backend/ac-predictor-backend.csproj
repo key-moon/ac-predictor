@@ -5,5 +5,9 @@
     <RootNamespace>ac_predictor_backend</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\AtCoder\AtCoder.csproj" />
+  </ItemGroup>
+
 
 </Project>
