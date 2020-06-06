@@ -11,10 +11,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AtCoder.Test", "AtCoder.Tes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureFunctions.Test", "AzureFunctions.Test\AzureFunctions.Test.csproj", "{76644EAD-677B-40AD-AD16-B49E324857C1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ac-predictor-backend", "ac-predictor-backend\ac-predictor-backend.csproj", "{6CFAA907-C3A2-4FD7-8240-3215379DAC04}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ac-predictor-backend", "ac-predictor-backend\ac-predictor-backend.csproj", "{6CFAA907-C3A2-4FD7-8240-3215379DAC04}"
 	ProjectSection(ProjectDependencies) = postProject
 		{5695D8C7-9413-4E57-BFFF-5278E9972081} = {5695D8C7-9413-4E57-BFFF-5278E9972081}
 	EndProjectSection
+EndProject
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "ac-predictor-frontend", "ac-predictor-frontend\ac-predictor-frontend.njsproj", "{A6FF0E51-FD7F-492A-9F2A-EAF71C715CEA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,6 +44,10 @@ Global
 		{6CFAA907-C3A2-4FD7-8240-3215379DAC04}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6CFAA907-C3A2-4FD7-8240-3215379DAC04}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6CFAA907-C3A2-4FD7-8240-3215379DAC04}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A6FF0E51-FD7F-492A-9F2A-EAF71C715CEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6FF0E51-FD7F-492A-9F2A-EAF71C715CEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A6FF0E51-FD7F-492A-9F2A-EAF71C715CEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6FF0E51-FD7F-492A-9F2A-EAF71C715CEA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
