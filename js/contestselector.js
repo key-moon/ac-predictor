@@ -188,13 +188,15 @@ $(() => {
 
         function getContestInfo(type) {
             var deffer = $.Deferred();
-
             //ストレージに存在していたらそっちを返す
             getData(type, contestID).done(aperfs => {
                 deffer.resolve(aperfs);
             }).fail(() => {
+                var url = type === "Standings" ?
+                    "https://ac-predictor.azurewebsites.net" :
+                    apiURL;
                 $.ajax({
-                    type: 'GET', dataType: 'json', url: apiURL + `/${type}/${contestID}.json`
+                    type: 'GET', dataType: 'json', url: url + `/${type}/${contestID}.json`
                 }).done(aperfs => {
                     deffer.resolve(aperfs);
                 }).fail(() => {
