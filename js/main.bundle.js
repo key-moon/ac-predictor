@@ -113,8 +113,8 @@ function getColor(rating) {
     return colors[colorIndex];
 }
 
-var dataURL = "http://data.ac-predictor.com";
-var apiURL = "http://ac-predictor.azurewebsites.com";
+var dataURL = "https://data.ac-predictor.com";
+var apiURL = "https://ac-predictor.azurewebsites.com";
 function getAPerfsAsync(contestScreenName) {
     return __awaiter(this, void 0, Promise, function () {
         var response;
