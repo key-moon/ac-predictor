@@ -10,9 +10,11 @@ defaults:
       layout: default
 
 exclude:
-  - ".gitignore"
+  - .gitignore
   - CNAME
   - /js/src/*
   - package.json
   - package-lock.json
+  - rollup.config.js
   - tsconfig.json
+  - ac-predictor-frontend.njsproj
