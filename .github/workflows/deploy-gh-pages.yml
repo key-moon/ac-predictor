@@ -36,15 +36,14 @@ jobs:
     - name: update repository
       run: |
         cp CNAME ../docs
-        rm -rf $GITHUB_WORKSPACE/*
-        cp -rT ../docs $GITHUB_WORKSPACE
+        rm -rf ./*
+        cp -rT ../docs ./
 
     - name: setup node
       uses: actions/setup-node@v1
 
     - name: bundle files
       run: |
-        cd $GITHUB_WORKSPACE/ac-predictor-frontend
         npm ci
         npm run bundle
 
