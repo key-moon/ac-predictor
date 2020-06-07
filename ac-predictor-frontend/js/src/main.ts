@@ -1,9 +1,7 @@
-import $ from "jquery";
-import * as B from "bootstrap";
 import { unpositivizeRating, positivizeRating, calcRatingFromLast, getColor } from "./rating";
 
-const dataURL = "data.ac-predictor.com";
-const apiURL = "ac-predictor.azurewebsites.com";
+const dataURL = "http://data.ac-predictor.com";
+const apiURL = "http://ac-predictor.azurewebsites.com";
 
 async function getAPerfsAsync(contestScreenName: string): Promise<{ [key: string]: number }> {
     const response = await fetch(dataURL + `/aperfs/${contestScreenName}.json`);
@@ -29,11 +27,11 @@ let state = 0;
 function toggleLoadingState(): void {
     if (state === 0) {
         state = 1;
-        $("#confirm-btn").text("�ǂݍ��ݒ��c");
+        $("#confirm-btn").text("読み込み中");
         $("#confirm-btn").prop("disabled", true);
     } else {
         state = 0;
-        $("#confirm-btn").text("�m��");
+        $("#confirm-btn").text("確定");
         $("#confirm-btn").prop("disabled", false);
     }
 }
@@ -47,7 +45,7 @@ function calcRankVal(X: number, aPerfs: number[]): number {
     return res;
 }
 
-// O(mlogR) (�񕪒T��)
+// O(mlogR) (二分探索)
 function getPerf(rank: number, aPerfs: number[]): number {
     let upper = 8192;
     let lower = -8192;
@@ -62,11 +60,11 @@ function getPerf(rank: number, aPerfs: number[]): number {
 
 async function DrawTable(contestScrenName: string): Promise<void> {
     //O(n + mR)
-    //n := �T�u�~�b�g�����l��(2500�l���炢 ?)
-    //m := Rated�Ȑl(�����2500�l)
-    //R := ���[�g�̕�(4000���炢)
+    //n := サブミットした人数(2500人くらい ?)
+    //m := Ratedな人(これも2500人)
+    //R := レートの幅(4000くらい)
     function draw(standings: Standings, aperfs: { [key: string]: number }, drawUnrated: boolean): void {
-        //�e�[�u�����N���A
+        //テーブルをクリア
         const table = $("#standings-body");
         table.empty();
 
@@ -90,11 +88,10 @@ async function DrawTable(contestScrenName: string): Promise<void> {
             { pattern: /.*/, maxPerf: Infinity }
         ];
 
-        //Perf�v�Z���Ɏg���p�t�H(Rated�I�����[)
+        //Perf計算時に使うパフォ(Ratedオンリー)
         const activePerf: number[] = [];
         let isAnyoneRated = false;
         const ratedLimit = maxDic.filter(x => x.pattern.exec(contestScrenName))[0].maxPerf as number;
-        //defaultPerf�͊�{�I�ɃR���e�X�g�������o�Ȃ��̂ŉߋ��̂��Ƃ͍l���Ȃ��ėǂ�(����̕]����ɂ��܂���)
         const defaulPerfDic: { [key: number]: number } = {
             1200: 800,
             2000: 800,
@@ -106,7 +103,7 @@ async function DrawTable(contestScrenName: string): Promise<void> {
         standings.StandingsData.forEach(function(element) {
             if (!element.IsRated || element.TotalResult.Count === 0) return;
             if (!aperfs[element.UserScreenName]) {
-                //�����ŉ����ǉ����Ȃ��Ɖ���RatedValue���l����������Ă��܂��A������
+                //ここで何も追加しないと下限RatedValueが人数を下回ってしまい、こわれる
                 activePerf.push(defaultAPerf);
                 return;
             }
@@ -114,12 +111,12 @@ async function DrawTable(contestScrenName: string): Promise<void> {
             activePerf.push(aperfs[element.UserScreenName]);
         });
 
-        //�v�����UnRated�R��
+        //要するにUnRatedコン
         if (!isAnyoneRated) {
-            //���[�e�B���O�͕ϓ����Ȃ��̂ŁA�R���e�X�g���Ɠ������������ėǂ��B(�t�ɂ��Ȃ���)
+            //レーティングは変動しないので、コンテスト中と同じ扱いをして良い。
             standings.Fixed = false;
 
-            //����Rated�������Ɛ����ł���ꍇ�A�ʏ��Rated�Ɠ����悤�Ȉ���
+            //元はRatedだったと推測できる場合、通常のRatedと同じような扱い
             activePerf.length = 0;
             for (let i = 0; i < standings.StandingsData.length; i++) {
                 const element = standings.StandingsData[i];
@@ -128,26 +125,26 @@ async function DrawTable(contestScrenName: string): Promise<void> {
                     activePerf.push(defaultAPerf);
                     continue;
                 }
-                //Rated�t���O���I����
+                //Ratedフラグをオンに
                 standings.StandingsData[i].IsRated = true;
                 activePerf.push(aperfs[element.UserScreenName]);
             }
         }
 
-        //���E�p�t�H�[�}���X(����Ȃ��̏ꍇ�͈�ʂ̐l�̃p�t�H)
+        //限界パフォーマンス(上限なしの場合は一位の人のパフォ)
         const maxPerf = ratedLimit === Infinity ? getPerf(1, activePerf) : ratedLimit + 400;
 
-        //addRow���񂷂Ƃ��̃p�t�H 0.5�������Ă���͎̂l�̌ܓ����������鋫�E�ɒu������
+        //addRowを回すときのパフォ 0.5を引いているのは四捨五入が発生する境界に置くため
         let currentPerf = maxPerf - 0.5;
         let rankVal = calcRankVal(currentPerf, activePerf);
 
-        //�^�C�̐l������(���ʂ��ς������`�恨���X�g�����)
+        //タイの人を入れる(順位が変わったら描画→リストを空に)
         let tiedList: StandingData[] = [];
         let rank = 1;
         let lastRank = 0;
         let ratedCount = 0;
 
-        //�^�C���X�g�̐l�S���s�ǉ�
+        //タイリストの人全員行追加
         function addRow(): void {
             const fixRank = rank + Math.max(0, ratedCount - 1) / 2;
             while (rankVal < fixRank - 0.5 && currentPerf >= -8192) {
@@ -184,7 +181,7 @@ async function DrawTable(contestScrenName: string): Promise<void> {
                 table.append(node);
             });
         }
-        //�S����
+        //全員回す
         standings.StandingsData.forEach(function(element) {
             if ((!drawUnrated && !element.IsRated) || element.TotalResult.Count === 0) return;
             if (lastRank !== element.Rank) {
@@ -197,7 +194,7 @@ async function DrawTable(contestScrenName: string): Promise<void> {
             lastRank = element.Rank;
             if (element.IsRated) ratedCount++;
         });
-        //�Ō�ɍX�V���Ă�����
+        //最後に更新してあげる
         addRow();
     }
 
@@ -211,7 +208,7 @@ async function DrawTable(contestScrenName: string): Promise<void> {
 $(async () => {
     $("#show-unrated-description").tooltip();
 
-    //���[�U�[������
+    //ユーザー名検索
     $("#username-search-button").click(() => {
         function setAlert(val: string): void {
             $("#username-search-input").addClass("is-invalid");
@@ -225,7 +222,7 @@ $(async () => {
         clearAlert();
         const searchName = $("#username-search-input").val();
         if (searchName === "") {
-            setAlert("���[�U�[������͂��Ă�������");
+            setAlert("ユーザー名を入力してください");
             return;
         }
 
@@ -233,14 +230,14 @@ $(async () => {
         $("#standings-body a[class^=user]").each((_, elem) => {
             const elemDom = $(elem);
             if (found || elemDom.text() === searchName) return;
-            // ���݂̘g�����폜
+            // 現在の枠線を削除
             $("#standings-body > tr").css("border", "none");
-            // �g��������
+            // 枠線をつける
             elemDom
                 .parent()
                 .parent()
                 .css("border", "solid 3px #dd289a");
-            // �X�N���[��
+            // スクロール
             const offset = elemDom.offset();
             const height = $(window).height();
             if (typeof offset === "undefined" || typeof height === "undefined") return;
@@ -251,12 +248,12 @@ $(async () => {
         });
 
         if (!found) {
-            setAlert("���[�U�[����������܂���ł���");
+            setAlert("ユーザー名が見つかりませんでした");
         }
     });
     $("#username-search-input").keypress(pressedKey => {
         if (pressedKey.which === 13) {
-            // �G���^�[�L�[
+            //エンターキー
             $("#username-search-button").click();
         }
     });
