@@ -5,14 +5,14 @@ function bigf(n: number): number {
         numerator *= 0.81;
         denominator *= 0.9;
     }
-    numerator = (1 - numerator) * 0.81 / 0.19;
-    denominator = (1 - denominator) * 0.9 / 0.1;
+    numerator = ((1 - numerator) * 0.81) / 0.19;
+    denominator = ((1 - denominator) * 0.9) / 0.1;
     return Math.sqrt(numerator) / denominator;
 }
 
 const finf = bigf(400);
-function f(n) {
-    return (bigf(n) - finf) / (bigf(1) - finf) * 1200.0;
+function f(n: number): number {
+    return ((bigf(n) - finf) / (bigf(1) - finf)) * 1200.0;
 }
 
 /**
@@ -21,7 +21,7 @@ function f(n) {
  * @returns {number} unpositivized rating
  */
 export function calcRatingFromHistory(history: number[]): number {
-    let n = history.length;
+    const n = history.length;
     let numerator = 0.0;
     let denominator = 0.0;
     for (let i = n - 1; i >= 0; --i) {
@@ -44,7 +44,7 @@ export function calcRatingFromLast(last: number, perf: number, ratedMatches: num
     if (ratedMatches === 0) return perf - 1200;
     last += f(ratedMatches);
     const weight = 9 - 9 * 0.9 ** ratedMatches;
-    const numerator = weight * (2 ** (last / 800.0)) + 2 ** (perf / 800.0);
+    const numerator = weight * 2 ** (last / 800.0) + 2 ** (perf / 800.0);
     const denominator = 1 + weight;
     return Math.log(numerator / denominator) * Math.LOG2E * 800.0 - f(ratedMatches + 1);
 }
@@ -73,11 +73,11 @@ export function unpositivizeRating(rating: number): number {
     return 400.0 + 400.0 * Math.log(rating / 400.0);
 }
 
-const colors = ["unrated", "gray", "brown", "green", "cyan", "blue", "yellow", "orange", "red"]
+const colors = ["unrated", "gray", "brown", "green", "cyan", "blue", "yellow", "orange", "red"];
 export function getColor(rating: number): string {
-    let colorIndex = 0
+    let colorIndex = 0;
     if (rating > 0) {
-        colorIndex = Math.min(Math.floor(rating / 400) + 1, 8)
+        colorIndex = Math.min(Math.floor(rating / 400) + 1, 8);
     }
-    return colors[colorIndex]
+    return colors[colorIndex];
 }

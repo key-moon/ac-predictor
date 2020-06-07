@@ -1,10 +1,9 @@
-import 'jquery';
-import 'bootstrap';
-import { positivizeRating, calcRatingFromLast, getColor } from './rating';
-import { unpositivizeRating } from '../../_site/js/src/rating';
+import $ from "jquery";
+import * as B from "bootstrap";
+import { unpositivizeRating, positivizeRating, calcRatingFromLast, getColor } from "./rating";
 
-const dataURL = "data.ac-predictor.com"
-const apiURL = "ac-predictor.azurewebsites.com"
+const dataURL = "data.ac-predictor.com";
+const apiURL = "ac-predictor.azurewebsites.com";
 
 async function getAPerfsAsync(contestScreenName: string): Promise<{ [key: string]: number }> {
     const response = await fetch(dataURL + `/aperfs/${contestScreenName}.json`);
@@ -19,10 +18,10 @@ async function getStandingsAsync(contestScreenName: string): Promise<Standings> 
 function setItemToSelector(items: string[]): void {
     const selected = $("#contest-selector").val();
     $("#contest-selector").empty();
-    items.forEach((item) => {
+    items.forEach(item => {
         $("#contest-selector").append(`<option>${item}</option>`);
     });
-    if (typeof (selected) === "undefined") return;
+    if (typeof selected === "undefined") return;
     $("#contest-selector").val(selected);
 }
 
@@ -30,28 +29,25 @@ let state = 0;
 function toggleLoadingState(): void {
     if (state === 0) {
         state = 1;
-        $('#confirm-btn').text('“Ç‚İ‚İ’†c');
-        $('#confirm-btn').prop("disabled", true);
-    }
-    else {
+        $("#confirm-btn").text("ï¿½Ç‚İï¿½ï¿½İ’ï¿½ï¿½c");
+        $("#confirm-btn").prop("disabled", true);
+    } else {
         state = 0;
-        $('#confirm-btn').text('Šm’è');
-        $('#confirm-btn').prop("disabled", false);
+        $("#confirm-btn").text("ï¿½mï¿½ï¿½");
+        $("#confirm-btn").prop("disabled", false);
     }
 }
-
-
 
 // O(m)
 function calcRankVal(X: number, aPerfs: number[]): number {
     let res = 0;
-    aPerfs.forEach(function (aperf) {
+    aPerfs.forEach(function(aperf) {
         res += 1.0 / (1.0 + Math.pow(6.0, (X - aperf) / 400.0));
     });
     return res;
 }
 
-// O(mlogR) (“ñ•ª’Tõ)
+// O(mlogR) (ï¿½ñ•ª’Tï¿½ï¿½)
 function getPerf(rank: number, aPerfs: number[]): number {
     let upper = 8192;
     let lower = -8192;
@@ -65,49 +61,40 @@ function getPerf(rank: number, aPerfs: number[]): number {
 }
 
 async function DrawTable(contestScrenName: string): Promise<void> {
-    var table = $('#standings-body');
-
-    await Promise.all([getAPerfsAsync(contestScrenName), getStandingsAsync(contestScrenName)])
-        .then((value) => {
-            const aperfs = value[0] as { [key: string]: number };
-            const standings = value[1] as Standings;
-            draw(standings, aperfs, $("#show-unrated").prop("checked"));
-        });
-
     //O(n + mR)
-    //n := ƒTƒuƒ~ƒbƒg‚µ‚½l”(2500l‚­‚ç‚¢ ?)
-    //m := Rated‚Èl(‚±‚ê‚à2500l)
-    //R := ƒŒ[ƒg‚Ì•(4000‚­‚ç‚¢)
-    function draw(standings: Standings, aperfs: { [key: string]: number }, drawUnrated: boolean) {
-        //ƒe[ƒuƒ‹‚ğƒNƒŠƒA
+    //n := ï¿½Tï¿½uï¿½~ï¿½bï¿½gï¿½ï¿½ï¿½ï¿½ï¿½lï¿½ï¿½(2500ï¿½lï¿½ï¿½ï¿½ç‚¢ ?)
+    //m := Ratedï¿½Èl(ï¿½ï¿½ï¿½ï¿½ï¿½2500ï¿½l)
+    //R := ï¿½ï¿½ï¿½[ï¿½gï¿½Ì•ï¿½(4000ï¿½ï¿½ï¿½ç‚¢)
+    function draw(standings: Standings, aperfs: { [key: string]: number }, drawUnrated: boolean): void {
+        //ï¿½eï¿½[ï¿½uï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½A
+        const table = $("#standings-body");
         table.empty();
 
-        const maxDic =
-            [
-                { pattern: /^abc12[6-9]$/, maxPerf: 2000 },
-                { pattern: /^abc1[3-9]\d$/, maxPerf: 2000 },
-                { pattern: /^abc\d{3}$/, maxPerf: 1200 },
-                { pattern: /^arc\d{3}$/, maxPerf: 2800 },
-                { pattern: /^agc\d{3}$/, maxPerf: Infinity },
-                { pattern: /^apc\d{3}$/, maxPerf: Infinity },
-                { pattern: /^cf\d{2}-final-open$/, maxPerf: Infinity },
-                { pattern: /^soundhound2018-summer-qual$/, maxPerf: 2000 },
-                { pattern: /^caddi2018$/, maxPerf: 1800 },
-                { pattern: /^caddi2018b$/, maxPerf: 1200 },
-                { pattern: /^aising2019$/, maxPerf: 2000 },
-                { pattern: /^keyence2019$/, maxPerf: 2800 },
-                { pattern: /^nikkei2019-qual$/, maxPerf: 2800 },
-                { pattern: /^exawizards2019$/, maxPerf: 2800 },
-                { pattern: /^diverta2019/, maxPerf: 2800 },
-                { pattern: /^m-solutions2019$/, maxPerf: 2800 },
-                { pattern: /.*/, maxPerf: Infinity }
-            ];
+        const maxDic = [
+            { pattern: /^abc12[6-9]$/, maxPerf: 2000 },
+            { pattern: /^abc1[3-9]\d$/, maxPerf: 2000 },
+            { pattern: /^abc\d{3}$/, maxPerf: 1200 },
+            { pattern: /^arc\d{3}$/, maxPerf: 2800 },
+            { pattern: /^agc\d{3}$/, maxPerf: Infinity },
+            { pattern: /^apc\d{3}$/, maxPerf: Infinity },
+            { pattern: /^cf\d{2}-final-open$/, maxPerf: Infinity },
+            { pattern: /^soundhound2018-summer-qual$/, maxPerf: 2000 },
+            { pattern: /^caddi2018$/, maxPerf: 1800 },
+            { pattern: /^caddi2018b$/, maxPerf: 1200 },
+            { pattern: /^aising2019$/, maxPerf: 2000 },
+            { pattern: /^keyence2019$/, maxPerf: 2800 },
+            { pattern: /^nikkei2019-qual$/, maxPerf: 2800 },
+            { pattern: /^exawizards2019$/, maxPerf: 2800 },
+            { pattern: /^diverta2019/, maxPerf: 2800 },
+            { pattern: /^m-solutions2019$/, maxPerf: 2800 },
+            { pattern: /.*/, maxPerf: Infinity }
+        ];
 
-        //PerfŒvZ‚Ég‚¤ƒpƒtƒH(RatedƒIƒ“ƒŠ[)
+        //Perfï¿½vï¿½Zï¿½ï¿½ï¿½Égï¿½ï¿½ï¿½pï¿½tï¿½H(Ratedï¿½Iï¿½ï¿½ï¿½ï¿½ï¿½[)
         const activePerf: number[] = [];
         let isAnyoneRated = false;
         const ratedLimit = maxDic.filter(x => x.pattern.exec(contestScrenName))[0].maxPerf as number;
-        //defaultPerf‚ÍŠî–{“I‚ÉƒRƒ“ƒeƒXƒg’†‚µ‚©o‚È‚¢‚Ì‚Å‰ß‹‚Ì‚±‚Æ‚Íl‚¦‚È‚­‚Ä—Ç‚¢(¡Œã‚Ì•]‰¿Šî€‚É‚µ‚Ü‚µ‚½)
+        //defaultPerfï¿½ÍŠï¿½{ï¿½Iï¿½ÉƒRï¿½ï¿½ï¿½eï¿½Xï¿½gï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½oï¿½È‚ï¿½ï¿½Ì‚Å‰ß‹ï¿½ï¿½Ì‚ï¿½ï¿½Æ‚Ílï¿½ï¿½ï¿½È‚ï¿½ï¿½Ä—Ç‚ï¿½(ï¿½ï¿½ï¿½ï¿½Ì•]ï¿½ï¿½ï¿½î€ï¿½É‚ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½)
         const defaulPerfDic: { [key: number]: number } = {
             1200: 800,
             2000: 800,
@@ -116,10 +103,10 @@ async function DrawTable(contestScrenName: string): Promise<void> {
         };
         const defaultAPerf = defaulPerfDic[ratedLimit];
 
-        standings.StandingsData.forEach(function (element) {
+        standings.StandingsData.forEach(function(element) {
             if (!element.IsRated || element.TotalResult.Count === 0) return;
             if (!aperfs[element.UserScreenName]) {
-                //‚±‚±‚Å‰½‚à’Ç‰Á‚µ‚È‚¢‚Æ‰ºŒÀRatedValue‚ªl”‚ğ‰º‰ñ‚Á‚Ä‚µ‚Ü‚¢A‚±‚í‚ê‚é
+                //ï¿½ï¿½ï¿½ï¿½ï¿½Å‰ï¿½ï¿½ï¿½ï¿½Ç‰ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½Æ‰ï¿½ï¿½ï¿½RatedValueï¿½ï¿½ï¿½lï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½Ü‚ï¿½ï¿½Aï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                 activePerf.push(defaultAPerf);
                 return;
             }
@@ -127,41 +114,79 @@ async function DrawTable(contestScrenName: string): Promise<void> {
             activePerf.push(aperfs[element.UserScreenName]);
         });
 
-        //—v‚·‚é‚ÉUnRatedƒRƒ“
+        //ï¿½vï¿½ï¿½ï¿½ï¿½ï¿½UnRatedï¿½Rï¿½ï¿½
         if (!isAnyoneRated) {
-            //ƒŒ[ƒeƒBƒ“ƒO‚Í•Ï“®‚µ‚È‚¢‚Ì‚ÅAƒRƒ“ƒeƒXƒg’†‚Æ“¯‚¶ˆµ‚¢‚ğ‚µ‚Ä—Ç‚¢B(‹t‚É‚µ‚È‚¢‚Æ)
+            //ï¿½ï¿½ï¿½[ï¿½eï¿½Bï¿½ï¿½ï¿½Oï¿½Í•Ï“ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½Ì‚ÅAï¿½Rï¿½ï¿½ï¿½eï¿½Xï¿½gï¿½ï¿½ï¿½Æ“ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä—Ç‚ï¿½ï¿½B(ï¿½tï¿½É‚ï¿½ï¿½È‚ï¿½ï¿½ï¿½)
             standings.Fixed = false;
 
-            //Œ³‚ÍRated‚¾‚Á‚½‚Æ„‘ª‚Å‚«‚éê‡A’Êí‚ÌRated‚Æ“¯‚¶‚æ‚¤‚Èˆµ‚¢
+            //ï¿½ï¿½ï¿½ï¿½Ratedï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æï¿½ï¿½ï¿½ï¿½Å‚ï¿½ï¿½ï¿½ê‡ï¿½Aï¿½Êï¿½ï¿½Ratedï¿½Æ“ï¿½ï¿½ï¿½ï¿½æ‚¤ï¿½Èˆï¿½ï¿½ï¿½
             activePerf.length = 0;
-            for (var i = 0; i < standings.StandingsData.length; i++) {
+            for (let i = 0; i < standings.StandingsData.length; i++) {
                 const element = standings.StandingsData[i];
                 if (element.OldRating >= ratedLimit || element.TotalResult.Count === 0) continue;
                 if (!aperfs[element.UserScreenName]) {
                     activePerf.push(defaultAPerf);
                     continue;
                 }
-                //Ratedƒtƒ‰ƒO‚ğƒIƒ“‚É
+                //Ratedï¿½tï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½Iï¿½ï¿½ï¿½ï¿½
                 standings.StandingsData[i].IsRated = true;
                 activePerf.push(aperfs[element.UserScreenName]);
             }
         }
 
-        //ŒÀŠEƒpƒtƒH[ƒ}ƒ“ƒX(ãŒÀ‚È‚µ‚Ìê‡‚ÍˆêˆÊ‚Ìl‚ÌƒpƒtƒH)
+        //ï¿½ï¿½ï¿½Eï¿½pï¿½tï¿½Hï¿½[ï¿½}ï¿½ï¿½ï¿½X(ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½Ìê‡ï¿½Íˆï¿½Ê‚Ìlï¿½Ìƒpï¿½tï¿½H)
         const maxPerf = ratedLimit === Infinity ? getPerf(1, activePerf) : ratedLimit + 400;
 
-        //addRow‚ğ‰ñ‚·‚Æ‚«‚ÌƒpƒtƒH 0.5‚ğˆø‚¢‚Ä‚¢‚é‚Ì‚ÍlÌŒÜ“ü‚ª”­¶‚·‚é‹«ŠE‚É’u‚­‚½‚ß
+        //addRowï¿½ï¿½ï¿½ñ‚·‚Æ‚ï¿½ï¿½Ìƒpï¿½tï¿½H 0.5ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½Ì‚Ílï¿½ÌŒÜ“ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½é‹«ï¿½Eï¿½É’uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         let currentPerf = maxPerf - 0.5;
         let rankVal = calcRankVal(currentPerf, activePerf);
 
-        //ƒ^ƒC‚Ìl‚ğ“ü‚ê‚é(‡ˆÊ‚ª•Ï‚í‚Á‚½‚ç•`‰æ¨ƒŠƒXƒg‚ğ‹ó‚É)
+        //ï¿½^ï¿½Cï¿½Ìlï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½ï¿½Ê‚ï¿½ï¿½Ï‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½`ï¿½æ¨ï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½ï¿½ï¿½)
         let tiedList: StandingData[] = [];
         let rank = 1;
         let lastRank = 0;
         let ratedCount = 0;
-        //‘Sˆõ‰ñ‚·
-        standings.StandingsData.forEach(function (element) {
-            if (!drawUnrated && !element.IsRated || element.TotalResult.Count === 0) return;
+
+        //ï¿½^ï¿½Cï¿½ï¿½ï¿½Xï¿½gï¿½Ìlï¿½Sï¿½ï¿½ï¿½sï¿½Ç‰ï¿½
+        function addRow(): void {
+            const fixRank = rank + Math.max(0, ratedCount - 1) / 2;
+            while (rankVal < fixRank - 0.5 && currentPerf >= -8192) {
+                currentPerf--;
+                rankVal = calcRankVal(currentPerf, activePerf);
+            }
+            const perf = currentPerf + 0.5;
+            tiedList.forEach(function(element): void {
+                function getRatingChangeStr(oldRate: number, newRate: number): string {
+                    function ratingSpan(rate: number): string {
+                        return `<span class="user-${getColor(rate)}">${rate}</span>`;
+                    }
+
+                    return element.IsRated
+                        ? `${ratingSpan(oldRate)} -> ${ratingSpan(newRate)}(${newRate >= oldRate ? "+" : ""}${newRate -
+                              oldRate})`
+                        : `${ratingSpan(oldRate)}(unrated)`;
+                }
+
+                const matches = element.Competitions - (standings.Fixed && element.IsRated ? 1 : 0);
+                const oldRate = standings.Fixed ? element.OldRating : element.Rating;
+                const newRate = Math.floor(
+                    positivizeRating(
+                        matches !== 0 ? calcRatingFromLast(unpositivizeRating(oldRate), perf, matches) : perf - 1200
+                    )
+                );
+                const name = element.UserScreenName;
+                const node = `<tr><td>${rank}</td><td><a class="user-${getColor(
+                    oldRate
+                )}" href=http://atcoder.jp/users/${name} >${name}</a></td><td>${perf}</td><td>${getRatingChangeStr(
+                    oldRate,
+                    newRate
+                )}</td></tr>`;
+                table.append(node);
+            });
+        }
+        //ï¿½Sï¿½ï¿½ï¿½ï¿½
+        standings.StandingsData.forEach(function(element) {
+            if ((!drawUnrated && !element.IsRated) || element.TotalResult.Count === 0) return;
             if (lastRank !== element.Rank) {
                 addRow();
                 rank += ratedCount;
@@ -172,72 +197,53 @@ async function DrawTable(contestScrenName: string): Promise<void> {
             lastRank = element.Rank;
             if (element.IsRated) ratedCount++;
         });
-        //ÅŒã‚ÉXV‚µ‚Ä‚ ‚°‚é
+        //ï¿½ÅŒï¿½ÉXï¿½Vï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½ï¿½
         addRow();
-
-        //ƒ^ƒCƒŠƒXƒg‚Ìl‘Sˆõs’Ç‰Á
-        function addRow() {
-            const fixRank = rank + Math.max(0, ratedCount - 1) / 2;
-            while (rankVal < fixRank - 0.5 && currentPerf >= -8192) {
-                currentPerf--;
-                rankVal = calcRankVal(currentPerf, activePerf);
-            }
-            const perf = currentPerf + 0.5;
-            tiedList.forEach(function (element) {
-                const matches = element.Competitions - (standings.Fixed && element.IsRated ? 1 : 0);
-                const oldRate = standings.Fixed ? element.OldRating : element.Rating;
-                const newRate = Math.floor(positivizeRating(matches !== 0 ? calcRatingFromLast(unpositivizeRating(oldRate), perf, matches) : perf - 1200));
-                const name = element.UserScreenName;
-                const node = `<tr><td>${rank}</td><td><a class="user-${getColor(oldRate)}" href=http://atcoder.jp/users/${name} >${name}</a></td><td>${perf}</td><td>${getRatingChangeStr(oldRate, newRate)}</td></tr>`;
-                table.append(node);
-
-                function getRatingChangeStr(oldRate: number, newRate: number): string {
-                    return element.IsRated ? `${ratingSpan(oldRate)} -> ${ratingSpan(newRate)}(${(newRate >= oldRate ? '+' : '')}${newRate - oldRate})` : `${ratingSpan(oldRate)}(unrated)`;
-
-                    function ratingSpan(rate: number): string {
-                        return `<span class="user-${getColor(rate)}">${rate}</span>`;
-                    }
-                }
-            });
-        }
     }
+
+    await Promise.all([getAPerfsAsync(contestScrenName), getStandingsAsync(contestScrenName)]).then(value => {
+        const aperfs = value[0] as { [key: string]: number };
+        const standings = value[1] as Standings;
+        draw(standings, aperfs, $("#show-unrated").prop("checked"));
+    });
 }
 
-
 $(async () => {
-    $('#show-unrated-description').tooltip();
+    $("#show-unrated-description").tooltip();
 
-    //ƒ†[ƒU[–¼ŒŸõ
-    $('#username-search-button').click(() => {
-        function setAlert(val: string) {
-            $('#username-search-input').addClass('is-invalid');
-            $('#username-search-alert').text(val);
+    //ï¿½ï¿½ï¿½[ï¿½Uï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    $("#username-search-button").click(() => {
+        function setAlert(val: string): void {
+            $("#username-search-input").addClass("is-invalid");
+            $("#username-search-alert").text(val);
         }
-        function clearAlert() {
-            $('#username-search-input').removeClass('is-invalid');
-            $('#username-search-alert').empty();
+        function clearAlert(): void {
+            $("#username-search-input").removeClass("is-invalid");
+            $("#username-search-alert").empty();
         }
 
         clearAlert();
-        const searchName = $('#username-search-input').val();
-        if (searchName === '') {
-            setAlert("ƒ†[ƒU[–¼‚ğ“ü—Í‚µ‚Ä‚­‚¾‚³‚¢");
+        const searchName = $("#username-search-input").val();
+        if (searchName === "") {
+            setAlert("ï¿½ï¿½ï¿½[ï¿½Uï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í‚ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½");
             return;
         }
 
         let found = false;
-        $('#standings-body a[class^=user]').each((_, elem) => {
+        $("#standings-body a[class^=user]").each((_, elem) => {
             const elemDom = $(elem);
             if (found || elemDom.text() === searchName) return;
-            // Œ»İ‚Ì˜gü‚ğíœ
-            $('#standings-body > tr').css('border', 'none');
-            // ˜gü‚ğ‚Â‚¯‚é
-            elemDom.parent().parent().css('border', 'solid 3px #dd289a');
-            // ƒXƒNƒ[ƒ‹
+            // ï¿½ï¿½ï¿½İ‚Ì˜gï¿½ï¿½ï¿½ï¿½ï¿½íœ
+            $("#standings-body > tr").css("border", "none");
+            // ï¿½gï¿½ï¿½ï¿½ï¿½ï¿½Â‚ï¿½ï¿½ï¿½
+            elemDom
+                .parent()
+                .parent()
+                .css("border", "solid 3px #dd289a");
+            // ï¿½Xï¿½Nï¿½ï¿½ï¿½[ï¿½ï¿½
             const offset = elemDom.offset();
             const height = $(window).height();
-            if (typeof(offset) === 'undefined' ||
-                typeof(height) === 'undefined') return;
+            if (typeof offset === "undefined" || typeof height === "undefined") return;
             $("html,body").animate({
                 scrollTop: offset.top - height / 2
             });
@@ -245,24 +251,24 @@ $(async () => {
         });
 
         if (!found) {
-            setAlert("ƒ†[ƒU[–¼‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ‚Å‚µ‚½");
+            setAlert("ï¿½ï¿½ï¿½[ï¿½Uï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â‚ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½Å‚ï¿½ï¿½ï¿½");
         }
     });
-    $('#username-search-input').keypress(pressedKey => {
+    $("#username-search-input").keypress(pressedKey => {
         if (pressedKey.which === 13) {
-            // ƒGƒ“ƒ^[ƒL[
-            $('#username-search-button').click();
+            // ï¿½Gï¿½ï¿½ï¿½^ï¿½[ï¿½Lï¿½[
+            $("#username-search-button").click();
         }
     });
 
-    $('#confirm-btn').click(() => {
+    $("#confirm-btn").click(() => {
         const contestScreenName = $("#contest-selector").val();
-        if (typeof (contestScreenName) === "undefined") return;
+        if (typeof contestScreenName === "undefined") return;
         toggleLoadingState();
-        DrawTable((String)(contestScreenName)).then(() => {
+        DrawTable(String(contestScreenName)).then(() => {
             toggleLoadingState();
         });
     });
 
-    setItemToSelector(await (await fetch(dataURL + '/contests.json')).json());
+    setItemToSelector(await (await fetch(dataURL + "/contests.json")).json());
 });
