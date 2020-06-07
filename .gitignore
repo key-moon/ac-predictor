@@ -269,3 +269,4 @@ __pycache__/
 /ac-predictor/Scripts/modernizr*
 /ac-predictor/Scripts/README.md
 /ac-predictor/Scripts/index.d.ts
+/ac-predictor-frontend/js/main.bundle.js
