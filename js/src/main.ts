@@ -1,10 +1,7 @@
-import 'jquery';
-import 'bootstrap';
-import { positivizeRating, calcRatingFromLast, getColor } from './rating';
-import { unpositivizeRating } from '../../_site/js/src/rating';
+import { unpositivizeRating, positivizeRating, calcRatingFromLast, getColor } from "./rating";
 
-const dataURL = "data.ac-predictor.com"
-const apiURL = "ac-predictor.azurewebsites.com"
+const dataURL = "http://data.ac-predictor.com";
+const apiURL = "http://ac-predictor.azurewebsites.com";
 
 async function getAPerfsAsync(contestScreenName: string): Promise<{ [key: string]: number }> {
     const response = await fetch(dataURL + `/aperfs/${contestScreenName}.json`);
@@ -19,10 +16,10 @@ async function getStandingsAsync(contestScreenName: string): Promise<Standings> 
 function setItemToSelector(items: string[]): void {
     const selected = $("#contest-selector").val();
     $("#contest-selector").empty();
-    items.forEach((item) => {
+    items.forEach(item => {
         $("#contest-selector").append(`<option>${item}</option>`);
     });
-    if (typeof (selected) === "undefined") return;
+    if (typeof selected === "undefined") return;
     $("#contest-selector").val(selected);
 }
 
@@ -30,28 +27,25 @@ let state = 0;
 function toggleLoadingState(): void {
     if (state === 0) {
         state = 1;
-        $('#confirm-btn').text('“Ç‚İ‚İ’†c');
-        $('#confirm-btn').prop("disabled", true);
-    }
-    else {
+        $("#confirm-btn").text("èª­ã¿è¾¼ã¿ä¸­");
+        $("#confirm-btn").prop("disabled", true);
+    } else {
         state = 0;
-        $('#confirm-btn').text('Šm’è');
-        $('#confirm-btn').prop("disabled", false);
+        $("#confirm-btn").text("ç¢ºå®š");
+        $("#confirm-btn").prop("disabled", false);
     }
 }
-
-
 
 // O(m)
 function calcRankVal(X: number, aPerfs: number[]): number {
     let res = 0;
-    aPerfs.forEach(function (aperf) {
+    aPerfs.forEach(function(aperf) {
         res += 1.0 / (1.0 + Math.pow(6.0, (X - aperf) / 400.0));
     });
     return res;
 }
 
-// O(mlogR) (“ñ•ª’Tõ)
+// O(mlogR) (äºŒåˆ†æ¢ç´¢)
 function getPerf(rank: number, aPerfs: number[]): number {
     let upper = 8192;
     let lower = -8192;
@@ -65,49 +59,39 @@ function getPerf(rank: number, aPerfs: number[]): number {
 }
 
 async function DrawTable(contestScrenName: string): Promise<void> {
-    var table = $('#standings-body');
-
-    await Promise.all([getAPerfsAsync(contestScrenName), getStandingsAsync(contestScrenName)])
-        .then((value) => {
-            const aperfs = value[0] as { [key: string]: number };
-            const standings = value[1] as Standings;
-            draw(standings, aperfs, $("#show-unrated").prop("checked"));
-        });
-
     //O(n + mR)
-    //n := ƒTƒuƒ~ƒbƒg‚µ‚½l”(2500l‚­‚ç‚¢ ?)
-    //m := Rated‚Èl(‚±‚ê‚à2500l)
-    //R := ƒŒ[ƒg‚Ì•(4000‚­‚ç‚¢)
-    function draw(standings: Standings, aperfs: { [key: string]: number }, drawUnrated: boolean) {
-        //ƒe[ƒuƒ‹‚ğƒNƒŠƒA
+    //n := ã‚µãƒ–ãƒŸãƒƒãƒˆã—ãŸäººæ•°(2500äººãã‚‰ã„ ?)
+    //m := Ratedãªäºº(ã“ã‚Œã‚‚2500äºº)
+    //R := ãƒ¬ãƒ¼ãƒˆã®å¹…(4000ãã‚‰ã„)
+    function draw(standings: Standings, aperfs: { [key: string]: number }, drawUnrated: boolean): void {
+        //ãƒ†ãƒ¼ãƒ–ãƒ«ã‚’ã‚¯ãƒªã‚¢
+        const table = $("#standings-body");
         table.empty();
 
-        const maxDic =
-            [
-                { pattern: /^abc12[6-9]$/, maxPerf: 2000 },
-                { pattern: /^abc1[3-9]\d$/, maxPerf: 2000 },
-                { pattern: /^abc\d{3}$/, maxPerf: 1200 },
-                { pattern: /^arc\d{3}$/, maxPerf: 2800 },
-                { pattern: /^agc\d{3}$/, maxPerf: Infinity },
-                { pattern: /^apc\d{3}$/, maxPerf: Infinity },
-                { pattern: /^cf\d{2}-final-open$/, maxPerf: Infinity },
-                { pattern: /^soundhound2018-summer-qual$/, maxPerf: 2000 },
-                { pattern: /^caddi2018$/, maxPerf: 1800 },
-                { pattern: /^caddi2018b$/, maxPerf: 1200 },
-                { pattern: /^aising2019$/, maxPerf: 2000 },
-                { pattern: /^keyence2019$/, maxPerf: 2800 },
-                { pattern: /^nikkei2019-qual$/, maxPerf: 2800 },
-                { pattern: /^exawizards2019$/, maxPerf: 2800 },
-                { pattern: /^diverta2019/, maxPerf: 2800 },
-                { pattern: /^m-solutions2019$/, maxPerf: 2800 },
-                { pattern: /.*/, maxPerf: Infinity }
-            ];
+        const maxDic = [
+            { pattern: /^abc12[6-9]$/, maxPerf: 2000 },
+            { pattern: /^abc1[3-9]\d$/, maxPerf: 2000 },
+            { pattern: /^abc\d{3}$/, maxPerf: 1200 },
+            { pattern: /^arc\d{3}$/, maxPerf: 2800 },
+            { pattern: /^agc\d{3}$/, maxPerf: Infinity },
+            { pattern: /^apc\d{3}$/, maxPerf: Infinity },
+            { pattern: /^cf\d{2}-final-open$/, maxPerf: Infinity },
+            { pattern: /^soundhound2018-summer-qual$/, maxPerf: 2000 },
+            { pattern: /^caddi2018$/, maxPerf: 1800 },
+            { pattern: /^caddi2018b$/, maxPerf: 1200 },
+            { pattern: /^aising2019$/, maxPerf: 2000 },
+            { pattern: /^keyence2019$/, maxPerf: 2800 },
+            { pattern: /^nikkei2019-qual$/, maxPerf: 2800 },
+            { pattern: /^exawizards2019$/, maxPerf: 2800 },
+            { pattern: /^diverta2019/, maxPerf: 2800 },
+            { pattern: /^m-solutions2019$/, maxPerf: 2800 },
+            { pattern: /.*/, maxPerf: Infinity }
+        ];
 
-        //PerfŒvZ‚Ég‚¤ƒpƒtƒH(RatedƒIƒ“ƒŠ[)
+        //Perfè¨ˆç®—æ™‚ã«ä½¿ã†ãƒ‘ãƒ•ã‚©(Ratedã‚ªãƒ³ãƒªãƒ¼)
         const activePerf: number[] = [];
         let isAnyoneRated = false;
         const ratedLimit = maxDic.filter(x => x.pattern.exec(contestScrenName))[0].maxPerf as number;
-        //defaultPerf‚ÍŠî–{“I‚ÉƒRƒ“ƒeƒXƒg’†‚µ‚©o‚È‚¢‚Ì‚Å‰ß‹‚Ì‚±‚Æ‚Íl‚¦‚È‚­‚Ä—Ç‚¢(¡Œã‚Ì•]‰¿Šî€‚É‚µ‚Ü‚µ‚½)
         const defaulPerfDic: { [key: number]: number } = {
             1200: 800,
             2000: 800,
@@ -116,10 +100,10 @@ async function DrawTable(contestScrenName: string): Promise<void> {
         };
         const defaultAPerf = defaulPerfDic[ratedLimit];
 
-        standings.StandingsData.forEach(function (element) {
+        standings.StandingsData.forEach(function(element) {
             if (!element.IsRated || element.TotalResult.Count === 0) return;
             if (!aperfs[element.UserScreenName]) {
-                //‚±‚±‚Å‰½‚à’Ç‰Á‚µ‚È‚¢‚Æ‰ºŒÀRatedValue‚ªl”‚ğ‰º‰ñ‚Á‚Ä‚µ‚Ü‚¢A‚±‚í‚ê‚é
+                //ã“ã“ã§ä½•ã‚‚è¿½åŠ ã—ãªã„ã¨ä¸‹é™RatedValueãŒäººæ•°ã‚’ä¸‹å›ã£ã¦ã—ã¾ã„ã€ã“ã‚ã‚Œã‚‹
                 activePerf.push(defaultAPerf);
                 return;
             }
@@ -127,41 +111,79 @@ async function DrawTable(contestScrenName: string): Promise<void> {
             activePerf.push(aperfs[element.UserScreenName]);
         });
 
-        //—v‚·‚é‚ÉUnRatedƒRƒ“
+        //è¦ã™ã‚‹ã«UnRatedã‚³ãƒ³
         if (!isAnyoneRated) {
-            //ƒŒ[ƒeƒBƒ“ƒO‚Í•Ï“®‚µ‚È‚¢‚Ì‚ÅAƒRƒ“ƒeƒXƒg’†‚Æ“¯‚¶ˆµ‚¢‚ğ‚µ‚Ä—Ç‚¢B(‹t‚É‚µ‚È‚¢‚Æ)
+            //ãƒ¬ãƒ¼ãƒ†ã‚£ãƒ³ã‚°ã¯å¤‰å‹•ã—ãªã„ã®ã§ã€ã‚³ãƒ³ãƒ†ã‚¹ãƒˆä¸­ã¨åŒã˜æ‰±ã„ã‚’ã—ã¦è‰¯ã„ã€‚
             standings.Fixed = false;
 
-            //Œ³‚ÍRated‚¾‚Á‚½‚Æ„‘ª‚Å‚«‚éê‡A’Êí‚ÌRated‚Æ“¯‚¶‚æ‚¤‚Èˆµ‚¢
+            //å…ƒã¯Ratedã ã£ãŸã¨æ¨æ¸¬ã§ãã‚‹å ´åˆã€é€šå¸¸ã®Ratedã¨åŒã˜ã‚ˆã†ãªæ‰±ã„
             activePerf.length = 0;
-            for (var i = 0; i < standings.StandingsData.length; i++) {
+            for (let i = 0; i < standings.StandingsData.length; i++) {
                 const element = standings.StandingsData[i];
                 if (element.OldRating >= ratedLimit || element.TotalResult.Count === 0) continue;
                 if (!aperfs[element.UserScreenName]) {
                     activePerf.push(defaultAPerf);
                     continue;
                 }
-                //Ratedƒtƒ‰ƒO‚ğƒIƒ“‚É
+                //Ratedãƒ•ãƒ©ã‚°ã‚’ã‚ªãƒ³ã«
                 standings.StandingsData[i].IsRated = true;
                 activePerf.push(aperfs[element.UserScreenName]);
             }
         }
 
-        //ŒÀŠEƒpƒtƒH[ƒ}ƒ“ƒX(ãŒÀ‚È‚µ‚Ìê‡‚ÍˆêˆÊ‚Ìl‚ÌƒpƒtƒH)
+        //é™ç•Œãƒ‘ãƒ•ã‚©ãƒ¼ãƒãƒ³ã‚¹(ä¸Šé™ãªã—ã®å ´åˆã¯ä¸€ä½ã®äººã®ãƒ‘ãƒ•ã‚©)
         const maxPerf = ratedLimit === Infinity ? getPerf(1, activePerf) : ratedLimit + 400;
 
-        //addRow‚ğ‰ñ‚·‚Æ‚«‚ÌƒpƒtƒH 0.5‚ğˆø‚¢‚Ä‚¢‚é‚Ì‚ÍlÌŒÜ“ü‚ª”­¶‚·‚é‹«ŠE‚É’u‚­‚½‚ß
+        //addRowã‚’å›ã™ã¨ãã®ãƒ‘ãƒ•ã‚© 0.5ã‚’å¼•ã„ã¦ã„ã‚‹ã®ã¯å››æ¨äº”å…¥ãŒç™ºç”Ÿã™ã‚‹å¢ƒç•Œã«ç½®ããŸã‚
         let currentPerf = maxPerf - 0.5;
         let rankVal = calcRankVal(currentPerf, activePerf);
 
-        //ƒ^ƒC‚Ìl‚ğ“ü‚ê‚é(‡ˆÊ‚ª•Ï‚í‚Á‚½‚ç•`‰æ¨ƒŠƒXƒg‚ğ‹ó‚É)
+        //ã‚¿ã‚¤ã®äººã‚’å…¥ã‚Œã‚‹(é †ä½ãŒå¤‰ã‚ã£ãŸã‚‰æç”»â†’ãƒªã‚¹ãƒˆã‚’ç©ºã«)
         let tiedList: StandingData[] = [];
         let rank = 1;
         let lastRank = 0;
         let ratedCount = 0;
-        //‘Sˆõ‰ñ‚·
-        standings.StandingsData.forEach(function (element) {
-            if (!drawUnrated && !element.IsRated || element.TotalResult.Count === 0) return;
+
+        //ã‚¿ã‚¤ãƒªã‚¹ãƒˆã®äººå…¨å“¡è¡Œè¿½åŠ 
+        function addRow(): void {
+            const fixRank = rank + Math.max(0, ratedCount - 1) / 2;
+            while (rankVal < fixRank - 0.5 && currentPerf >= -8192) {
+                currentPerf--;
+                rankVal = calcRankVal(currentPerf, activePerf);
+            }
+            const perf = currentPerf + 0.5;
+            tiedList.forEach(function(element): void {
+                function getRatingChangeStr(oldRate: number, newRate: number): string {
+                    function ratingSpan(rate: number): string {
+                        return `<span class="user-${getColor(rate)}">${rate}</span>`;
+                    }
+
+                    return element.IsRated
+                        ? `${ratingSpan(oldRate)} -> ${ratingSpan(newRate)}(${newRate >= oldRate ? "+" : ""}${newRate -
+                              oldRate})`
+                        : `${ratingSpan(oldRate)}(unrated)`;
+                }
+
+                const matches = element.Competitions - (standings.Fixed && element.IsRated ? 1 : 0);
+                const oldRate = standings.Fixed ? element.OldRating : element.Rating;
+                const newRate = Math.floor(
+                    positivizeRating(
+                        matches !== 0 ? calcRatingFromLast(unpositivizeRating(oldRate), perf, matches) : perf - 1200
+                    )
+                );
+                const name = element.UserScreenName;
+                const node = `<tr><td>${rank}</td><td><a class="user-${getColor(
+                    oldRate
+                )}" href=http://atcoder.jp/users/${name} >${name}</a></td><td>${perf}</td><td>${getRatingChangeStr(
+                    oldRate,
+                    newRate
+                )}</td></tr>`;
+                table.append(node);
+            });
+        }
+        //å…¨å“¡å›ã™
+        standings.StandingsData.forEach(function(element) {
+            if ((!drawUnrated && !element.IsRated) || element.TotalResult.Count === 0) return;
             if (lastRank !== element.Rank) {
                 addRow();
                 rank += ratedCount;
@@ -172,72 +194,53 @@ async function DrawTable(contestScrenName: string): Promise<void> {
             lastRank = element.Rank;
             if (element.IsRated) ratedCount++;
         });
-        //ÅŒã‚ÉXV‚µ‚Ä‚ ‚°‚é
+        //æœ€å¾Œã«æ›´æ–°ã—ã¦ã‚ã’ã‚‹
         addRow();
-
-        //ƒ^ƒCƒŠƒXƒg‚Ìl‘Sˆõs’Ç‰Á
-        function addRow() {
-            const fixRank = rank + Math.max(0, ratedCount - 1) / 2;
-            while (rankVal < fixRank - 0.5 && currentPerf >= -8192) {
-                currentPerf--;
-                rankVal = calcRankVal(currentPerf, activePerf);
-            }
-            const perf = currentPerf + 0.5;
-            tiedList.forEach(function (element) {
-                const matches = element.Competitions - (standings.Fixed && element.IsRated ? 1 : 0);
-                const oldRate = standings.Fixed ? element.OldRating : element.Rating;
-                const newRate = Math.floor(positivizeRating(matches !== 0 ? calcRatingFromLast(unpositivizeRating(oldRate), perf, matches) : perf - 1200));
-                const name = element.UserScreenName;
-                const node = `<tr><td>${rank}</td><td><a class="user-${getColor(oldRate)}" href=http://atcoder.jp/users/${name} >${name}</a></td><td>${perf}</td><td>${getRatingChangeStr(oldRate, newRate)}</td></tr>`;
-                table.append(node);
-
-                function getRatingChangeStr(oldRate: number, newRate: number): string {
-                    return element.IsRated ? `${ratingSpan(oldRate)} -> ${ratingSpan(newRate)}(${(newRate >= oldRate ? '+' : '')}${newRate - oldRate})` : `${ratingSpan(oldRate)}(unrated)`;
-
-                    function ratingSpan(rate: number): string {
-                        return `<span class="user-${getColor(rate)}">${rate}</span>`;
-                    }
-                }
-            });
-        }
     }
+
+    await Promise.all([getAPerfsAsync(contestScrenName), getStandingsAsync(contestScrenName)]).then(value => {
+        const aperfs = value[0] as { [key: string]: number };
+        const standings = value[1] as Standings;
+        draw(standings, aperfs, $("#show-unrated").prop("checked"));
+    });
 }
 
-
 $(async () => {
-    $('#show-unrated-description').tooltip();
+    $("#show-unrated-description").tooltip();
 
-    //ƒ†[ƒU[–¼ŒŸõ
-    $('#username-search-button').click(() => {
-        function setAlert(val: string) {
-            $('#username-search-input').addClass('is-invalid');
-            $('#username-search-alert').text(val);
+    //ãƒ¦ãƒ¼ã‚¶ãƒ¼åæ¤œç´¢
+    $("#username-search-button").click(() => {
+        function setAlert(val: string): void {
+            $("#username-search-input").addClass("is-invalid");
+            $("#username-search-alert").text(val);
         }
-        function clearAlert() {
-            $('#username-search-input').removeClass('is-invalid');
-            $('#username-search-alert').empty();
+        function clearAlert(): void {
+            $("#username-search-input").removeClass("is-invalid");
+            $("#username-search-alert").empty();
         }
 
         clearAlert();
-        const searchName = $('#username-search-input').val();
-        if (searchName === '') {
-            setAlert("ƒ†[ƒU[–¼‚ğ“ü—Í‚µ‚Ä‚­‚¾‚³‚¢");
+        const searchName = $("#username-search-input").val();
+        if (searchName === "") {
+            setAlert("ãƒ¦ãƒ¼ã‚¶ãƒ¼åã‚’å…¥åŠ›ã—ã¦ãã ã•ã„");
             return;
         }
 
         let found = false;
-        $('#standings-body a[class^=user]').each((_, elem) => {
+        $("#standings-body a[class^=user]").each((_, elem) => {
             const elemDom = $(elem);
             if (found || elemDom.text() === searchName) return;
-            // Œ»İ‚Ì˜gü‚ğíœ
-            $('#standings-body > tr').css('border', 'none');
-            // ˜gü‚ğ‚Â‚¯‚é
-            elemDom.parent().parent().css('border', 'solid 3px #dd289a');
-            // ƒXƒNƒ[ƒ‹
+            // ç¾åœ¨ã®æ ç·šã‚’å‰Šé™¤
+            $("#standings-body > tr").css("border", "none");
+            // æ ç·šã‚’ã¤ã‘ã‚‹
+            elemDom
+                .parent()
+                .parent()
+                .css("border", "solid 3px #dd289a");
+            // ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«
             const offset = elemDom.offset();
             const height = $(window).height();
-            if (typeof(offset) === 'undefined' ||
-                typeof(height) === 'undefined') return;
+            if (typeof offset === "undefined" || typeof height === "undefined") return;
             $("html,body").animate({
                 scrollTop: offset.top - height / 2
             });
@@ -245,24 +248,24 @@ $(async () => {
         });
 
         if (!found) {
-            setAlert("ƒ†[ƒU[–¼‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ‚Å‚µ‚½");
+            setAlert("ãƒ¦ãƒ¼ã‚¶ãƒ¼åãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã§ã—ãŸ");
         }
     });
-    $('#username-search-input').keypress(pressedKey => {
+    $("#username-search-input").keypress(pressedKey => {
         if (pressedKey.which === 13) {
-            // ƒGƒ“ƒ^[ƒL[
-            $('#username-search-button').click();
+            //ã‚¨ãƒ³ã‚¿ãƒ¼ã‚­ãƒ¼
+            $("#username-search-button").click();
         }
     });
 
-    $('#confirm-btn').click(() => {
+    $("#confirm-btn").click(() => {
         const contestScreenName = $("#contest-selector").val();
-        if (typeof (contestScreenName) === "undefined") return;
+        if (typeof contestScreenName === "undefined") return;
         toggleLoadingState();
-        DrawTable((String)(contestScreenName)).then(() => {
+        DrawTable(String(contestScreenName)).then(() => {
             toggleLoadingState();
         });
     });
 
-    setItemToSelector(await (await fetch(dataURL + '/contests.json')).json());
+    setItemToSelector(await (await fetch(dataURL + "/contests.json")).json());
 });

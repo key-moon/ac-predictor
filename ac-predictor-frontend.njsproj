@@ -17,11 +17,16 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
   <ItemGroup>
+    <Content Include=".eslintrc.json">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="index.md" />
+    <Content Include="rollup.config.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="userscript.md" />
     <Content Include="css\base.css" />
     <Content Include="css\standingstable.css" />
-    <Content Include="js\contestselector.js" />
     <Content Include="_includes\footer.html" />
     <Content Include="_includes\head.html" />
     <Content Include="_includes\navbar.html" />

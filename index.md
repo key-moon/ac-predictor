@@ -1,7 +1,7 @@
 ---
 title: Home
 styles: [base.css, standingstable.css]
-scripts: [base.js, contestselector.js]
+scripts: [main.bundle.js]
 ---
 
 <div class="my-2">
