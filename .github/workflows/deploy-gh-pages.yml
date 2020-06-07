@@ -44,7 +44,7 @@ jobs:
 
     - name: bundle files
       run: |
-        cd ac-predictor-frontend
+        cd $GITHUB_WORKSPACE/ac-predictor-frontend
         npm ci
         npm run bundle
 
