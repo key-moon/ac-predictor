@@ -35,6 +35,7 @@ jobs:
    
     - name: update repository
       run: |
+        cp CNAME ../docs
         rm -rf $GITHUB_WORKSPACE/*
         cp -rT ../docs $GITHUB_WORKSPACE
         
