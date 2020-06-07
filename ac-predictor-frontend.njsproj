@@ -21,7 +21,6 @@
     <Content Include="userscript.md" />
     <Content Include="css\base.css" />
     <Content Include="css\standingstable.css" />
-    <Content Include="js\base.js" />
     <Content Include="js\contestselector.js" />
     <Content Include="_includes\footer.html" />
     <Content Include="_includes\head.html" />
@@ -29,11 +28,19 @@
     <Content Include="_layouts\default.html" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="js\src\" />
+    <Folder Include="js\src\types\" />
+    <Folder Include="js\src\types\standings\" />
     <Folder Include="_includes" />
     <Folder Include="_layouts" />
     <Folder Include="ac-predictor-frontend" />
     <Folder Include="css" />
     <Folder Include="js" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="js\src\main.ts" />
+    <TypeScriptCompile Include="js\src\rating.ts" />
+    <TypeScriptCompile Include="js\src\types\standings\index.d.ts" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />
