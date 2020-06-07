@@ -2,16 +2,30 @@
   "name": "ac-predictor-frontend",
   "version": "0.0.1",
   "description": "",
-  "main": "js/src/main.ts",
+  "scripts": {
+    "lint": "eslint 'js/src/**'",
+    "lint:fix": "eslint --fix 'js/src/**'",
+    "bundle": "rollup -c",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "keymoon",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/key-moon/ac-predictor/issues"
+  },
+  "homepage": "https://ac-predictor.com",
   "dependencies": {},
   "devDependencies": {
     "@types/bootstrap": "^4.5.0",
     "@types/jquery": "^3.3.38",
+    "@typescript-eslint/eslint-plugin": "^2.20.0",
+    "@typescript-eslint/parser": "^2.20.0",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.10.0",
+    "eslint-plugin-prettier": "^3.1.2",
+    "prettier": "^1.19.1",
+    "rollup-plugin-typescript": "^1.0.1",
+    "rollup": "^1.31.1",
     "typescript": "^3.9.5"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "MIT"
+  }
 }
