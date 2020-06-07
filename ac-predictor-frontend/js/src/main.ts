@@ -1,7 +1,7 @@
 import { unpositivizeRating, positivizeRating, calcRatingFromLast, getColor } from "./rating";
 
-const dataURL = "http://data.ac-predictor.com";
-const apiURL = "http://ac-predictor.azurewebsites.com";
+const dataURL = "https://data.ac-predictor.com";
+const apiURL = "https://ac-predictor.azurewebsites.com";
 
 async function getAPerfsAsync(contestScreenName: string): Promise<{ [key: string]: number }> {
     const response = await fetch(dataURL + `/aperfs/${contestScreenName}.json`);
