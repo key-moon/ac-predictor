@@ -1,0 +1,17 @@
+{
+  "name": "ac-predictor-frontend",
+  "version": "0.0.1",
+  "description": "",
+  "main": "js/src/main.ts",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/bootstrap": "^4.5.0",
+    "@types/jquery": "^3.3.38",
+    "typescript": "^3.9.5"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT"
+}
