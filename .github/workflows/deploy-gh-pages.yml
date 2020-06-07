@@ -36,9 +36,17 @@ jobs:
     - name: update repository
       run: |
         cp CNAME ../docs
-        rm -rf $GITHUB_WORKSPACE/*
-        cp -rT ../docs $GITHUB_WORKSPACE
-        
+        rm -rf ./*
+        cp -rT ../docs ./
+
+    - name: setup node
+      uses: actions/setup-node@v1
+
+    - name: bundle files
+      run: |
+        npm ci
+        npm run bundle
+
     - name: commit and push
       env: 
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -50,4 +58,3 @@ jobs:
           git commit -m "update GitHub Pages"
           git push origin HEAD
         fi
-        
