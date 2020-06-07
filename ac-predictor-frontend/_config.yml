@@ -1,16 +1,7 @@
 title: ac-predictor
-baseurl: "/"
-url: "https://key-moon.github.io"
-
-collections:
-  docs:
-    permalink: "/:collection/:path/"
-    output: true
-  posts:
-    permalink: "/news/:year/:month/:day/:title/"
-    output: true
-  tutorials:
-    output: true
+baseurl: /
+url: https://ac-predictor.com
+repository: https://github.com/key-moon/ac-predictor
 
 defaults:
   - scope:
@@ -20,3 +11,8 @@ defaults:
 
 exclude:
   - ".gitignore"
+  - CNAME
+  - /js/src/*
+  - package.json
+  - package-lock.json
+  - tsconfig.json
