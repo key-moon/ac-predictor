@@ -6,10 +6,12 @@ using Microsoft.AspNetCore.Mvc;
 
 using AtCoder;
 using AtCoder.Client;
+using Microsoft.AspNetCore.DataProtection;
+using AzureFunctions;
 
 namespace ac_predictor_backend.Controller
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class StandingsController : ControllerBase
     {
@@ -17,23 +19,24 @@ namespace ac_predictor_backend.Controller
         public async Task<MinimalStandings> GetAsync(string contestScreenName)
         {
             AtCoderClient client = new AtCoderClient();
-            var res = (MinimalStandings)(await client.GetStandingsAsync(contestScreenName));
-            if (res is null) res = new MinimalStandings() { Fixed = true, StandingsData = Array.Empty<MinimalStandingData>() };
-            return res;
+            await client.LoginAsync(Secrets.GetSecret("AtCoderCSRFToken"));
+            var res = await client.GetStandingsAsync(contestScreenName);
+            if (res is null) return null;
+            return (MinimalStandings)res;
         }
     }
 
     public class MinimalStandings
     {
-        public bool Fixed;
-        public MinimalStandingData[] StandingsData;
+        public bool Fixed { get; private set; }
+        public MinimalStandingData[] StandingsData { get; private set; }
 
         public static explicit operator MinimalStandings(Standings standings)
         {
             return new MinimalStandings()
             {
                 Fixed = standings.Fixed,
-                StandingsData = standings.StandingsData.Cast<MinimalStandingData>().ToArray()
+                StandingsData = standings.StandingsData.Select(x => (MinimalStandingData)x).ToArray()
             };
         }
     }
@@ -67,11 +70,13 @@ namespace ac_predictor_backend.Controller
 
     public class MinimalTotalResult
     {
+        public int Count { get; private set; }
         public int Penalty { get; private set; }
         public static explicit operator MinimalTotalResult(TotalResult totalResult)
         {
             return new MinimalTotalResult()
             {
+                Count = totalResult.Count,
                 Penalty = totalResult.Penalty
             };
         }
