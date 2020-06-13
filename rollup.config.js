@@ -5,5 +5,5 @@ export default {
     output: {
         file: "js/main.bundle.js"
     },
-    plugins: [typescript()],
+    plugins: [typescript()]
 };

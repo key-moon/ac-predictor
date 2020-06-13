@@ -34,6 +34,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="js\src\" />
+    <Folder Include="js\src\view\" />
     <Folder Include="js\src\types\" />
     <Folder Include="js\src\types\standings\" />
     <Folder Include="_includes" />
@@ -43,9 +44,18 @@
     <Folder Include="js" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="js\src\api.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="js\src\main.ts" />
+    <TypeScriptCompile Include="js\src\PerformanceCalculator.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="js\src\rating.ts" />
     <TypeScriptCompile Include="js\src\types\standings\index.d.ts" />
+    <TypeScriptCompile Include="js\src\view\table.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />
