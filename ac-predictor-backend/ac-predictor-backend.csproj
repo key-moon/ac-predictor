@@ -1,13 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk.Web">
-
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>ac_predictor_backend</RootNamespace>
+    <UserSecretsId>45360624-6cea-468a-ac3e-b52a76b2628d</UserSecretsId>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\AtCoder\AtCoder.csproj" />
   </ItemGroup>
-
-
 </Project>
