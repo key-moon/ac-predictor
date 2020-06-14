@@ -23,7 +23,7 @@ namespace AtCoder.Client
 
                 var tds = row.GetElementsByTagName("td");
                 var dateTimeStr = tds[0].FirstElementChild.GetAttribute("href").Split('?')[1].Substring(4, 13);
-                res.StartTime = DateTime.ParseExact(dateTimeStr, "yyyyMMddTHHmm", null).AddHours(9);
+                res.StartTime = DateTime.ParseExact(dateTimeStr, "yyyyMMddTHHmm", null).AddHours(-9);
 
                 var contestAnchor = tds[1].GetElementsByTagName("a")[0];
                 res.ContestName = contestAnchor.TextContent;
