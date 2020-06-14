@@ -146,12 +146,15 @@ function GetRowHTML(row) {
         }
         return getRatingSpan(oldRate) + " \u2192 " + getRatingSpan(newRate) + getRatingChangeSpan(newRate - oldRate);
     }
-    var unratedStr = getRatingSpan(row.oldRating) + "<span class=\"gray\">(unrated)</span>";
+    var oldRating = row.oldRating ? Math.round(row.oldRating) : null;
+    var newRating = row.newRating ? Math.round(row.newRating) : null;
+    var performance = row.performance ? Math.round(row.performance) : null;
+    var unratedStr = getRatingSpan(oldRating) + "<span class=\"gray\">(unrated)</span>";
     var rankCell = "<td>" + row.rank + "</td>";
     var href = "http://atcoder.jp/users/" + row.userScreenName;
-    var userCell = "<td><a class=\"user-" + getColor(row.oldRating) + "\" href=" + href + ">" + row.userScreenName + "</a></td>";
-    var perfCell = "<td>" + getRatingSpan(row.performance) + "</td>";
-    var rateChangeCell = "<td>" + (row.isRated ? getRatingChangeStr(row.oldRating, row.newRating) : unratedStr) + "</td>";
+    var userCell = "<td><a class=\"user-" + getColor(oldRating) + "\" href=" + href + ">" + row.userScreenName + "</a></td>";
+    var perfCell = "<td>" + getRatingSpan(performance) + "</td>";
+    var rateChangeCell = "<td>" + (row.isRated ? getRatingChangeStr(oldRating, newRating) : unratedStr) + "</td>";
     return "<tr>" + rankCell + userCell + perfCell + rateChangeCell + "</tr>";
 }
 var ResultFixedRow = /** @class */ (function () {
@@ -382,7 +385,7 @@ function DrawTable(contestScreenName, drawUnrated) {
                                         row = new ResultFixedRow(calculator, fixRank, element.Rank, element.UserScreenName, element.IsRated, element.OldRating, element.Rating);
                                     }
                                     else {
-                                        row = new OndemandRow(calculator, element.Competitions, fixRank, element.Rank, element.UserScreenName, element.IsRated, element.OldRating);
+                                        row = new OndemandRow(calculator, element.Competitions, fixRank, element.Rank, element.UserScreenName, element.IsRated, element.Rating);
                                     }
                                     table.rows.push(row);
                                 });
