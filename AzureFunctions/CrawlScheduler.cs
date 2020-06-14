@@ -89,6 +89,8 @@ namespace AzureFunctions
         {
             logger = context.CreateReplaySafeLogger(logger);
 
+            var startAt = context.CurrentUtcDateTime;
+
             var needCrawlContests = context.GetInput<List<string>>() ?? new List<string>();
             var tasks = new Task<bool>[needCrawlContests.Count];
             logger.LogInformation($"needCrawlContests : [{string.Join(", ", needCrawlContests)}]");
@@ -107,8 +109,8 @@ namespace AzureFunctions
                     needCrawlContests.RemoveAt(i);
             
             if (needCrawlContests.Count == 0) return;
-            
-            await context.CreateTimer(context.CurrentUtcDateTime.AddMinutes(20), CancellationToken.None);
+
+            await context.CreateTimer(startAt.AddMinutes(15), CancellationToken.None);
             context.ContinueAsNew(needCrawlContests);
         }
 
