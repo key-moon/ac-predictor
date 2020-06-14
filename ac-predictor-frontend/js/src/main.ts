@@ -136,7 +136,7 @@ async function DrawTable(contestScreenName: string, drawUnrated: boolean): Promi
                         element.Rank,
                         element.UserScreenName,
                         element.IsRated,
-                        element.OldRating
+                        element.Rating
                     );
                 }
                 table.rows.push(row);
