@@ -22,13 +22,17 @@ function GetRowHTML(row: Row): string {
         return `${getRatingSpan(oldRate)} → ${getRatingSpan(newRate)}${getRatingChangeSpan(newRate - oldRate)}`;
     }
 
-    const unratedStr = `${getRatingSpan(row.oldRating)}<span class="gray">(unrated)</span>`;
+    const oldRating = row.oldRating ? Math.round(row.oldRating) : null;
+    const newRating = row.newRating ? Math.round(row.newRating) : null;
+    const performance = row.performance ? Math.round(row.performance) : null;
+
+    const unratedStr = `${getRatingSpan(oldRating)}<span class="gray">(unrated)</span>`;
 
     const rankCell = `<td>${row.rank}</td>`;
     const href = `http://atcoder.jp/users/${row.userScreenName}`;
-    const userCell = `<td><a class="user-${getColor(row.oldRating)}" href=${href}>${row.userScreenName}</a></td>`;
-    const perfCell = `<td>${getRatingSpan(row.performance)}</td>`;
-    const rateChangeCell = `<td>${row.isRated ? getRatingChangeStr(row.oldRating, row.newRating) : unratedStr}</td>`;
+    const userCell = `<td><a class="user-${getColor(oldRating)}" href=${href}>${row.userScreenName}</a></td>`;
+    const perfCell = `<td>${getRatingSpan(performance)}</td>`;
+    const rateChangeCell = `<td>${row.isRated ? getRatingChangeStr(oldRating, newRating) : unratedStr}</td>`;
 
     return `<tr>${rankCell}${userCell}${perfCell}${rateChangeCell}</tr>`;
 }
