@@ -20,11 +20,12 @@ namespace AzureFunctions
         [FunctionName("UpdateAPerfs")]
         public static async Task<bool> Run([ActivityTrigger] string contestScreenName, ILogger log)
         {
+            var startTime = DateTime.Now;
             log.LogInformation("start updating {0}", contestScreenName);
             var ghClient = GitHubUtil.Client;
             var acClient = new AtCoderClient();
 
-            var session = Secrets.GetSecret("AtCoderSession");
+            var session = Secrets.GetSecret("AtCoderCSRFToken");
             await acClient.LoginAsync(session);
 
             var standings = await acClient.GetStandingsAsync(contestScreenName);
@@ -45,8 +46,15 @@ namespace AzureFunctions
             }
             var dic = content is null ? new Dictionary<string, double>() : JsonSerializer.Deserialize<Dictionary<string, double>>(content.Content);
             log.LogInformation("start crawling.");
+            bool abort = false;
             foreach (var standingData in standings.StandingsData)
             {
+                if ((DateTime.Now - startTime).TotalMinutes >= 8)
+                {
+                    log.LogWarning("time limit is nearing. abort.");
+                    abort = true;
+                    break;
+                }
                 if (standingData.UserIsDeleted || 
                     standingData.Competitions == 0 ||
                     dic.ContainsKey(standingData.UserScreenName)) continue;
@@ -81,7 +89,7 @@ namespace AzureFunctions
                 await ghClient.Repository.Content.UpdateFile(GitHubUtil.Owner, GitHubUtil.Repo, jsonPath, request);
             }
 
-            return !standings.Fixed;
+            return abort || !standings.Fixed;
         }
     }
 }
