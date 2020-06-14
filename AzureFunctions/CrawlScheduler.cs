@@ -45,7 +45,7 @@ namespace AzureFunctions
             return starter.CreateCheckStatusResponse(req, instanceId);
         }
 
-        [FunctionName("GetNeedCrawlContests")]
+        [FunctionName("PeriodicCrawlScheduler")]
         public static async Task RunOrchestrator(
             [OrchestrationTrigger] IDurableOrchestrationContext context, ILogger logger)
         {
@@ -98,7 +98,6 @@ namespace AzureFunctions
                 logger.LogInformation($"start updating {needCrawlContests[i]}");
                 tasks[i] = context.CallActivityAsync<bool>("UpdateAPerfs", needCrawlContests[i]);
             }
-            //Task.WaitAll(tasks);
             for (int i = 0; i < tasks.Length; i++)
                 await tasks[i];
             logger.LogInformation("completed"); 
