@@ -138,17 +138,20 @@ function getColor(rating) {
 
 function GetRowHTML(row) {
     function getRatingSpan(rate) {
+        if (rate === null)
+            return '<span class="bold">?</span>';
         return "<span class=\"bold user-" + getColor(rate) + "\">" + rate + "</span>";
     }
     function getRatingChangeStr(oldRate, newRate) {
-        function getRatingChangeSpan(delta) {
-            return "<span class=\"gray\">(" + (0 <= delta ? "+" : "") + delta + ")</span>";
-        }
-        return getRatingSpan(oldRate) + " \u2192 " + getRatingSpan(newRate) + getRatingChangeSpan(newRate - oldRate);
+        var delta = newRate - oldRate;
+        var ratingChangeSpan = oldRate === null || newRate === null
+            ? '<span class="gray">(?)'
+            : "<span class=\"gray\">(" + (0 <= delta ? "+" : "") + delta + ")</span>";
+        return getRatingSpan(oldRate) + " \u2192 " + getRatingSpan(newRate) + ratingChangeSpan;
     }
-    var oldRating = row.oldRating ? Math.round(row.oldRating) : null;
-    var newRating = row.newRating ? Math.round(row.newRating) : null;
-    var performance = row.performance ? Math.round(row.performance) : null;
+    var oldRating = row.oldRating !== null ? Math.round(row.oldRating) : null;
+    var newRating = row.newRating !== null ? Math.round(row.newRating) : null;
+    var performance = row.performance !== null ? Math.round(row.performance) : null;
     var unratedStr = getRatingSpan(oldRating) + "<span class=\"gray\">(unrated)</span>";
     var rankCell = "<td>" + row.rank + "</td>";
     var href = "http://atcoder.jp/users/" + row.userScreenName;
@@ -232,6 +235,14 @@ var Table = /** @class */ (function () {
     };
     return Table;
 }());
+function getRow(fixed, internalRank, performanceCalculator, standingData) {
+    if (fixed) {
+        return new ResultFixedRow(performanceCalculator, internalRank, standingData.Rank, standingData.UserScreenName, standingData.IsRated, standingData.OldRating, null);
+    }
+    else {
+        return new OndemandRow(performanceCalculator, standingData.Competitions, internalRank, standingData.Rank, standingData.UserScreenName, standingData.IsRated, standingData.Rating);
+    }
+}
 
 // O(m)
 function calcRankVal(X, aPerfs) {
@@ -332,7 +343,16 @@ var contests = {};
 var currentTable;
 function DrawTable(contestScreenName, drawUnrated) {
     return __awaiter(this, void 0, Promise, function () {
-        var tableDom, table, calculator, addedSet;
+        function isRated(standingData) {
+            return standingData.IsRated || (standings.Fixed ? standingData.OldRating : standingData.Rating) < ratedLimit;
+        }
+        function addRow() {
+            var fixRank = ratedRank + Math.max(0, ratedCount - 1) / 2;
+            tiedList.forEach(function (standingsData) {
+                table.rows.push(getRow(standings.Fixed, fixRank, calculator, standingsData));
+            });
+        }
+        var tableDom, table, calculator, addedSet, value, aperfs, standings, officialResultLink, userScreptInstallLink, warningStr, div, newAPerfs, ratedLimit, defaultAPerf, tiedList, ratedRank, lastRank, ratedCount;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -349,109 +369,95 @@ function DrawTable(contestScreenName, drawUnrated) {
                     calculator = contests[contestScreenName].calculator;
                     addedSet = contests[contestScreenName].addedSet;
                     currentTable = table;
-                    return [4 /*yield*/, Promise.all([getAPerfsAsync(contestScreenName), getStandingsAsync(contestScreenName)]).then(function (value) {
-                            if (table === null)
-                                return;
-                            var aperfs = value[0];
-                            var standings = value[1];
-                            var newAPerfs = [];
-                            var ratedLimit = getMaxPerf(contestScreenName);
-                            var defaultAPerf = getDefaultPerf(ratedLimit);
-                            calculator.maxPerf = ratedLimit;
-                            standings.StandingsData.forEach(function (element) {
-                                var _a;
-                                var userScreenName = element.UserScreenName;
-                                var isUnrated = element.UserIsDeleted ||
-                                    (!element.IsRated && element.OldRating >= ratedLimit) ||
-                                    element.TotalResult.Count === 0 ||
-                                    addedSet.has(userScreenName);
-                                if (isUnrated)
-                                    return;
-                                addedSet.add(userScreenName);
-                                newAPerfs.push((_a = aperfs[userScreenName]) !== null && _a !== void 0 ? _a : defaultAPerf);
-                            });
-                            calculator.addAPerfs(newAPerfs);
-                            //タイの人を入れる(順位が変わったら描画→リストを空に)
-                            var tiedList = [];
-                            var ratedRank = 1;
-                            var lastRank = 0;
-                            var ratedCount = 0;
-                            //タイリストの人全員行追加
-                            function addRow() {
-                                var fixRank = ratedRank + Math.max(0, ratedCount - 1) / 2;
-                                tiedList.forEach(function (element) {
-                                    var row;
-                                    if (standings.Fixed) {
-                                        row = new ResultFixedRow(calculator, fixRank, element.Rank, element.UserScreenName, element.IsRated, element.OldRating, element.Rating);
-                                    }
-                                    else {
-                                        row = new OndemandRow(calculator, element.Competitions, fixRank, element.Rank, element.UserScreenName, element.IsRated, element.Rating);
-                                    }
-                                    table.rows.push(row);
-                                });
-                            }
-                            table.rows.length = 0;
-                            //全員回す
-                            standings.StandingsData.forEach(function (element) {
-                                if ((!drawUnrated && !element.IsRated) || element.TotalResult.Count === 0)
-                                    return;
-                                if (lastRank !== element.Rank) {
-                                    addRow();
-                                    tiedList.length = 0;
-                                    ratedRank += ratedCount;
-                                    ratedCount = 0;
-                                }
-                                tiedList.push(element);
-                                lastRank = element.Rank;
-                                if (element.IsRated)
-                                    ratedCount++;
-                            });
-                            addRow();
-                            table.draw();
-                        })];
+                    return [4 /*yield*/, Promise.all([getAPerfsAsync(contestScreenName), getStandingsAsync(contestScreenName)])];
                 case 1:
-                    _a.sent();
+                    value = _a.sent();
+                    aperfs = value[0];
+                    standings = value[1];
+                    if (standings.Fixed) {
+                        officialResultLink = "<a href=https://atcoder.jp/contests/" + contestScreenName + "/results>\u516C\u5F0F\u306E\u767A\u8868</a>";
+                        userScreptInstallLink = "<a href=/userscript>UserScript</a>";
+                        warningStr = "\u30B3\u30F3\u30C6\u30B9\u30C8\u7D50\u679C\u304C\u78BA\u5B9A\u3057\u3066\u3044\u308B\u305F\u3081\u3001\u30EC\u30FC\u30C6\u30A3\u30F3\u30B0\u5909\u5316\u3092\u6B63\u78BA\u306B\u8A08\u7B97\u3067\u304D\u307E\u305B\u3093\u3002\u6B63\u78BA\u306A\u7D50\u679C\u306F\u3001" + officialResultLink + "\u307E\u305F\u306F" + userScreptInstallLink + "\u306B\u3066\u3054\u78BA\u8A8D\u4E0B\u3055\u3044\u3002";
+                        div = "<div class=\"alert alert-info\" role=\"alert\">" + warningStr + "</div>";
+                        table.body.parentElement.insertAdjacentHTML("beforebegin", div);
+                    }
+                    newAPerfs = [];
+                    ratedLimit = getMaxPerf(contestScreenName);
+                    defaultAPerf = getDefaultPerf(ratedLimit);
+                    calculator.maxPerf = ratedLimit;
+                    standings.StandingsData.forEach(function (element) {
+                        var _a;
+                        var userScreenName = element.UserScreenName;
+                        var isUnrated = element.UserIsDeleted ||
+                            isRated(element) ||
+                            element.TotalResult.Count === 0 ||
+                            addedSet.has(userScreenName);
+                        if (isUnrated)
+                            return;
+                        addedSet.add(userScreenName);
+                        newAPerfs.push((_a = aperfs[userScreenName]) !== null && _a !== void 0 ? _a : defaultAPerf);
+                    });
+                    calculator.addAPerfs(newAPerfs);
+                    tiedList = [];
+                    ratedRank = 1;
+                    lastRank = 0;
+                    ratedCount = 0;
+                    table.rows.length = 0;
+                    standings.StandingsData.forEach(function (element) {
+                        if ((!drawUnrated && !element.IsRated) || element.TotalResult.Count === 0)
+                            return;
+                        if (lastRank !== element.Rank) {
+                            addRow();
+                            tiedList.length = 0;
+                            ratedRank += ratedCount;
+                            ratedCount = 0;
+                        }
+                        tiedList.push(element);
+                        lastRank = element.Rank;
+                        if (isRated(element))
+                            ratedCount++;
+                    });
+                    addRow();
+                    table.draw();
                     return [2 /*return*/];
             }
         });
     });
+}
+function searchUser() {
+    function setAlert(val) {
+        $("#username-search-input").addClass("is-invalid");
+        $("#username-search-alert").text(val);
+    }
+    function clearAlert() {
+        $("#username-search-input").removeClass("is-invalid");
+        $("#username-search-alert").empty();
+    }
+    clearAlert();
+    var targetUserScreenName = $("#username-search-input").val();
+    if (targetUserScreenName === "") {
+        setAlert("ユーザー名を入力してください");
+        return;
+    }
+    var index = currentTable.rows.findIndex(function (row) { return row.userScreenName === targetUserScreenName; });
+    if (index === -1) {
+        setAlert("ユーザー名が見つかりませんでした");
+        return;
+    }
+    currentTable.highlight(index);
 }
 $(function () { return __awaiter(void 0, void 0, void 0, function () {
     var _a;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
-                console.log("run");
                 $("#show-unrated-description").tooltip();
                 //ユーザー名検索
-                $("#username-search-button").click(function () {
-                    function setAlert(val) {
-                        $("#username-search-input").addClass("is-invalid");
-                        $("#username-search-alert").text(val);
-                    }
-                    function clearAlert() {
-                        $("#username-search-input").removeClass("is-invalid");
-                        $("#username-search-alert").empty();
-                    }
-                    clearAlert();
-                    var targetUserScreenName = $("#username-search-input").val();
-                    if (targetUserScreenName === "") {
-                        setAlert("ユーザー名を入力してください");
-                        return;
-                    }
-                    var index = currentTable.rows.findIndex(function (row) { return row.userScreenName === targetUserScreenName; });
-                    if (index === -1) {
-                        setAlert("ユーザー名が見つかりませんでした");
-                        return;
-                    }
-                    currentTable.highlight(index);
-                });
-                $("#username-search-input").keypress(function (pressedKey) {
-                    if (pressedKey.which === 13) {
-                        //エンターキー
-                        $("#username-search-button").click();
-                    }
-                });
+                document.getElementById("username-search-button").onclick = searchUser;
+                document.getElementById("username-search-input").onkeypress = function (pressedKey) {
+                    if (pressedKey.which === 13)
+                        searchUser();
+                };
                 $("#confirm-btn").click(function () { return __awaiter(void 0, void 0, void 0, function () {
                     var contestScreenName, e_1;
                     return __generator(this, function (_a) {

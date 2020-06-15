@@ -12,19 +12,22 @@ export interface Row {
 
 function GetRowHTML(row: Row): string {
     function getRatingSpan(rate: number): string {
+        if (rate === null) return '<span class="bold">?</span>';
         return `<span class="bold user-${getColor(rate)}">${rate}</span>`;
     }
 
     function getRatingChangeStr(oldRate: number, newRate: number): string {
-        function getRatingChangeSpan(delta: number): string {
-            return `<span class="gray">(${0 <= delta ? "+" : ""}${delta})</span>`;
-        }
-        return `${getRatingSpan(oldRate)} → ${getRatingSpan(newRate)}${getRatingChangeSpan(newRate - oldRate)}`;
+        const delta = newRate - oldRate;
+        const ratingChangeSpan =
+            oldRate === null || newRate === null
+                ? '<span class="gray">(?)'
+                : `<span class="gray">(${0 <= delta ? "+" : ""}${delta})</span>`;
+        return `${getRatingSpan(oldRate)} → ${getRatingSpan(newRate)}${ratingChangeSpan}`;
     }
 
-    const oldRating = row.oldRating ? Math.round(row.oldRating) : null;
-    const newRating = row.newRating ? Math.round(row.newRating) : null;
-    const performance = row.performance ? Math.round(row.performance) : null;
+    const oldRating = row.oldRating !== null ? Math.round(row.oldRating) : null;
+    const newRating = row.newRating !== null ? Math.round(row.newRating) : null;
+    const performance = row.performance !== null ? Math.round(row.performance) : null;
 
     const unratedStr = `${getRatingSpan(oldRating)}<span class="gray">(unrated)</span>`;
 
@@ -158,5 +161,34 @@ export class Table {
         const ind = index % this.rowsPerPage;
         const elem = this.body.children[ind];
         elem.setAttribute("style", "border: 3px solid rgb(221, 40, 154);");
+    }
+}
+
+export function getRow(
+    fixed: boolean,
+    internalRank: number,
+    performanceCalculator: PerformanceCalculator,
+    standingData: StandingData
+): Row {
+    if (fixed) {
+        return new ResultFixedRow(
+            performanceCalculator,
+            internalRank,
+            standingData.Rank,
+            standingData.UserScreenName,
+            standingData.IsRated,
+            standingData.OldRating,
+            null
+        );
+    } else {
+        return new OndemandRow(
+            performanceCalculator,
+            standingData.Competitions,
+            internalRank,
+            standingData.Rank,
+            standingData.UserScreenName,
+            standingData.IsRated,
+            standingData.Rating
+        );
     }
 }

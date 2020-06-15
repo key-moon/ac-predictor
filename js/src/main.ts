@@ -1,5 +1,5 @@
 import { getAPerfsAsync, getStandingsAsync, getContestsAsync } from "./api";
-import { OndemandRow, ResultFixedRow, Table, Row } from "./view/table";
+import { Table, getRow } from "./view/table";
 import { PreCalcedPerformanceCalculator } from "./PerformanceCalculator";
 
 function setItemToSelector(items: string[]): void {
@@ -82,122 +82,104 @@ async function DrawTable(contestScreenName: string, drawUnrated: boolean): Promi
 
     currentTable = table;
 
-    await Promise.all([getAPerfsAsync(contestScreenName), getStandingsAsync(contestScreenName)]).then(value => {
-        if (table === null) return;
+    const value = await Promise.all([getAPerfsAsync(contestScreenName), getStandingsAsync(contestScreenName)]);
 
-        const aperfs = value[0] as { [key: string]: number };
-        const standings = value[1] as Standings;
+    const aperfs = value[0];
+    const standings = value[1];
 
-        const newAPerfs: number[] = [];
-        const ratedLimit = getMaxPerf(contestScreenName);
-        const defaultAPerf = getDefaultPerf(ratedLimit);
-        calculator.maxPerf = ratedLimit;
+    if (standings.Fixed) {
+        const officialResultLink = `<a href=https://atcoder.jp/contests/${contestScreenName}/results>公式の発表</a>`;
+        const userScreptInstallLink = "<a href=/userscript>UserScript</a>";
+        const warningStr = `コンテスト結果が確定しているため、レーティング変化を正確に計算できません。正確な結果は、${officialResultLink}または${userScreptInstallLink}にてご確認下さい。`;
+        const div = `<div class="alert alert-info" role="alert">${warningStr}</div>`;
+        table.body.parentElement.insertAdjacentHTML("beforebegin", div);
+    }
 
-        standings.StandingsData.forEach(function(element) {
-            const userScreenName = element.UserScreenName;
-            const isUnrated =
-                element.UserIsDeleted ||
-                (!element.IsRated && element.OldRating >= ratedLimit) ||
-                element.TotalResult.Count === 0 ||
-                addedSet.has(userScreenName);
-            if (isUnrated) return;
-            addedSet.add(userScreenName);
-            newAPerfs.push(aperfs[userScreenName] ?? defaultAPerf);
-        });
-        calculator.addAPerfs(newAPerfs);
+    const newAPerfs: number[] = [];
+    const ratedLimit = getMaxPerf(contestScreenName);
+    const defaultAPerf = getDefaultPerf(ratedLimit);
+    calculator.maxPerf = ratedLimit;
 
-        //タイの人を入れる(順位が変わったら描画→リストを空に)
-        const tiedList: StandingData[] = [];
+    function isRated(standingData: StandingData): boolean {
+        return standingData.IsRated || (standings.Fixed ? standingData.OldRating : standingData.Rating) < ratedLimit;
+    }
 
-        let ratedRank = 1;
-        let lastRank = 0;
-        let ratedCount = 0;
-
-        //タイリストの人全員行追加
-        function addRow(): void {
-            const fixRank = ratedRank + Math.max(0, ratedCount - 1) / 2;
-            tiedList.forEach(function(element): void {
-                let row: Row;
-                if (standings.Fixed) {
-                    row = new ResultFixedRow(
-                        calculator,
-                        fixRank,
-                        element.Rank,
-                        element.UserScreenName,
-                        element.IsRated,
-                        element.OldRating,
-                        element.Rating
-                    );
-                } else {
-                    row = new OndemandRow(
-                        calculator,
-                        element.Competitions,
-                        fixRank,
-                        element.Rank,
-                        element.UserScreenName,
-                        element.IsRated,
-                        element.Rating
-                    );
-                }
-                table.rows.push(row);
-            });
-        }
-
-        table.rows.length = 0;
-
-        //全員回す
-        standings.StandingsData.forEach(function(element) {
-            if ((!drawUnrated && !element.IsRated) || element.TotalResult.Count === 0) return;
-            if (lastRank !== element.Rank) {
-                addRow();
-                tiedList.length = 0;
-                ratedRank += ratedCount;
-                ratedCount = 0;
-            }
-            tiedList.push(element);
-            lastRank = element.Rank;
-            if (element.IsRated) ratedCount++;
-        });
-        addRow();
-        table.draw();
+    standings.StandingsData.forEach(function(element) {
+        const userScreenName = element.UserScreenName;
+        const isUnrated =
+            element.UserIsDeleted ||
+            isRated(element) ||
+            element.TotalResult.Count === 0 ||
+            addedSet.has(userScreenName);
+        if (isUnrated) return;
+        addedSet.add(userScreenName);
+        newAPerfs.push(aperfs[userScreenName] ?? defaultAPerf);
     });
+    calculator.addAPerfs(newAPerfs);
+
+    const tiedList: StandingData[] = [];
+
+    let ratedRank = 1;
+    let lastRank = 0;
+    let ratedCount = 0;
+
+    table.rows.length = 0;
+
+    function addRow(): void {
+        const fixRank = ratedRank + Math.max(0, ratedCount - 1) / 2;
+        tiedList.forEach(function(standingsData): void {
+            table.rows.push(getRow(standings.Fixed, fixRank, calculator, standingsData));
+        });
+    }
+
+    standings.StandingsData.forEach(function(element) {
+        if ((!drawUnrated && !element.IsRated) || element.TotalResult.Count === 0) return;
+        if (lastRank !== element.Rank) {
+            addRow();
+            tiedList.length = 0;
+            ratedRank += ratedCount;
+            ratedCount = 0;
+        }
+        tiedList.push(element);
+        lastRank = element.Rank;
+        if (isRated(element)) ratedCount++;
+    });
+    addRow();
+    table.draw();
+}
+
+function searchUser(): void {
+    function setAlert(val: string): void {
+        $("#username-search-input").addClass("is-invalid");
+        $("#username-search-alert").text(val);
+    }
+    function clearAlert(): void {
+        $("#username-search-input").removeClass("is-invalid");
+        $("#username-search-alert").empty();
+    }
+
+    clearAlert();
+    const targetUserScreenName = $("#username-search-input").val();
+    if (targetUserScreenName === "") {
+        setAlert("ユーザー名を入力してください");
+        return;
+    }
+    const index = currentTable.rows.findIndex(row => row.userScreenName === targetUserScreenName);
+    if (index === -1) {
+        setAlert("ユーザー名が見つかりませんでした");
+        return;
+    }
+    currentTable.highlight(index);
 }
 
 $(async () => {
-    console.log("run");
-
     $("#show-unrated-description").tooltip();
 
     //ユーザー名検索
-    $("#username-search-button").click(() => {
-        function setAlert(val: string): void {
-            $("#username-search-input").addClass("is-invalid");
-            $("#username-search-alert").text(val);
-        }
-        function clearAlert(): void {
-            $("#username-search-input").removeClass("is-invalid");
-            $("#username-search-alert").empty();
-        }
-
-        clearAlert();
-        const targetUserScreenName = $("#username-search-input").val();
-        if (targetUserScreenName === "") {
-            setAlert("ユーザー名を入力してください");
-            return;
-        }
-        const index = currentTable.rows.findIndex(row => row.userScreenName === targetUserScreenName);
-        if (index === -1) {
-            setAlert("ユーザー名が見つかりませんでした");
-            return;
-        }
-        currentTable.highlight(index);
-    });
-    $("#username-search-input").keypress(pressedKey => {
-        if (pressedKey.which === 13) {
-            //エンターキー
-            $("#username-search-button").click();
-        }
-    });
+    document.getElementById("username-search-button").onclick = searchUser;
+    document.getElementById("username-search-input").onkeypress = (pressedKey): void => {
+        if (pressedKey.which === 13) searchUser();
+    };
 
     $("#confirm-btn").click(async () => {
         const contestScreenName = $("#contest-selector").val();
