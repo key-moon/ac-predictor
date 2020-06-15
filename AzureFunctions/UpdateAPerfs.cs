@@ -1,17 +1,19 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
-using System.Net.Http;
-using System.Text.Json;
 using System.Threading.Tasks;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
+using Microsoft.Extensions.Logging;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
-using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Azure.WebJobs.Host;
-using Microsoft.Extensions.Logging;
+
 using Octokit;
+
 using AtCoder.Util;
 using AtCoder.Client;
-using System.Linq;
+
 
 namespace AzureFunctions
 {
@@ -70,8 +72,11 @@ namespace AzureFunctions
                 await Task.Delay(100);
             }
             log.LogInformation("end crawling.");
+            
+            var options = new JsonSerializerOptions();
+            options.Converters.Add(new TruncateDoubleConverter());
+            var json = JsonSerializer.Serialize(dic, options);
 
-            var json = JsonSerializer.Serialize(dic);
             if (!found)
             {
                 var request = new CreateFileRequest($"add aperfs data of {contestScreenName}", json)
@@ -91,5 +96,20 @@ namespace AzureFunctions
 
             return abort || !standings.Fixed;
         }
+    }
+
+    public class TruncateDoubleConverter : JsonConverter<double>
+    {
+        public override double Read(
+            ref Utf8JsonReader reader,
+            Type typeToConvert,
+            JsonSerializerOptions options) =>
+                reader.GetDouble();
+
+        public override void Write(
+            Utf8JsonWriter writer,
+            double value,
+            JsonSerializerOptions options) =>
+                writer.WriteStringValue(value.ToString(".##"));
     }
 }
