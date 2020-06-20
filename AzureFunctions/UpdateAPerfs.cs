@@ -110,6 +110,6 @@ namespace AzureFunctions
             Utf8JsonWriter writer,
             double value,
             JsonSerializerOptions options) =>
-                writer.WriteStringValue(value.ToString(".##"));
+                writer.WriteNumberValue(decimal.Parse(value.ToString("0.##")));
     }
 }
