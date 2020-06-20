@@ -23,7 +23,7 @@ namespace AzureFunctions
         //execute every hour
         [FunctionName("TimerTriggeredCrawlStarter")]
         public static async Task TimerStart(
-            [TimerTrigger("0 0 * * * *")] TimerInfo timer,
+            [TimerTrigger("7 0 * * * *")] TimerInfo timer,
             [DurableClient] IDurableOrchestrationClient starter,
             ILogger log)
         {
