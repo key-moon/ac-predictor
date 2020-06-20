@@ -389,7 +389,7 @@ function DrawTable(contestScreenName, drawUnrated) {
                         var _a;
                         var userScreenName = element.UserScreenName;
                         var isUnrated = element.UserIsDeleted ||
-                            isRated(element) ||
+                            !isRated(element) ||
                             element.TotalResult.Count === 0 ||
                             addedSet.has(userScreenName);
                         if (isUnrated)

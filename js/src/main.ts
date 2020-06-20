@@ -108,7 +108,7 @@ async function DrawTable(contestScreenName: string, drawUnrated: boolean): Promi
         const userScreenName = element.UserScreenName;
         const isUnrated =
             element.UserIsDeleted ||
-            isRated(element) ||
+            !isRated(element) ||
             element.TotalResult.Count === 0 ||
             addedSet.has(userScreenName);
         if (isUnrated) return;
