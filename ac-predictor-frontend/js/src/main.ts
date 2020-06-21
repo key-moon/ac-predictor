@@ -25,7 +25,7 @@ function toggleLoadingState(): void {
     }
 }
 
-function getMaxPerf(contestScreenName: string): number {
+function getRatedLimit(contestScreenName: string): number {
     const maxDic = [
         { pattern: /^abc12[6-9]$/, maxPerf: 2000 },
         { pattern: /^abc1[3-9]\d$/, maxPerf: 2000 },
@@ -96,12 +96,14 @@ async function DrawTable(contestScreenName: string, drawUnrated: boolean): Promi
     }
 
     const newAPerfs: number[] = [];
-    const ratedLimit = getMaxPerf(contestScreenName);
-    const defaultAPerf = getDefaultPerf(ratedLimit);
-    calculator.maxPerf = ratedLimit;
+    const ratedUpperBound = getRatedLimit(contestScreenName);
+    const ratedLowerBound = ratedUpperBound === Infinity ? 1200 : 0;
+    const defaultAPerf = getDefaultPerf(ratedUpperBound);
+    calculator.maxPerf = ratedUpperBound + 400;
 
     function isRated(standingData: StandingData): boolean {
-        return standingData.IsRated || (standings.Fixed ? standingData.OldRating : standingData.Rating) < ratedLimit;
+        const rate = standings.Fixed ? standingData.OldRating : standingData.Rating;
+        return standingData.IsRated || (ratedLowerBound <= rate && rate < ratedUpperBound);
     }
 
     standings.StandingsData.forEach(function(element) {
