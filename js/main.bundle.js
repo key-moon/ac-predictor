@@ -307,7 +307,7 @@ function toggleLoadingState() {
         $("#confirm-btn").prop("disabled", false);
     }
 }
-function getMaxPerf(contestScreenName) {
+function getRatedLimit(contestScreenName) {
     var maxDic = [
         { pattern: /^abc12[6-9]$/, maxPerf: 2000 },
         { pattern: /^abc1[3-9]\d$/, maxPerf: 2000 },
@@ -344,7 +344,8 @@ var currentTable;
 function DrawTable(contestScreenName, drawUnrated) {
     return __awaiter(this, void 0, Promise, function () {
         function isRated(standingData) {
-            return standingData.IsRated || (standings.Fixed ? standingData.OldRating : standingData.Rating) < ratedLimit;
+            var rate = standings.Fixed ? standingData.OldRating : standingData.Rating;
+            return standingData.IsRated || (ratedLowerBound <= rate && rate < ratedUpperBound);
         }
         function addRow() {
             var fixRank = ratedRank + Math.max(0, ratedCount - 1) / 2;
@@ -352,7 +353,7 @@ function DrawTable(contestScreenName, drawUnrated) {
                 table.rows.push(getRow(standings.Fixed, fixRank, calculator, standingsData));
             });
         }
-        var tableDom, table, calculator, addedSet, value, aperfs, standings, officialResultLink, userScreptInstallLink, warningStr, div, newAPerfs, ratedLimit, defaultAPerf, tiedList, ratedRank, lastRank, ratedCount;
+        var tableDom, table, calculator, addedSet, value, aperfs, standings, officialResultLink, userScreptInstallLink, warningStr, div, newAPerfs, ratedUpperBound, ratedLowerBound, defaultAPerf, tiedList, ratedRank, lastRank, ratedCount;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -382,9 +383,10 @@ function DrawTable(contestScreenName, drawUnrated) {
                         table.body.parentElement.insertAdjacentHTML("beforebegin", div);
                     }
                     newAPerfs = [];
-                    ratedLimit = getMaxPerf(contestScreenName);
-                    defaultAPerf = getDefaultPerf(ratedLimit);
-                    calculator.maxPerf = ratedLimit;
+                    ratedUpperBound = getRatedLimit(contestScreenName);
+                    ratedLowerBound = ratedUpperBound === Infinity ? 1200 : 0;
+                    defaultAPerf = getDefaultPerf(ratedUpperBound);
+                    calculator.maxPerf = ratedUpperBound + 400;
                     standings.StandingsData.forEach(function (element) {
                         var _a;
                         var userScreenName = element.UserScreenName;
