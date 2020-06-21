@@ -39,7 +39,6 @@
     <Folder Include="js\src\types\standings\" />
     <Folder Include="_includes" />
     <Folder Include="_layouts" />
-    <Folder Include="ac-predictor-frontend" />
     <Folder Include="css" />
     <Folder Include="js" />
   </ItemGroup>
