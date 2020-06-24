@@ -23,7 +23,7 @@ namespace AzureFunctions
         //execute every hour
         [FunctionName("TimerTriggeredCrawlStarter")]
         public static async Task TimerStart(
-            [TimerTrigger("7 0 * * * *")] TimerInfo timer,
+            [TimerTrigger("0 7 * * * *")] TimerInfo timer,
             [DurableClient] IDurableOrchestrationClient starter,
             ILogger log)
         {
@@ -88,8 +88,9 @@ namespace AzureFunctions
             [OrchestrationTrigger] IDurableOrchestrationContext context, ILogger logger)
         {
             logger = context.CreateReplaySafeLogger(logger);
-
-            var startAt = context.CurrentUtcDateTime;
+            
+            var dueTime = context.CurrentUtcDateTime.AddMinutes(15);
+            dueTime = dueTime.AddSeconds(-dueTime.Second);
 
             var needCrawlContests = context.GetInput<List<string>>() ?? new List<string>();
             var tasks = new Task<bool>[needCrawlContests.Count];
@@ -110,7 +111,7 @@ namespace AzureFunctions
             
             if (needCrawlContests.Count == 0) return;
 
-            await context.CreateTimer(startAt.AddMinutes(15), CancellationToken.None);
+            await context.CreateTimer(dueTime, CancellationToken.None);
             context.ContinueAsNew(needCrawlContests);
         }
 
