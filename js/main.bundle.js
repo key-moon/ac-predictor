@@ -374,7 +374,7 @@ function DrawTable(contestScreenName, drawUnrated) {
                 table.rows.push(getRow(standings.Fixed, fixRank, calculator, standingsData));
             });
         }
-        var tableDom, table, calculator, addedSet, value, aperfs, standings, officialResultLink, userScreptInstallLink, warningStr, div, newAPerfs, ratedUpperBound, ratedLowerBound, defaultAPerf, tiedList, ratedRank, lastRank, ratedCount;
+        var tableDom, table, calculator, addedSet, value, aperfs, standings, watching, officialResultLink, userScreptInstallLink, warningStr, div, newAPerfs, ratedUpperBound, ratedLowerBound, defaultAPerf, tiedList, ratedRank, lastRank, ratedCount;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -397,7 +397,8 @@ function DrawTable(contestScreenName, drawUnrated) {
                     aperfs = value[0];
                     standings = value[1];
                     if (standings.Fixed) {
-                        officialResultLink = "<a href=https://atcoder.jp/contests/" + contestScreenName + "/results>\u516C\u5F0F\u306E\u767A\u8868</a>";
+                        watching = $("#username-search-input").val();
+                        officialResultLink = "<a href=https://atcoder.jp/contests/" + contestScreenName + "/results?watching=" + watching + ">\u516C\u5F0F\u306E\u767A\u8868</a>";
                         userScreptInstallLink = "<a href=/userscript>UserScript</a>";
                         warningStr = "\u30B3\u30F3\u30C6\u30B9\u30C8\u7D50\u679C\u304C\u78BA\u5B9A\u3057\u3066\u3044\u308B\u305F\u3081\u3001\u30EC\u30FC\u30C6\u30A3\u30F3\u30B0\u5909\u5316\u3092\u6B63\u78BA\u306B\u8A08\u7B97\u3067\u304D\u307E\u305B\u3093\u3002\u6B63\u78BA\u306A\u7D50\u679C\u306F\u3001" + officialResultLink + "\u307E\u305F\u306F" + userScreptInstallLink + "\u306B\u3066\u3054\u78BA\u8A8D\u4E0B\u3055\u3044\u3002";
                         div = "<div class=\"alert alert-info\" role=\"alert\">" + warningStr + "</div>";
