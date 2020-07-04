@@ -88,7 +88,8 @@ async function DrawTable(contestScreenName: string, drawUnrated: boolean): Promi
     const standings = value[1];
 
     if (standings.Fixed) {
-        const officialResultLink = `<a href=https://atcoder.jp/contests/${contestScreenName}/results>公式の発表</a>`;
+        const watching = $("#username-search-input").val() as string;
+        const officialResultLink = `<a href=https://atcoder.jp/contests/${contestScreenName}/results?watching=${watching}>公式の発表</a>`;
         const userScreptInstallLink = "<a href=/userscript>UserScript</a>";
         const warningStr = `コンテスト結果が確定しているため、レーティング変化を正確に計算できません。正確な結果は、${officialResultLink}または${userScreptInstallLink}にてご確認下さい。`;
         const div = `<div class="alert alert-info" role="alert">${warningStr}</div>`;
