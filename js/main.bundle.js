@@ -127,6 +127,17 @@ function calcRatingFromLast(last, perf, ratedMatches) {
     var denominator = 1 + weight;
     return Math.log(numerator / denominator) * Math.LOG2E * 800.0 - f(ratedMatches + 1);
 }
+/**
+ * (-inf, inf) -> (0, inf)
+ * @param {number} [rating] unpositivized rating
+ * @returns {number} positivized rating
+ */
+function positivizeRating(rating) {
+    if (rating >= 400.0) {
+        return rating;
+    }
+    return 400.0 * Math.exp((rating - 400.0) / 400.0);
+}
 var colors = ["unrated", "gray", "brown", "green", "cyan", "blue", "yellow", "orange", "red"];
 function getColor(rating) {
     var colorIndex = 0;
@@ -143,13 +154,16 @@ function GetRowHTML(row) {
         return "<span class=\"bold user-" + getColor(rate) + "\">" + rate + "</span>";
     }
     function getRatingChangeStr(oldRate, newRate) {
-        var delta = newRate - oldRate;
-        var ratingChangeSpan = oldRate === null || newRate === null
-            ? '<span class="gray">(?)'
-            : "<span class=\"gray\">(" + (0 <= delta ? "+" : "") + delta + ")</span>";
+        var ratingChangeSpan;
+        if (oldRate === null || newRate === null)
+            ratingChangeSpan = '<span class="gray">(?)';
+        else {
+            var delta = newRate - oldRate;
+            ratingChangeSpan = "<span class=\"gray\">(" + (0 <= delta ? "+" : "") + delta + ")</span>";
+        }
         return getRatingSpan(oldRate) + " \u2192 " + getRatingSpan(newRate) + ratingChangeSpan;
     }
-    var oldRating = row.oldRating !== null ? Math.round(row.oldRating) : null;
+    var oldRating = row.oldRating !== null ? Math.round(row.oldRating) : 0;
     var newRating = row.newRating !== null ? Math.round(row.newRating) : null;
     var performance = row.performance !== null ? Math.round(row.performance) : null;
     var unratedStr = getRatingSpan(oldRating) + "<span class=\"gray\">(unrated)</span>";
@@ -172,7 +186,7 @@ var ResultFixedRow = /** @class */ (function () {
     }
     Object.defineProperty(ResultFixedRow.prototype, "performance", {
         get: function () {
-            return this.perfCalculator.getPerformance(this.internalRank - 0.5);
+            return positivizeRating(this.perfCalculator.getPerformance(this.internalRank - 0.5));
         },
         enumerable: false,
         configurable: true
@@ -189,16 +203,23 @@ var OndemandRow = /** @class */ (function () {
         this.isRated = isRated;
         this.oldRating = oldRating;
     }
+    Object.defineProperty(OndemandRow.prototype, "rawPerformance", {
+        get: function () {
+            return this.perfCalculator.getPerformance(this.internalRank - 0.5);
+        },
+        enumerable: false,
+        configurable: true
+    });
     Object.defineProperty(OndemandRow.prototype, "newRating", {
         get: function () {
-            return calcRatingFromLast(this.oldRating, this.performance, this.ratedMatches);
+            return calcRatingFromLast(this.oldRating, this.rawPerformance, this.ratedMatches);
         },
         enumerable: false,
         configurable: true
     });
     Object.defineProperty(OndemandRow.prototype, "performance", {
         get: function () {
-            return this.perfCalculator.getPerformance(this.internalRank - 0.5);
+            return positivizeRating(this.rawPerformance);
         },
         enumerable: false,
         configurable: true
