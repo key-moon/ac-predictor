@@ -1,4 +1,4 @@
-import { getColor, calcRatingFromLast } from "../rating";
+import { getColor, calcRatingFromLast, positivizeRating } from "../rating";
 import { PerformanceCalculator } from "../PerformanceCalculator";
 
 export interface Row {
@@ -11,21 +11,23 @@ export interface Row {
 }
 
 function GetRowHTML(row: Row): string {
-    function getRatingSpan(rate: number): string {
+    function getRatingSpan(rate: number | null): string {
         if (rate === null) return '<span class="bold">?</span>';
         return `<span class="bold user-${getColor(rate)}">${rate}</span>`;
     }
 
-    function getRatingChangeStr(oldRate: number, newRate: number): string {
-        const delta = newRate - oldRate;
-        const ratingChangeSpan =
-            oldRate === null || newRate === null
-                ? '<span class="gray">(?)'
-                : `<span class="gray">(${0 <= delta ? "+" : ""}${delta})</span>`;
+    function getRatingChangeStr(oldRate: number | null, newRate: number | null): string {
+        let ratingChangeSpan: string;
+        if (oldRate === null || newRate === null) ratingChangeSpan = '<span class="gray">(?)';
+        else {
+            const delta = newRate - oldRate;
+            ratingChangeSpan = `<span class="gray">(${0 <= delta ? "+" : ""}${delta})</span>`;
+        }
+
         return `${getRatingSpan(oldRate)} → ${getRatingSpan(newRate)}${ratingChangeSpan}`;
     }
 
-    const oldRating = row.oldRating !== null ? Math.round(row.oldRating) : null;
+    const oldRating = row.oldRating !== null ? Math.round(row.oldRating) : 0;
     const newRating = row.newRating !== null ? Math.round(row.newRating) : null;
     const performance = row.performance !== null ? Math.round(row.performance) : null;
 
@@ -74,7 +76,7 @@ export class ResultFixedRow implements Row {
     oldRating: number;
     newRating: number;
     get performance(): number {
-        return this.perfCalculator.getPerformance(this.internalRank - 0.5);
+        return positivizeRating(this.perfCalculator.getPerformance(this.internalRank - 0.5));
     }
     constructor(
         perfCalculator: PerformanceCalculator,
@@ -104,11 +106,14 @@ export class OndemandRow implements Row {
     public userScreenName: string;
     public isRated: boolean;
     public oldRating: number;
+    get rawPerformance(): number {
+        return this.perfCalculator.getPerformance(this.internalRank - 0.5);
+    }
     get newRating(): number {
-        return calcRatingFromLast(this.oldRating, this.performance, this.ratedMatches);
+        return calcRatingFromLast(this.oldRating, this.rawPerformance, this.ratedMatches);
     }
     get performance(): number {
-        return this.perfCalculator.getPerformance(this.internalRank - 0.5);
+        return positivizeRating(this.rawPerformance);
     }
 
     constructor(
