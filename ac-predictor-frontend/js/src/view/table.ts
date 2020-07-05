@@ -1,4 +1,4 @@
-import { getColor, calcRatingFromLast, positivizeRating } from "../rating";
+import { getColor, calcRatingFromLast, positivizeRating, unpositivizeRating } from "../rating";
 import { PerformanceCalculator } from "../PerformanceCalculator";
 
 export interface Row {
@@ -110,7 +110,9 @@ export class OndemandRow implements Row {
         return this.perfCalculator.getPerformance(this.internalRank - 0.5);
     }
     get newRating(): number {
-        return calcRatingFromLast(this.oldRating, this.rawPerformance, this.ratedMatches);
+        const oldInnerRating = unpositivizeRating(this.oldRating);
+        const rawRating = calcRatingFromLast(oldInnerRating, this.rawPerformance, this.ratedMatches);
+        return positivizeRating(rawRating);
     }
     get performance(): number {
         return positivizeRating(this.rawPerformance);
