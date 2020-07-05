@@ -138,6 +138,17 @@ function positivizeRating(rating) {
     }
     return 400.0 * Math.exp((rating - 400.0) / 400.0);
 }
+/**
+ * (0, inf) -> (-inf, inf)
+ * @param {number} [rating] positivized rating
+ * @returns {number} unpositivized rating
+ */
+function unpositivizeRating(rating) {
+    if (rating >= 400.0) {
+        return rating;
+    }
+    return 400.0 + 400.0 * Math.log(rating / 400.0);
+}
 var colors = ["unrated", "gray", "brown", "green", "cyan", "blue", "yellow", "orange", "red"];
 function getColor(rating) {
     var colorIndex = 0;
@@ -212,7 +223,9 @@ var OndemandRow = /** @class */ (function () {
     });
     Object.defineProperty(OndemandRow.prototype, "newRating", {
         get: function () {
-            return calcRatingFromLast(this.oldRating, this.rawPerformance, this.ratedMatches);
+            var oldInnerRating = unpositivizeRating(this.oldRating);
+            var rawRating = calcRatingFromLast(oldInnerRating, this.rawPerformance, this.ratedMatches);
+            return positivizeRating(rawRating);
         },
         enumerable: false,
         configurable: true
