@@ -69,7 +69,7 @@ async function DrawTable(contestScreenName: string, drawUnrated: boolean): Promi
     const tableDom = document.getElementById("standings-body");
     if (tableDom === null) throw new DOMException("#standings-body does not found");
 
-    if (typeof contests[contestScreenName] === "undefined")
+    if (!contests.hasOwnProperty(contestScreenName))
         contests[contestScreenName] = {
             table: new Table(tableDom),
             calculator: new PreCalcedPerformanceCalculator(),
