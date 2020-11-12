@@ -143,7 +143,7 @@ publish/
 *.azurePubxml
 # TODO: Comment the next line if you want to checkin your web deploy settings
 # but database connection strings (with potential passwords) will be unencrypted
-#*.pubxml
+*.pubxml
 *.publishproj
 
 # Microsoft Azure Web App publish settings. Comment the next line if you want to
@@ -259,15 +259,3 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
-
-/ac-predictor/Web.config
-/ac-predictor/Properties/PublishProfiles
-/ac-predictor/Content/bootstrap*
-/ac-predictor/Scripts/bootstrap*
-/ac-predictor/Scripts/jquery*
-/ac-predictor/Scripts/**/popper*
-/ac-predictor/Scripts/modernizr*
-/ac-predictor/Scripts/README.md
-/ac-predictor/Scripts/index.d.ts
-/ac-predictor-frontend/js/main.bundle.js
-*.pubxml
