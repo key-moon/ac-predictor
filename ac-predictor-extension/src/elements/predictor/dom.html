@@ -1,0 +1,25 @@
+<div id="predictor-alert" class="row"><h5 class='sidemenu-txt'>読み込み中…</h5></div>
+<div id="predictor-data" class="row">
+    <div class="input-group col-xs-12">
+        <span class="input-group-addon">順位<span class="glyphicon glyphicon-question-sign" aria-hidden="true" data-html="true" data-toggle="tooltip" data-placement="right" title="" data-original-title="Rated内の順位です。複数人同順位の際は人数を加味します(5位が4人居たら6.5位として計算)"></span></span>
+        <input class="form-control" id="predictor-input-rank">
+        <span class="input-group-addon">位</span>
+    </div>
+        
+    <div class="input-group col-xs-12">
+        <span class="input-group-addon">パフォーマンス</span>
+        <input class="form-control" id="predictor-input-perf">
+    </div>
+
+    <div class="input-group col-xs-12">
+        <span class="input-group-addon">レーティング</span>
+        <input class="form-control" id="predictor-input-rate">
+    </div>
+</div>
+<div class="row">
+    <div class="btn-group">
+        <button class="btn btn-default" id="predictor-current">現在の順位</button>
+        <button type="button" class="btn btn-primary" id="predictor-reload" data-loading-text="更新中…">更新</button>
+        <!--<button class="btn btn-default" id="predictor-solved" disabled>現問題AC後</button>-->
+    </div>
+</div>

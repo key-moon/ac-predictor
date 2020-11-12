@@ -1,0 +1,9 @@
+
+node_modules/
+npm-debug.log
+\.idea/
+/.vs
+/bin
+/obj
+/ac-predictor.user.js.njsproj
+/dist/bundle.js
