@@ -57,8 +57,9 @@ namespace AzureFunctions
                     abort = true;
                     break;
                 }
-                if (standingData.UserIsDeleted || 
+                if (standingData.UserIsDeleted ||
                     standingData.Competitions == 0 ||
+                    !standingData.IsRated ||
                     dic.ContainsKey(standingData.UserScreenName)) continue;
                 var history = await acClient.GetCompetitionHistoryAsync(standingData.UserScreenName);
                 var beforeContestPerfs = history?.TakeWhile(x => x.ContestScreenName.Split('.', 2).First() != contestScreenName)?.Where(x => x.IsRated)?.Select(x => x.InnerPerformance)?.ToArray();
