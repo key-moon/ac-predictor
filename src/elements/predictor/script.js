@@ -2,7 +2,6 @@ import * as $ from "jquery";
 import dom from "./dom.html";
 import moment from "moment";
 import { SideMenuElement } from "atcoder-sidemenu";
-import { PredictorDB } from "../../libs/database/predictorDB";
 import { Contest } from "../../libs/contest/contest";
 import { OnDemandResults } from "../../libs/contest/results/standingsResults";
 import { FixedResults } from "../../libs/contest/results/fIxedResults";
@@ -27,7 +26,7 @@ import {
     userScreenName
 } from "atcoder-userscript-libs/src/libs/global";
 import { fetchContestInformation } from "atcoder-userscript-libs/src/libs/contestInformation";
-import { getColor } from "atcoder-userscript-libs/src/libs/rating";
+import { getColor, positivizeRating } from "atcoder-userscript-libs/src/libs/rating";
 
 export let predictor = new SideMenuElement(
     "predictor",
@@ -46,12 +45,9 @@ const predictorElements = [
     "predictor-reload",
     "predictor-tweet"
 ];
-const aPerfUpdatedTimeKey = "predictor-aperf-last-updated";
-const updateDuration = 10 * 60 * 1000;
 
 async function afterAppend() {
     const isStandingsPage = /standings([^/]*)?$/.test(document.location.href);
-    const predictorDB = new PredictorDB();
     const contestInformation = await fetchContestInformation(contestScreenName);
 
     /** @type Results */
@@ -69,7 +65,7 @@ async function afterAppend() {
         history: getPerformanceHistories(await getMyHistoryData())
     });
 
-    $('[data-toggle="tooltip"]').tooltip();
+    if ($) $('[data-toggle="tooltip"]').tooltip();
 
     if (!shouldEnabledPredictor().verdict) {
         model.updateInformation(shouldEnabledPredictor().message);
@@ -144,22 +140,13 @@ async function afterAppend() {
         }
 
         try {
-            const lastUpdated = getLS(aPerfUpdatedTimeKey);
-            const now = Date.now();
-            aPerfs = await (standings.Fixed ||
-            now - lastUpdated <= updateDuration
-                ? getAPerfsFromLocalData().catch(() => getAPerfsFromAPI())
-                : getAPerfsFromAPI().catch(() => getAPerfsFromLocalData()));
+            aPerfs = await getAPerfsFromAPI();
         } catch (e) {
             throw new Error("APerfの取得に失敗しました。");
         }
 
         async function getAPerfsFromAPI() {
-            setLS(aPerfUpdatedTimeKey, Date.now());
             return await getAPerfsData(contestScreenName);
-        }
-        async function getAPerfsFromLocalData() {
-            return await predictorDB.getData("APerfs", contestScreenName);
         }
 
         await updateData(aPerfs, standings);
@@ -174,18 +161,20 @@ async function afterAppend() {
                 document.getElementById("standings-tbody"),
                 { childList: true }
             );
-            new MutationObserver(async mutationRecord => {
-                const isDisabled = mutationRecord[0].target.classList.contains(
-                    "disabled"
-                );
-                if (isDisabled) {
-                    await updateStandingsFromAPI();
-                    updateView();
-                }
-            }).observe(document.getElementById("refresh"), {
-                attributes: true,
-                attributeFilter: ["class"]
-            });
+            let refreshElem = document.getElementById("refresh");
+            if (refreshElem)
+                new MutationObserver(async mutationRecord => {
+                    const isDisabled = mutationRecord[0].target.classList.contains(
+                        "disabled"
+                    );
+                    if (isDisabled) {
+                        await updateStandingsFromAPI();
+                        updateView();
+                    }
+                }).observe(refreshElem, {
+                    attributes: true,
+                    attributeFilter: ["class"]
+                });
         }
         updateView();
     }
@@ -351,13 +340,13 @@ async function afterAppend() {
             }
             const result = results
                 ? results.getUserResult(
-                      $(".standings-username .username", elem).text()
+                      $(".standings-username .username span", elem).text()
                   )
                 : null;
             const perfElem =
                 !result || !result.IsSubmitted
                     ? "-"
-                    : getRatingSpan(result.Performance);
+                    : getRatingSpan(Math.round(positivizeRating(result.Performance)));
             const rateElem = !result
                 ? "-"
                 : result.IsRated && contest.IsRated
