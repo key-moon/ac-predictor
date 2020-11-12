@@ -13,7 +13,7 @@ namespace AtCoder
             s = s.Trim();
             if (s == "All") return All;
             if (s == "-") return None;
-            var splitted = s.Split('~');
+            var splitted = s.Split('-');
             int rangeStart = 0, rangeEnd = int.MaxValue;
             if (splitted.Length != 2 ||
                 (splitted[0].Length != 0 && !int.TryParse(splitted[0].Trim(), out rangeStart)) ||
