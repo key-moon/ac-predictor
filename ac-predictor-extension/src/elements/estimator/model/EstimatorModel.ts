@@ -1,4 +1,9 @@
 export class EstimatorModel {
+    inputValue: number;
+    resultValue: number;
+    perfHistory: number[];
+    inputDesc: string;
+    resultDesc: string;
     constructor(inputValue, perfHistory) {
         this.inputDesc = "";
         this.resultDesc = "";
@@ -6,18 +11,16 @@ export class EstimatorModel {
         this.updateInput(inputValue);
     }
 
-    updateInput(value) {
+    updateInput(value: number): void {
         this.inputValue = value;
         this.resultValue = this.calcResult(value);
     }
 
-    toggle() {}
+    toggle(): EstimatorModel {
+        return null;
+    }
 
-    /**
-     * @param {Number} [input]
-     * @return {Number}
-     */
-    calcResult(input) {
+    calcResult(input: number): number {
         return input;
     }
 }

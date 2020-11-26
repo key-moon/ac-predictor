@@ -1,7 +1,19 @@
 <div id="predictor-alert" class="row"><h5 class='sidemenu-txt'>読み込み中…</h5></div>
 <div id="predictor-data" class="row">
     <div class="input-group col-xs-12">
-        <span class="input-group-addon">順位<span class="glyphicon glyphicon-question-sign" aria-hidden="true" data-html="true" data-toggle="tooltip" data-placement="right" title="" data-original-title="Rated内の順位です。複数人同順位の際は人数を加味します(5位が4人居たら6.5位として計算)"></span></span>
+        <span class="input-group-addon">順位
+            <style>
+                .predictor-tooltip-icon:hover+.tooltip{
+                    opacity: .9;
+                    filter: alpha(opacity=90);
+                }
+            </style>
+            <span class="predictor-tooltip-icon glyphicon glyphicon-question-sign"></span>
+            <div class="tooltip fade bottom">
+                <div class="tooltip-arrow" style="left: 18%;"></div>
+                <div class="tooltip-inner">Rated内の順位です。複数人同順位の際は人数を加味します(5位が4人居たら6.5位として計算)</div>
+            </div>
+        </span>
         <input class="form-control" id="predictor-input-rank">
         <span class="input-group-addon">位</span>
     </div>

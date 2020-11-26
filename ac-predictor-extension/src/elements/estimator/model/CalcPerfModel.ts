@@ -1,9 +1,6 @@
 import { EstimatorModel } from "./EstimatorModel";
 import { CalcRatingModel } from "./CalcRatingModel";
-import {
-    calcRequiredPerformance,
-    unpositivizeRating
-} from "atcoder-userscript-libs/src/libs/rating";
+import { calcRequiredPerformance, unpositivizeRating } from "../../../libs/utils/rating";
 
 export class CalcPerfModel extends EstimatorModel {
     constructor(inputValue, perfHistory) {
@@ -12,13 +9,11 @@ export class CalcPerfModel extends EstimatorModel {
         this.resultDesc = "必要パフォーマンス";
     }
 
-    toggle() {
+    toggle(): EstimatorModel {
         return new CalcRatingModel(this.resultValue, this.perfHistory);
     }
-    calcResult(input) {
-        return calcRequiredPerformance(
-            unpositivizeRating(input),
-            this.perfHistory
-        );
+
+    calcResult(input): number {
+        return calcRequiredPerformance(unpositivizeRating(input), this.perfHistory);
     }
 }

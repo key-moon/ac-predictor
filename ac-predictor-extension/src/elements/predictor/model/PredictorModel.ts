@@ -1,8 +1,14 @@
+import { Contest } from "../../../libs/contest/contest";
+
 export class PredictorModel {
-    /**
-     * @param {PredictorModel} [model]
-     */
-    constructor(model) {
+    enabled: boolean;
+    contest: Contest;
+    history: number[];
+    information: string;
+    rankValue: number;
+    perfValue: number;
+    rateValue: number;
+    constructor(model: PredictorModel) {
         this.enabled = model.enabled;
         this.contest = model.contest;
         this.history = model.history;
@@ -10,26 +16,15 @@ export class PredictorModel {
         this.updateData(model.rankValue, model.perfValue, model.rateValue);
     }
 
-    /**
-     * @param {boolean} state
-     */
-    setEnable(state) {
+    setEnable(state: boolean): void {
         this.enabled = state;
     }
 
-    /**
-     * @param {string} information
-     */
-    updateInformation(information) {
+    updateInformation(information: string): void {
         this.information = information;
     }
 
-    /**
-     * @param {number} rankValue
-     * @param {number} perfValue
-     * @param {number} rateValue
-     */
-    updateData(rankValue, perfValue, rateValue) {
+    updateData(rankValue: number, perfValue: number, rateValue: number): void {
         this.rankValue = rankValue;
         this.perfValue = perfValue;
         this.rateValue = rateValue;
