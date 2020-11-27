@@ -7,8 +7,8 @@
     "node_modules/@types"
   ],
   "scripts": {
-    "lint": "eslint 'src/**/*.ts'",
-    "lint:fix": "eslint --fix 'src/**/*.ts'",
+    "lint": "tsc --noEmit; eslint --ext .js,.jsx,.ts,.tsx,.json src/**",
+    "lint:fix": "tsc --noEmit; eslint --ext .js,.jsx,.ts,.tsx,.json --fix src/**",
     "bundle": "rollup -c",
     "test": "jest"
   },
