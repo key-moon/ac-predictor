@@ -1,5 +1,5 @@
 import { Result } from "./results/result";
-import { ContestInformation } from "../utils/contestInformation";
+import { ContestInformation } from "../utils/data";
 
 type AnalyzedStandingsData = {
     contestantAPerf: number[];

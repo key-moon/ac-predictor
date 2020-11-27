@@ -8,13 +8,13 @@ import { CalcFromRankModel } from "./model/calcFromRankModel";
 import { CalcFromPerfModel } from "./model/calcFromPerfModel";
 import { CalcFromRateModel } from "./model/calcFromRateModel";
 import { roundValue } from "../../libs/utils/roundValue";
-import { fetchContestInformation } from "../../libs/utils/contestInformation";
 import {
     getAPerfsDataAsync,
     getMyHistoryData,
     getPerformanceHistories,
     getResultsDataAsync,
-    getStandingsDataAsync
+    getStandingsDataAsync,
+    getContestInformationAsync
 } from "../../libs/utils/data";
 import { getColor, positivizeRating } from "../../libs/utils/rating";
 import { Results } from "../../libs/contest/results/results";
@@ -34,7 +34,7 @@ const predictorElements = [
 
 async function afterAppend(): Promise<void> {
     const isStandingsPage = /standings([^/]*)?$/.test(document.location.href);
-    const contestInformation = await fetchContestInformation(contestScreenName);
+    const contestInformation = await getContestInformationAsync(contestScreenName);
 
     let results: Results;
 
