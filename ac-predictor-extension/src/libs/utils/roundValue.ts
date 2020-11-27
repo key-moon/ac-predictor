@@ -1,3 +1,3 @@
-export function roundValue(value: number, digit: number): number {
-    return Math.round(value * 10 ** digit) / 10 ** digit;
+export function roundValue(value: number, numDigits: number): number {
+    return Math.round(value * 10 ** numDigits) / 10 ** numDigits;
 }
