@@ -4,14 +4,16 @@
 const finf = bigf(400);
 
 function bigf(n: number): number {
-    let numerator = 1.0;
-    let denominator = 1.0;
+    let pow1 = 1;
+    let pow2 = 1;
+    let numerator = 0;
+    let denominator = 0;
     for (let i = 0; i < n; ++i) {
-        numerator *= 0.81;
-        denominator *= 0.9;
+        pow1 *= 0.81;
+        pow2 *= 0.9;
+        numerator += pow1;
+        denominator += pow2;
     }
-    numerator = ((1 - numerator) * 0.81) / 0.19;
-    denominator = ((1 - denominator) * 0.9) / 0.1;
     return Math.sqrt(numerator) / denominator;
 }
 
@@ -26,13 +28,13 @@ function f(n: number): number {
  */
 export function calcRatingFromHistory(history: number[]): number {
     const n = history.length;
+    let pow = 1;
     let numerator = 0.0;
     let denominator = 0.0;
-    for (let i = n - 1; i >= 0; --i) {
-        numerator *= 0.9;
-        numerator += 0.9 * Math.pow(2, history[i] / 800.0);
-        denominator *= 0.9;
-        denominator += 0.9;
+    for (let i = 0; i < n; i++) {
+        pow *= 0.9;
+        numerator += Math.pow(2, history[i] / 800.0) * pow;
+        denominator += pow;
     }
     return Math.log2(numerator / denominator) * 800.0 - f(n);
 }
@@ -84,15 +86,15 @@ export function unpositivizeRating(rating: number): number {
  * @returns {number} performance
  */
 export function calcRequiredPerformance(targetRating: number, history: number[]): number {
-    let upper = 10000.0;
-    let lower = -10000.0;
+    let valid = 10000.0;
+    let invalid = -10000.0;
     for (let i = 0; i < 100; ++i) {
-        const mid = (lower + upper) / 2;
-        const rating = calcRatingFromHistory([mid].concat(history));
-        if (targetRating <= rating) upper = mid;
-        else lower = mid;
+        const mid = (invalid + valid) / 2;
+        const rating = Math.round(calcRatingFromHistory([mid].concat(history)));
+        if (targetRating <= rating) valid = mid;
+        else invalid = mid;
     }
-    return lower;
+    return valid;
 }
 
 export const colorBounds = {
