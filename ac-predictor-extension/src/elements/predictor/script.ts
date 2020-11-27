@@ -10,11 +10,11 @@ import { CalcFromRateModel } from "./model/calcFromRateModel";
 import { roundValue } from "../../libs/utils/roundValue";
 import { fetchContestInformation } from "../../libs/utils/contestInformation";
 import {
-    getAPerfsData,
+    getAPerfsDataAsync,
     getMyHistoryData,
     getPerformanceHistories,
-    getResultsData,
-    getStandingsData
+    getResultsDataAsync,
+    getStandingsDataAsync
 } from "../../libs/utils/data";
 import { getColor, positivizeRating } from "../../libs/utils/rating";
 import { Results } from "../../libs/contest/results/results";
@@ -23,7 +23,7 @@ import { contestScreenName, startTime, userScreenName } from "../../libs/utils/g
 
 export const predictor = new SideMenuElement("predictor", "Predictor", /atcoder.jp\/contests\/.+/, dom, afterAppend);
 
-const firstContestDate = new Date(2016, 7, 16, 21);
+const firstContestDate = new Date(2016, 6, 16, 21);
 const predictorElements = [
     "predictor-input-rank",
     "predictor-input-perf",
@@ -114,7 +114,7 @@ async function afterAppend(): Promise<void> {
         let standings;
 
         try {
-            standings = await getStandingsData(contestScreenName);
+            standings = await getStandingsDataAsync(contestScreenName);
         } catch (e) {
             throw new Error("順位表の取得に失敗しました。");
         }
@@ -126,7 +126,7 @@ async function afterAppend(): Promise<void> {
         }
 
         async function getAPerfsFromAPI(): Promise<{ [key: string]: number }> {
-            return await getAPerfsData(contestScreenName);
+            return await getAPerfsDataAsync(contestScreenName);
         }
 
         await updateData(aPerfs, standings);
@@ -165,7 +165,7 @@ async function afterAppend(): Promise<void> {
         try {
             const shouldEnabled = shouldEnabledPredictor();
             if (!shouldEnabled.verdict) throw new Error(shouldEnabled.message);
-            const standings = await getStandingsData(contestScreenName);
+            const standings = await getStandingsDataAsync(contestScreenName);
             await updateData(contest.aPerfs, standings);
             model.updateInformation(`最終更新 : ${new Date().toTimeString().split(" ")[0]}`);
             model.setEnable(true);
@@ -176,9 +176,6 @@ async function afterAppend(): Promise<void> {
     }
 
     async function updateData(aperfs: number[], standings: Standings): Promise<void> {
-        if (Object.keys(aperfs).length === 0) {
-            throw new Error("APerfのデータが提供されていません");
-        }
         contest = new Contest(contestScreenName, contestInformation, standings, aperfs);
         model.contest = contest;
         await updateResultsData();
@@ -230,7 +227,7 @@ async function afterAppend(): Promise<void> {
     //全員の結果データを更新する
     async function updateResultsData(): Promise<void> {
         if (contest.standings.Fixed && contest.IsRated) {
-            const rawResult = await getResultsData(contestScreenName);
+            const rawResult = await getResultsDataAsync(contestScreenName);
             rawResult.sort((a, b) => (a.Place !== b.Place ? a.Place - b.Place : b.OldRating - a.OldRating));
             const sortedStandingsData = Array.from(contest.standings.StandingsData).filter(
                 x => x.TotalResult.Count !== 0

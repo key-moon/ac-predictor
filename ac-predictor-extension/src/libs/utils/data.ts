@@ -1,33 +1,48 @@
-export async function fetchTextData(url: string): Promise<string> {
-    const response = await fetch(url);
-    if (response.ok) return response.text();
-    throw new Error(`request to ${url} returns ${response.status}`);
+import { HttpClient } from "./client/httpClient";
+import { Client } from "./client/client";
+
+export class Data {
+    client: Client;
+    constructor(client: Client) {
+        this.client = client;
+    }
+
+    public async getStandingsDataAsync(contestScreenName): Promise<Standings> {
+        return await this.client.fetchJsonDataAsync(`https://atcoder.jp/contests/${contestScreenName}/standings/json`);
+    }
+
+    public async getAPerfsDataAsync(contestScreenName: string): Promise<{ [s: string]: number }> {
+        return await this.client.fetchJsonDataAsync(`https://data.ac-predictor.com/aperfs/${contestScreenName}.json`);
+    }
+
+    public async getResultsDataAsync(contestScreenName: string): Promise<UserResult[]> {
+        return await this.client.fetchJsonDataAsync(`https://atcoder.jp/contests/${contestScreenName}/results/json`);
+    }
+
+    public async getHistoryDataAsync(userScreenName: string): Promise<UserResult[]> {
+        return await this.client.fetchJsonDataAsync(`https://atcoder.jp/users/${userScreenName}/history/json`);
+    }
 }
 
-export async function fetchJsonData<T>(url: string): Promise<T> {
-    const response = await fetch(url);
-    if (response.ok) return response.json();
-    throw new Error(`request to ${url} returns ${response.status}`);
+const data = new Data(new HttpClient());
+
+export function getStandingsDataAsync(contestScreenName: string): Promise<Standings> {
+    return data.getStandingsDataAsync(contestScreenName);
 }
 
-export async function getStandingsData(contestScreenName): Promise<Standings> {
-    return await fetchJsonData(`https://atcoder.jp/contests/${contestScreenName}/standings/json`);
+export function getAPerfsDataAsync(contestScreenName: string): Promise<{ [s: string]: number }> {
+    return data.getAPerfsDataAsync(contestScreenName);
 }
 
-export async function getAPerfsData(contestScreenName: string): Promise<{ [s: string]: number }> {
-    return await fetchJsonData(`https://data.ac-predictor.com/aperfs/${contestScreenName}.json`);
+export function getResultsDataAsync(contestScreenName: string): Promise<UserResult[]> {
+    return data.getResultsDataAsync(contestScreenName);
 }
 
-export async function getResultsData(contestScreenName: string): Promise<UserResult[]> {
-    return await fetchJsonData(`https://atcoder.jp/contests/${contestScreenName}/results/json`);
-}
-
-export async function getHistoryData(userScreenName: string): Promise<UserResult[]> {
-    return await fetchJsonData(`https://atcoder.jp/users/${userScreenName}/history/json`);
+export function getHistoryDataAsync(userScreenName: string): Promise<UserResult[]> {
+    return data.getHistoryDataAsync(userScreenName);
 }
 
 import { userScreenName } from "./global";
-
 let myHistoryData: UserResult[] = null;
 /**
  * 自分のパフォーマンス履歴を取得
@@ -35,7 +50,7 @@ let myHistoryData: UserResult[] = null;
 export async function getMyHistoryData(): Promise<UserResult[]> {
     return new Promise(resolve => {
         if (myHistoryData || !userScreenName) resolve(myHistoryData);
-        getHistoryData(userScreenName).then(data => {
+        getHistoryDataAsync(userScreenName).then(data => {
             resolve((myHistoryData = data));
         });
     });
