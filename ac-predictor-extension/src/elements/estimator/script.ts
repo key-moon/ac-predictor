@@ -4,7 +4,7 @@ import { CalcRatingModel } from "./model/CalcRatingModel";
 import { GetEmbedTweetLink } from "../../libs/utils/twitter";
 import { roundValue } from "../../libs/utils/roundValue";
 import { SideMenuElement } from "../../libs/sidemenu/element";
-import { getMyHistoryData, getPerformanceHistories } from "../../libs/utils/data";
+import { getHistoryDataAsync, getPerformanceHistories } from "../../libs/utils/data";
 import { EstimatorModel } from "./model/EstimatorModel";
 import { userScreenName } from "../../libs/utils/global";
 
@@ -29,7 +29,7 @@ async function afterAppend(): Promise<void> {
     let model = GetModelFromStateCode(
         getLS<string>("sidemenu_estimator_state"),
         getLS<number>("sidemenu_estimator_value"),
-        getPerformanceHistories(await getMyHistoryData())
+        getPerformanceHistories(await getHistoryDataAsync(userScreenName))
     );
     updateView();
 
