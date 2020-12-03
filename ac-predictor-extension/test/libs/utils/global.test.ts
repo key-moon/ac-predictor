@@ -1,8 +1,8 @@
 import * as fs from "fs";
 
-const html = fs.readFileSync(__dirname + "/global.html");
+const html = fs.readFileSync(__dirname + "/data/global.html").toString();
 
-const dom = new DOMParser().parseFromString(html.toString(),"text/html");
+const dom = new DOMParser().parseFromString(html,"text/html");
 Object.defineProperty(window, "document", { writable: true, value: dom });
 
 
