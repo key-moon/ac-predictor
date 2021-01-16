@@ -8,7 +8,7 @@ const userScriptBanner = `
 // @namespace   http://ac-predictor.azurewebsites.net/
 // @version     ${packageJson.version}
 // @description ${packageJson.description}
-// @author      ${packageJson.version}
+// @author      ${packageJson.author}
 // @license     ${packageJson.license}
 // @supportURL  ${packageJson.bugs.url}
 // @match       https://atcoder.jp/*
