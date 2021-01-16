@@ -1,11 +1,10 @@
 import * as fs from "fs";
+import { dataDir } from "../../data/data";
 
-const html = fs.readFileSync(__dirname + "/data/global.html").toString();
-
+const html = fs.readFileSync(dataDir + "/global.html").toString();
 const dom = new DOMParser().parseFromString(html,"text/html");
+
 Object.defineProperty(window, "document", { writable: true, value: dom });
-
-
 import { globalVals } from "../../../src/libs/utils/global";
 
 test("parse check", () => {

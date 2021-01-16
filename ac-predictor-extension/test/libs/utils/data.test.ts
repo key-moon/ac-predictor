@@ -6,6 +6,7 @@ import {
 } from "../../../src/libs/utils/data";
 import * as fs from "fs";
 import Mock = jest.Mock;
+import {dataDir} from "../../data/data";
 
 function isNodeEnv(): boolean {
     return (
@@ -34,7 +35,7 @@ afterEach(() => {
 });
 
 test("standingsData", async () => {
-    const standingsData = content = fs.readFileSync(__dirname + "/data/wtf19_standings.json").toString();
+    const standingsData = content = fs.readFileSync(dataDir + "/wtf19_standings.json").toString();
     const standings = await getStandingsDataAsync("wtf19");
     expect(standings).toEqual(JSON.parse(standingsData));
     expect(fetchMock.mock.calls.length).toBe(1);
@@ -42,7 +43,7 @@ test("standingsData", async () => {
 });
 
 test("resultsData", async () => {
-    const resultsJson = content = fs.readFileSync(__dirname + "/data/wtf19_results.json").toString();
+    const resultsJson = content = fs.readFileSync(dataDir + "/wtf19_results.json").toString();
     const results = await getResultsDataAsync("wtf19");
     expect(results).toEqual(JSON.parse(resultsJson));
     expect(fetchMock.mock.calls.length).toBe(1);
@@ -50,7 +51,7 @@ test("resultsData", async () => {
 });
 
 test("aperfsData", async () => {
-    const aperfsJson = content = fs.readFileSync(__dirname + "/data/wtf19_aperfs.json").toString();
+    const aperfsJson = content = fs.readFileSync(dataDir + "/wtf19_aperfs.json").toString();
     const aperfs = await getAPerfsDataAsync("wtf19");
     expect(aperfs).toEqual(JSON.parse(aperfsJson));
     expect(fetchMock.mock.calls.length).toBe(1);
@@ -58,7 +59,7 @@ test("aperfsData", async () => {
 });
 
 test("test getContestInformation", async () => {
-    const infoHtml = content = fs.readFileSync(__dirname + "/data/wtf19_info.html").toString();
+    const infoHtml = content = fs.readFileSync(dataDir + "/wtf19_info.html").toString();
     const results = await getContestInformationAsync("wtf19");
     expect(results).toEqual(new ContestInformation([0, -1], [0, Infinity], 5 * 60 * 1000));
     expect(fetchMock.mock.calls.length).toBe(1);
@@ -66,7 +67,7 @@ test("test getContestInformation", async () => {
 });
 
 test("test getHistoryData", async () => {
-    const historyJson = content = fs.readFileSync(__dirname + "/data/tourist_history.json").toString();
+    const historyJson = content = fs.readFileSync(dataDir + "/tourist_history.json").toString();
     const results = await getHistoryDataAsync("tourist");
     expect(results).toEqual(JSON.parse(historyJson));
     expect(fetchMock.mock.calls.length).toBe(1);
