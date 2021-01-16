@@ -161,7 +161,8 @@ async function afterAppend(): Promise<void> {
             const shouldEnabled = shouldEnabledPredictor();
             if (!shouldEnabled.verdict) throw new Error(shouldEnabled.message);
             const standings = await getStandingsDataAsync(contestScreenName);
-            await updateData(contest.aPerfs, standings);
+            const aperfs = await getAPerfsDataAsync(contestScreenName);
+            await updateData(aperfs, standings);
             model.updateInformation(`最終更新 : ${new Date().toTimeString().split(" ")[0]}`);
             model.setEnable(true);
         } catch (e) {
