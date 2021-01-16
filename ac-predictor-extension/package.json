@@ -1,6 +1,6 @@
 {
   "name": "ac-predictor",
-  "version": "1.2.9",
+  "version": "1.2.10",
   "description": "コンテスト中にAtCoderのパフォーマンスを予測します。",
   "typeRoots": [
     "types",
@@ -29,7 +29,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/key-moon/ac-predictor.user.js.git"
+    "url": "git+https://github.com/key-moon/ac-predictor.git"
   },
   "author": "keymoon",
   "license": "MIT",
