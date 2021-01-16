@@ -14,6 +14,6 @@ export class CalcRatingModel extends EstimatorModel {
     }
 
     calcResult(input: number): number {
-        return positivizeRating(calcRatingFromHistory([input].concat(this.perfHistory)));
+        return positivizeRating(calcRatingFromHistory(this.perfHistory.concat([input])));
     }
 }

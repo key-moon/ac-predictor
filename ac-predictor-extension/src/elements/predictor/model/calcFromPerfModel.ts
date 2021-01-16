@@ -4,7 +4,7 @@ import { PredictorModel } from "./PredictorModel";
 export class CalcFromPerfModel extends PredictorModel {
     updateData(rankValue, perfValue, rateValue): void {
         rankValue = this.contest.getRatedRank(perfValue);
-        rateValue = positivizeRating(calcRatingFromHistory([perfValue].concat(this.history)));
+        rateValue = positivizeRating(calcRatingFromHistory(this.history.concat([perfValue])));
         super.updateData(rankValue, perfValue, rateValue);
     }
 }

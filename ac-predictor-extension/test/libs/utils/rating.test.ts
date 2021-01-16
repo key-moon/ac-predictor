@@ -12,7 +12,7 @@ const rates = [2720, 2851, 3368, 3647, 3802, 3834, 3806, 3860, 3949, 4021, 4081
 
 test("calc rating from perf history", () => {
     for (let i = 0; i < perfs.length; i++) {
-        expect(Math.round(calcRatingFromHistory(perfs.slice(0, i + 1).reverse()))).toBe(rates[i]);
+        expect(Math.round(calcRatingFromHistory(perfs.slice(0, i + 1)))).toBe(rates[i]);
     }
 });
 
@@ -30,13 +30,13 @@ test("check inverseness", () => {
 
 test("check necessaries and sufficiency of calcRequiredPerformance", () => {
     for (let i = 1; i < perfs.length; i++) {
-        const requiredPerformance = calcRequiredPerformance(rates[i], perfs.slice(0, i).reverse());
+        const requiredPerformance = calcRequiredPerformance(rates[i], perfs.slice(0, i));
         const positiveHistory = perfs.slice(0, i);
         positiveHistory.push(requiredPerformance);
-        expect(Math.round(calcRatingFromHistory(positiveHistory.reverse()))).toBe(rates[i]);
+        expect(Math.round(calcRatingFromHistory(positiveHistory))).toBe(rates[i]);
         const negativeHistory = perfs.slice(0, i);
         negativeHistory.push(requiredPerformance - 0.001);
-        expect(Math.round(calcRatingFromHistory(negativeHistory.reverse()))).toBeLessThan(rates[i]);
+        expect(Math.round(calcRatingFromHistory(negativeHistory))).toBeLessThan(rates[i]);
     }
 });
 

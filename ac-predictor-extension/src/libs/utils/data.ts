@@ -85,12 +85,12 @@ export async function getContestInformationAsync(contestScreenName: string): Pro
 }
 
 /**
- * ユーザーのパフォーマンス履歴を時間降順で取得
+ * ユーザーのパフォーマンス履歴を時間昇順で取得
  */
 export function getPerformanceHistories(history: UserResult[]): number[] {
     const onlyRated = history.filter(x => x.IsRated);
     onlyRated.sort((a, b) => {
-        return new Date(b.EndTime).getTime() - new Date(a.EndTime).getTime();
+        return new Date(a.EndTime).getTime() - new Date(b.EndTime).getTime();
     });
     return onlyRated.map(x => x.Performance);
 }

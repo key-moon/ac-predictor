@@ -23,7 +23,7 @@ function f(n: number): number {
 
 /**
  * calculate unpositivized rating from performance history
- * @param {Number[]} [history] performance history
+ * @param {Number[]} [history] performance history with ascending order
  * @returns {Number} unpositivized rating
  */
 export function calcRatingFromHistory(history: number[]): number {
@@ -31,7 +31,7 @@ export function calcRatingFromHistory(history: number[]): number {
     let pow = 1;
     let numerator = 0.0;
     let denominator = 0.0;
-    for (let i = 0; i < n; i++) {
+    for (let i = n - 1; i >= 0; i--) {
         pow *= 0.9;
         numerator += Math.pow(2, history[i] / 800.0) * pow;
         denominator += pow;
@@ -82,7 +82,7 @@ export function unpositivizeRating(rating: number): number {
 /**
  * calculate the performance required to reach a target rate
  * @param {Number} [targetRating] targeted unpositivized rating
- * @param {Number[]} [history] performance history
+ * @param {Number[]} [history] performance history with ascending order
  * @returns {number} performance
  */
 export function calcRequiredPerformance(targetRating: number, history: number[]): number {
@@ -90,7 +90,7 @@ export function calcRequiredPerformance(targetRating: number, history: number[])
     let invalid = -10000.0;
     for (let i = 0; i < 100; ++i) {
         const mid = (invalid + valid) / 2;
-        const rating = Math.round(calcRatingFromHistory([mid].concat(history)));
+        const rating = Math.round(calcRatingFromHistory(history.concat([mid])));
         if (targetRating <= rating) valid = mid;
         else invalid = mid;
     }
