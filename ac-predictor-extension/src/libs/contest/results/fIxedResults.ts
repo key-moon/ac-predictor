@@ -11,6 +11,8 @@ export class FixedResults extends Results {
         });
     }
     getUserResult(userScreenName: string): Result {
-        return this.resultsDic[userScreenName] || null;
+        return Object.prototype.hasOwnProperty.call(this.resultsDic, userScreenName)
+            ? this.resultsDic[userScreenName]
+            : null;
     }
 }
