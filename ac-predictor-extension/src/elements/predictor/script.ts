@@ -21,7 +21,14 @@ import { Results } from "../../libs/contest/results/results";
 import { SideMenuElement } from "../../libs/sidemenu/element";
 import { contestScreenName, startTime, userScreenName } from "../../libs/utils/global";
 
-export const predictor = new SideMenuElement("predictor", "Predictor", /atcoder.jp\/contests\/.+/, dom, afterAppend);
+export const predictor = new SideMenuElement(
+    "predictor",
+    "Predictor",
+    /atcoder.jp\/contests\/.+/,
+    dom,
+    afterAppend,
+    afterOpen
+);
 
 const firstContestDate = new Date(2016, 6, 16, 21);
 const predictorElements = [
@@ -31,6 +38,8 @@ const predictorElements = [
     "predictor-current",
     "predictor-reload"
 ];
+
+const historyData = [];
 
 async function afterAppend(): Promise<void> {
     const isStandingsPage = /standings([^/]*)?$/.test(document.location.href);
@@ -45,7 +54,7 @@ async function afterAppend(): Promise<void> {
         perfValue: 0,
         rateValue: 0,
         enabled: false,
-        history: getPerformanceHistories(await getHistoryDataAsync(userScreenName))
+        history: historyData
     } as PredictorModel);
 
     if (!shouldEnabledPredictor().verdict) {
@@ -313,4 +322,8 @@ async function afterAppend(): Promise<void> {
             }
         });
     }
+}
+
+async function afterOpen(): Promise<void> {
+    getPerformanceHistories(await getHistoryDataAsync(userScreenName)).forEach(elem => historyData.push(elem));
 }

@@ -8,7 +8,7 @@ import { getHistoryDataAsync, getPerformanceHistories } from "../../libs/utils/d
 import { EstimatorModel } from "./model/EstimatorModel";
 import { userScreenName } from "../../libs/utils/global";
 
-export const estimator = new SideMenuElement("estimator", "Estimator", /atcoder.jp/, dom, afterAppend);
+export const estimator = new SideMenuElement("estimator", "Estimator", /atcoder.jp/, dom, () => {}, afterOpen);
 
 function getLS<T>(key: string): T {
     const val = localStorage.getItem(key);
@@ -23,7 +23,7 @@ function setLS<T>(key: string, val: T): void {
     }
 }
 
-async function afterAppend(): Promise<void> {
+async function afterOpen(): Promise<void> {
     const estimatorInputSelector = document.getElementById("estimator-input") as HTMLInputElement;
     const estimatorResultSelector = document.getElementById("estimator-res") as HTMLInputElement;
     let model = GetModelFromStateCode(
