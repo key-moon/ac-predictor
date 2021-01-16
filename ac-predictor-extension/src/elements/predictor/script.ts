@@ -10,11 +10,11 @@ import { CalcFromRateModel } from "./model/calcFromRateModel";
 import { roundValue } from "../../libs/utils/roundValue";
 import {
     getAPerfsDataAsync,
-    getMyHistoryData,
     getPerformanceHistories,
     getResultsDataAsync,
     getStandingsDataAsync,
-    getContestInformationAsync
+    getContestInformationAsync,
+    getHistoryDataAsync
 } from "../../libs/utils/data";
 import { getColor, positivizeRating } from "../../libs/utils/rating";
 import { Results } from "../../libs/contest/results/results";
@@ -45,7 +45,7 @@ async function afterAppend(): Promise<void> {
         perfValue: 0,
         rateValue: 0,
         enabled: false,
-        history: getPerformanceHistories(await getMyHistoryData())
+        history: getPerformanceHistories(await getHistoryDataAsync(userScreenName))
     } as PredictorModel);
 
     if (!shouldEnabledPredictor().verdict) {
