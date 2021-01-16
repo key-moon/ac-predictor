@@ -1,5 +1,6 @@
 //import "./sidemenu.scss";
 import sidemenuHtml from "./sidemenu.html";
+import { SideMenuElement } from "./element";
 
 export class SideMenu {
     constructor() {
@@ -12,6 +13,8 @@ export class SideMenu {
         const key = document.getElementById("sidemenu-key");
         const wrap = document.getElementById("menu-wrap");
         key.addEventListener("click", () => {
+            this.pendingElements.forEach(elem => elem.afterOpen());
+            this.pendingElements.length = 0;
             key.classList.toggle("glyphicon-menu-left");
             key.classList.toggle("glyphicon-menu-right");
             wrap.classList.toggle("sidemenu-active");
@@ -33,12 +36,14 @@ export class SideMenu {
         }
     }
 
-    addElement(element): void {
+    pendingElements: SideMenuElement[] = [];
+    addElement(element: SideMenuElement): void {
         if (!element.shouldDisplayed(document.location.href)) return;
         const sidemenu = document.getElementById("sidemenu");
         sidemenu.insertAdjacentHTML("afterbegin", element.GetHTML());
         const content: HTMLElement = sidemenu.querySelector(".menu-content");
         content.parentElement.style.height = `${content.offsetHeight}px`;
         element.afterAppend();
+        this.pendingElements.push(element);
     }
 }

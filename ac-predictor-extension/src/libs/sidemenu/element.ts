@@ -7,13 +7,15 @@ export class SideMenuElement {
     id: string;
     document: string;
     afterAppend: Function;
+    afterOpen: Function;
 
-    constructor(id: string, title: string, match: RegExp, document: string, afterAppend: Function) {
+    constructor(id: string, title: string, match: RegExp, document: string, afterAppend: Function, afterOpen: Function) {
         this.id = id;
         this.title = title;
         this.match = match;
         this.document = document;
         this.afterAppend = afterAppend;
+        this.afterOpen = afterOpen;
     }
 
     shouldDisplayed(url: string): boolean {
