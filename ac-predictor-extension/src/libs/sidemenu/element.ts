@@ -9,7 +9,14 @@ export class SideMenuElement {
     afterAppend: Function;
     afterOpen: Function;
 
-    constructor(id: string, title: string, match: RegExp, document: string, afterAppend: Function, afterOpen: Function) {
+    constructor(
+        id: string,
+        title: string,
+        match: RegExp,
+        document: string,
+        afterAppend: Function,
+        afterOpen: Function
+    ) {
         this.id = id;
         this.title = title;
         this.match = match;

@@ -8,7 +8,16 @@ import { getHistoryDataAsync, getPerformanceHistories } from "../../libs/utils/d
 import { EstimatorModel } from "./model/EstimatorModel";
 import { userScreenName } from "../../libs/utils/global";
 
-export const estimator = new SideMenuElement("estimator", "Estimator", /atcoder.jp/, dom, () => {}, afterOpen);
+export const estimator = new SideMenuElement(
+    "estimator",
+    "Estimator",
+    /atcoder.jp/,
+    dom,
+    () => {
+        /* do nothing */
+    },
+    afterOpen
+);
 
 function getLS<T>(key: string): T {
     const val = localStorage.getItem(key);
