@@ -110,8 +110,8 @@ async function afterAppend(): Promise<void> {
     }
 
     async function initPredictor(): Promise<void> {
-        let aPerfs;
-        let standings;
+        let aPerfs: { [key: string]: number };
+        let standings: Standings;
 
         try {
             standings = await getStandingsDataAsync(contestScreenName);
@@ -120,13 +120,9 @@ async function afterAppend(): Promise<void> {
         }
 
         try {
-            aPerfs = await getAPerfsFromAPI();
+            aPerfs = await getAPerfsDataAsync(contestScreenName);
         } catch (e) {
             throw new Error("APerfの取得に失敗しました。");
-        }
-
-        async function getAPerfsFromAPI(): Promise<{ [key: string]: number }> {
-            return await getAPerfsDataAsync(contestScreenName);
         }
 
         await updateData(aPerfs, standings);
@@ -160,7 +156,6 @@ async function afterAppend(): Promise<void> {
         }
         updateView();
     }
-
     async function updateStandingsFromAPI(): Promise<void> {
         try {
             const shouldEnabled = shouldEnabledPredictor();
@@ -175,7 +170,7 @@ async function afterAppend(): Promise<void> {
         }
     }
 
-    async function updateData(aperfs: number[], standings: Standings): Promise<void> {
+    async function updateData(aperfs: { [key: string]: number }, standings: Standings): Promise<void> {
         contest = new Contest(contestScreenName, contestInformation, standings, aperfs);
         model.contest = contest;
         await updateResultsData();

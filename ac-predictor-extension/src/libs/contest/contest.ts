@@ -9,7 +9,7 @@ type AnalyzedStandingsData = {
 function analyzeStandingsData(
     fixed: boolean,
     standingsData,
-    aPerfs: number[],
+    aPerfs: { [key: string]: number },
     defaultAPerf: number,
     ratedLimit: number
 ): AnalyzedStandingsData {
@@ -81,7 +81,7 @@ export class Contest {
     ratedLimit: number;
     perfLimit: number;
     standings: Standings;
-    aPerfs: number[];
+    aPerfs: { [key: string]: number };
     rankMemo: { [key: number]: number };
     contestantAPerf: number[];
     templateResults: { [key: string]: Result };
@@ -90,7 +90,7 @@ export class Contest {
         contestScreenName: string,
         contestInformation: ContestInformation,
         standings: Standings,
-        aPerfs: number[]
+        aPerfs: { [key: string]: number }
     ) {
         this.ratedLimit = contestInformation.RatedRange[1] + 1;
         this.perfLimit = this.ratedLimit + 400;
