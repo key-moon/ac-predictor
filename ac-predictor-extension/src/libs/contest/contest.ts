@@ -114,7 +114,7 @@ export class Contest {
         if (this.rankMemo[X]) return this.rankMemo[X];
         return (this.rankMemo[X] = this.contestantAPerf.reduce(
             (val, APerf) => val + 1.0 / (1.0 + Math.pow(6.0, (X - APerf) / 400.0)),
-            0
+            0.5
         ));
     }
 
@@ -127,7 +127,7 @@ export class Contest {
         let lower = -2048;
         while (upper - lower > 0.5) {
             const mid = (upper + lower) / 2;
-            if (ratedRank - 0.5 > this.getRatedRank(mid)) upper = mid;
+            if (ratedRank > this.getRatedRank(mid)) upper = mid;
             else lower = mid;
         }
         return Math.round((upper + lower) / 2);
