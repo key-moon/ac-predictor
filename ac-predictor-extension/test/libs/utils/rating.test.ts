@@ -23,7 +23,7 @@ test("calc rating from previous rate and perf", () => {
 });
 
 test("check inverseness", () => {
-    for (let i = -1000; i < 500; i++) {
+    for (let i = -1000; i < 4000; i += 100) {
         expect(unpositivizeRating(positivizeRating(i))).toBeCloseTo(i);
     }
 });
