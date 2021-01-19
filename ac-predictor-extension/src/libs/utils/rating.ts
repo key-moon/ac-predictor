@@ -105,7 +105,7 @@ export const colorBounds = {
     blue: 1600,
     yellow: 2000,
     orange: 2400,
-    red: 2800
+    red: 2800,
 };
 
 type ColorName = "unrated" | "gray" | "brown" | "green" | "cyan" | "blue" | "yellow" | "orange" | "red";

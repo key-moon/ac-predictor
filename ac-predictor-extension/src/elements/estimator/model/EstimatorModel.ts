@@ -4,7 +4,7 @@ export class EstimatorModel {
     perfHistory: number[];
     inputDesc: string;
     resultDesc: string;
-    constructor(inputValue, perfHistory) {
+    constructor(inputValue: number, perfHistory: number[]) {
         this.inputDesc = "";
         this.resultDesc = "";
         this.perfHistory = perfHistory;

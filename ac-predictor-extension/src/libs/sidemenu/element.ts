@@ -6,16 +6,16 @@ export class SideMenuElement {
     match: RegExp;
     id: string;
     document: string;
-    afterAppend: Function;
-    afterOpen: Function;
+    afterAppend: () => unknown;
+    afterOpen: () => unknown;
 
     constructor(
         id: string,
         title: string,
         match: RegExp,
         document: string,
-        afterAppend: Function,
-        afterOpen: Function
+        afterAppend: () => unknown,
+        afterOpen: () => unknown
     ) {
         this.id = id;
         this.title = title;

@@ -13,14 +13,16 @@ export class SideMenu {
         const key = document.getElementById("sidemenu-key");
         const wrap = document.getElementById("menu-wrap");
         key.addEventListener("click", () => {
-            this.pendingElements.forEach(elem => elem.afterOpen());
+            this.pendingElements.forEach((elem) => {
+                elem.afterOpen();
+            });
             this.pendingElements.length = 0;
             key.classList.toggle("glyphicon-menu-left");
             key.classList.toggle("glyphicon-menu-right");
             wrap.classList.toggle("sidemenu-active");
         });
         window.addEventListener("onresize", resizeSidemenuHeight);
-        document.getElementById("sidemenu").addEventListener("click", event => {
+        document.getElementById("sidemenu").addEventListener("click", (event) => {
             const target = event.target as HTMLElement;
             const header = target.closest(".menu-header");
             if (!header) return;

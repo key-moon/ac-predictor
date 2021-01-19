@@ -3,7 +3,7 @@ import { CalcPerfModel } from "./CalcPerfModel";
 import { calcRatingFromHistory, positivizeRating } from "../../../libs/utils/rating";
 
 export class CalcRatingModel extends EstimatorModel {
-    constructor(inputValue, perfHistory) {
+    constructor(inputValue: number, perfHistory: number[]) {
         super(inputValue, perfHistory);
         this.inputDesc = "パフォーマンス";
         this.resultDesc = "到達レーティング";

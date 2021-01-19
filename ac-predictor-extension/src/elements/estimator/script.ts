@@ -21,7 +21,7 @@ export const estimator = new SideMenuElement(
 
 function getLS<T>(key: string): T {
     const val = localStorage.getItem(key);
-    return val ? JSON.parse(val) : val;
+    return (val ? JSON.parse(val) : val) as T;
 }
 
 function setLS<T>(key: string, val: T): void {
@@ -87,7 +87,7 @@ async function afterOpen(): Promise<void> {
 const models = [CalcPerfModel, CalcRatingModel];
 
 function GetModelFromStateCode(state: string, value: number, history: number[]): EstimatorModel {
-    let model = models.find(model => model.name === state);
+    let model = models.find((model) => model.name === state);
     if (!model) model = CalcPerfModel;
     return new model(value, history);
 }

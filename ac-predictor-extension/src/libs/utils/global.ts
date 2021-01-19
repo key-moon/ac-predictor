@@ -1,7 +1,7 @@
-function getGlobalVals(): {} {
-    const script = [...document.querySelectorAll("head script:not([src])")].map(x => x.innerHTML).join("\n");
+function getGlobalVals(): Record<string, unknown> {
+    const script = [...document.querySelectorAll("head script:not([src])")].map((x) => x.innerHTML).join("\n");
     const res = {};
-    script.match(/var [^ ]+ = .+$/gm).forEach(statement => {
+    script.match(/var [^ ]+ = .+$/gm).forEach((statement) => {
         const match = /var ([^ ]+) = (.+)$/m.exec(statement);
         function safeEval(val: string): unknown {
             function trim(val: string): string {
@@ -26,13 +26,13 @@ function getGlobalVals(): {} {
     return res;
 }
 
-export const globalVals = getGlobalVals();
-export const userScreenName: string = globalVals["userScreenName"];
-export const LANG: string = globalVals["LANG"];
-export const csrfToken: string = globalVals["csrfToken"];
+export const globalVals: Record<string, unknown> = getGlobalVals();
+export const userScreenName: string = globalVals["userScreenName"] as string;
+export const LANG: string = globalVals["LANG"] as string;
+export const csrfToken: string = globalVals["csrfToken"] as string;
 
-export const contestScreenName: string = globalVals["contestScreenName"];
-export const countDownText: string = globalVals["countDownText"];
-export const remainingText: string = globalVals["remainingText"];
-export const startTime: Date = globalVals["startTime"];
-export const endTime: Date = globalVals["endTime"];
+export const contestScreenName: string = globalVals["contestScreenName"] as string;
+export const countDownText: string = globalVals["countDownText"] as string;
+export const remainingText: string = globalVals["remainingText"] as string;
+export const startTime: Date = globalVals["startTime"] as Date;
+export const endTime: Date = globalVals["endTime"] as Date;

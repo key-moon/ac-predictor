@@ -6,7 +6,7 @@ export class FixedResults extends Results {
     constructor(results: Result[]) {
         super();
         this.resultsDic = {};
-        results.forEach(result => {
+        results.forEach((result) => {
             this.resultsDic[result.UserScreenName] = result;
         });
     }

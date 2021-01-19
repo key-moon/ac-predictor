@@ -23,7 +23,7 @@ function parseRangeString(s: string): number[] {
 function parseDurationString(s: string): number {
     if (s === "None" || s === "なし") return 0;
     if (!/(\d+[^\d]+)/.test(s)) return NaN;
-    const durationDic = {
+    const durationDic: Record<string, number> = {
         日: 24 * 60 * 60 * 1000,
         day: 24 * 60 * 60 * 1000,
         days: 24 * 60 * 60 * 1000,
@@ -35,14 +35,14 @@ function parseDurationString(s: string): number {
         minutes: 60 * 1000,
         秒: 1000,
         second: 1000,
-        seconds: 1000
+        seconds: 1000,
     };
     let res = 0;
     s.match(/(\d+[^\d]+)/g).forEach((x: string) => {
         const trimmed = x.trim();
         const num = parseInt(/\d+/.exec(trimmed)[0]);
         const unit = /[^\d]+/.exec(trimmed)[0];
-        const duration = durationDic[unit] || unit;
+        const duration = durationDic[unit] ?? 0;
         res += num * duration;
     });
     return res;
@@ -50,7 +50,7 @@ function parseDurationString(s: string): number {
 
 async function fetchJsonDataAsync<T>(url: string): Promise<T> {
     const response = await fetch(url);
-    if (response.ok) return response.json();
+    if (response.ok) return (await response.json()) as T;
     throw new Error(`request to ${url} returns ${response.status}`);
 }
 
@@ -80,7 +80,7 @@ export async function getContestInformationAsync(contestScreenName: string): Pro
     const html = await fetchTextDataAsync(`https://atcoder.jp/contests/${contestScreenName}`);
     const topPageDom = new DOMParser().parseFromString(html, "text/html");
     const dataParagraph = topPageDom.getElementsByClassName("small")[0];
-    const data = Array.from(dataParagraph.children).map(x => x.innerHTML.split(":")[1].trim());
+    const data = Array.from(dataParagraph.children).map((x) => x.innerHTML.split(":")[1].trim());
     return new ContestInformation(parseRangeString(data[0]), parseRangeString(data[1]), parseDurationString(data[2]));
 }
 
@@ -88,9 +88,9 @@ export async function getContestInformationAsync(contestScreenName: string): Pro
  * ユーザーのパフォーマンス履歴を時間昇順で取得
  */
 export function getPerformanceHistories(history: UserResult[]): number[] {
-    const onlyRated = history.filter(x => x.IsRated);
+    const onlyRated = history.filter((x) => x.IsRated);
     onlyRated.sort((a, b) => {
         return new Date(a.EndTime).getTime() - new Date(b.EndTime).getTime();
     });
-    return onlyRated.map(x => x.Performance);
+    return onlyRated.map((x) => x.Performance);
 }

@@ -8,13 +8,13 @@ type AnalyzedStandingsData = {
 };
 function analyzeStandingsData(
     fixed: boolean,
-    standingsData,
+    standingsData: StandingData[],
     aPerfs: { [key: string]: number },
     defaultAPerf: number,
     ratedLimit: number
 ): AnalyzedStandingsData {
     type AnalyzedData = { contestantAPerf: number[]; templateResults: { [s: string]: Result } };
-    function analyze(isUserRated: (StandingData) => boolean): AnalyzedData {
+    function analyze(isUserRated: (val: StandingData) => boolean): AnalyzedData {
         const contestantAPerf: number[] = [];
         const templateResults: { [s: string]: Result } = {};
 
@@ -24,7 +24,7 @@ function analyzeStandingsData(
         const tiedUsers: StandingData[] = [];
         let ratedInTiedUsers = 0;
         function applyTiedUsers(): void {
-            tiedUsers.forEach(data => {
+            tiedUsers.forEach((data) => {
                 if (isUserRated(data)) {
                     contestantAPerf.push(aPerfs[data.UserScreenName] || defaultAPerf);
                     ratedInTiedUsers++;
@@ -32,7 +32,7 @@ function analyzeStandingsData(
             });
 
             const ratedRank: number = currentRatedRank + Math.max(0, ratedInTiedUsers - 1) / 2;
-            tiedUsers.forEach(data => {
+            tiedUsers.forEach((data) => {
                 templateResults[data.UserScreenName] = new Result(
                     isUserRated(data),
                     data.TotalResult.Count !== 0,
@@ -51,7 +51,7 @@ function analyzeStandingsData(
             ratedInTiedUsers = 0;
         }
 
-        standingsData.forEach(data => {
+        standingsData.forEach((data) => {
             if (lastRank !== data.Rank) applyTiedUsers();
             lastRank = data.Rank;
             tiedUsers.push(data);
@@ -60,11 +60,11 @@ function analyzeStandingsData(
 
         return {
             contestantAPerf: contestantAPerf,
-            templateResults: templateResults
+            templateResults: templateResults,
         };
     }
 
-    let analyzedData = analyze(data => data.IsRated && data.TotalResult.Count !== 0);
+    let analyzedData = analyze((data) => data.IsRated && data.TotalResult.Count !== 0);
     let isRated = true;
     if (analyzedData.contestantAPerf.length === 0) {
         analyzedData = analyze(

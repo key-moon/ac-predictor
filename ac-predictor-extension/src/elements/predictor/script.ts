@@ -14,7 +14,7 @@ import {
     getResultsDataAsync,
     getStandingsDataAsync,
     getContestInformationAsync,
-    getHistoryDataAsync
+    getHistoryDataAsync,
 } from "../../libs/utils/data";
 import { getColor, positivizeRating } from "../../libs/utils/rating";
 import { Results } from "../../libs/contest/results/results";
@@ -36,10 +36,10 @@ const predictorElements = [
     "predictor-input-perf",
     "predictor-input-rate",
     "predictor-current",
-    "predictor-reload"
+    "predictor-reload",
 ];
 
-const historyData = [];
+const historyData: number[] = [];
 
 async function afterAppend(): Promise<void> {
     const isStandingsPage = /standings([^/]*)?$/.test(document.location.href);
@@ -54,7 +54,7 @@ async function afterAppend(): Promise<void> {
         perfValue: 0,
         rateValue: 0,
         enabled: false,
-        history: historyData
+        history: historyData,
     } as PredictorModel);
 
     if (!shouldEnabledPredictor().verdict) {
@@ -66,7 +66,7 @@ async function afterAppend(): Promise<void> {
     try {
         await initPredictor();
     } catch (e) {
-        model.updateInformation(e.message);
+        model.updateInformation((e as Error).message);
         model.setEnable(false);
         updateView();
     }
@@ -76,7 +76,7 @@ async function afterAppend(): Promise<void> {
     function subscribeEvents(): void {
         const reloadButton = document.getElementById("predictor-reload") as HTMLButtonElement;
         reloadButton.addEventListener("click", () => {
-            (async (): Promise<void> => {
+            void (async (): Promise<void> => {
                 model.updateInformation("読み込み中…");
                 reloadButton.disabled = true;
                 updateView();
@@ -85,14 +85,14 @@ async function afterAppend(): Promise<void> {
                 updateView();
             })();
         });
-        document.getElementById("predictor-current").addEventListener("click", function() {
+        document.getElementById("predictor-current").addEventListener("click", function () {
             const myResult = contest.templateResults[userScreenName];
             if (!myResult) return;
             model = new CalcFromRankModel(model);
             model.updateData(myResult.RatedRank, model.perfValue, model.rateValue);
             updateView();
         });
-        document.getElementById("predictor-input-rank").addEventListener("keyup", function() {
+        document.getElementById("predictor-input-rank").addEventListener("keyup", function () {
             const inputString = (document.getElementById("predictor-input-rank") as HTMLInputElement).value;
             const inputNumber = parseInt(inputString);
             if (!isFinite(inputNumber)) return;
@@ -100,7 +100,7 @@ async function afterAppend(): Promise<void> {
             model.updateData(inputNumber, 0, 0);
             updateView();
         });
-        document.getElementById("predictor-input-perf").addEventListener("keyup", function() {
+        document.getElementById("predictor-input-perf").addEventListener("keyup", function () {
             const inputString = (document.getElementById("predictor-input-perf") as HTMLInputElement).value;
             const inputNumber = parseInt(inputString);
             if (!isFinite(inputNumber)) return;
@@ -108,7 +108,7 @@ async function afterAppend(): Promise<void> {
             model.updateData(0, inputNumber, 0);
             updateView();
         });
-        document.getElementById("predictor-input-rate").addEventListener("keyup", function() {
+        document.getElementById("predictor-input-rate").addEventListener("keyup", function () {
             const inputString = (document.getElementById("predictor-input-rate") as HTMLInputElement).value;
             const inputNumber = parseInt(inputString);
             if (!isFinite(inputNumber)) return;
@@ -146,21 +146,21 @@ async function afterAppend(): Promise<void> {
                     '<th class="standings-result-th" style="width:84px;min-width:84px;">perf</th><th class="standings-result-th" style="width:168px;min-width:168px;">レート変化</th>'
                 );
             new MutationObserver(addPerfToStandings).observe(document.getElementById("standings-tbody"), {
-                childList: true
+                childList: true,
             });
             const refreshElem = document.getElementById("refresh");
             if (refreshElem)
-                new MutationObserver(mutationRecord => {
+                new MutationObserver((mutationRecord) => {
                     const disabled = (mutationRecord[0].target as HTMLButtonElement).disabled;
                     if (disabled) {
-                        (async (): Promise<void> => {
+                        void (async (): Promise<void> => {
                             await updateStandingsFromAPI();
                             updateView();
                         })();
                     }
                 }).observe(refreshElem, {
                     attributes: true,
-                    attributeFilter: ["class"]
+                    attributeFilter: ["class"],
                 });
         }
         updateView();
@@ -168,14 +168,18 @@ async function afterAppend(): Promise<void> {
     async function updateStandingsFromAPI(): Promise<void> {
         try {
             const shouldEnabled = shouldEnabledPredictor();
-            if (!shouldEnabled.verdict) throw new Error(shouldEnabled.message);
+            if (!shouldEnabled.verdict) {
+                model.updateInformation(shouldEnabled.message);
+                model.setEnable(false);
+                return;
+            }
             const standings = await getStandingsDataAsync(contestScreenName);
             const aperfs = await getAPerfsDataAsync(contestScreenName);
             await updateData(aperfs, standings);
             model.updateInformation(`最終更新 : ${new Date().toTimeString().split(" ")[0]}`);
             model.setEnable(true);
         } catch (e) {
-            model.updateInformation(e.message);
+            model.updateInformation((e as Error).message);
             model.setEnable(false);
         }
     }
@@ -203,12 +207,12 @@ async function afterAppend(): Promise<void> {
             addPerfToStandings();
         }
         function enabled(): void {
-            predictorElements.forEach(element => {
+            predictorElements.forEach((element) => {
                 (document.getElementById(element) as HTMLButtonElement).disabled = false;
             });
         }
         function disabled(): void {
-            predictorElements.forEach(element => {
+            predictorElements.forEach((element) => {
                 (document.getElementById(element) as HTMLButtonElement).disabled = false;
             });
         }
@@ -219,12 +223,12 @@ async function afterAppend(): Promise<void> {
         if (startTime < firstContestDate)
             return {
                 verdict: false,
-                message: "現行レートシステム以前のコンテストです"
+                message: "現行レートシステム以前のコンテストです",
             };
         if (contestInformation.RatedRange[0] > contestInformation.RatedRange[1])
             return {
                 verdict: false,
-                message: "ratedなコンテストではありません"
+                message: "ratedなコンテストではありません",
             };
         return { verdict: true, message: "" };
     }
@@ -235,7 +239,7 @@ async function afterAppend(): Promise<void> {
             const rawResult = await getResultsDataAsync(contestScreenName);
             rawResult.sort((a, b) => (a.Place !== b.Place ? a.Place - b.Place : b.OldRating - a.OldRating));
             const sortedStandingsData = Array.from(contest.standings.StandingsData).filter(
-                x => x.TotalResult.Count !== 0
+                (x) => x.TotalResult.Count !== 0
             );
             sortedStandingsData.sort((a, b) => {
                 if (a.TotalResult.Count === 0 && b.TotalResult.Count === 0) return 0;
@@ -278,9 +282,8 @@ async function afterAppend(): Promise<void> {
 
     //結果データを順位表に追加する
     function addPerfToStandings(): void {
-        document.querySelectorAll(".standings-perf, .standings-rate").forEach(elem => elem.remove());
-
-        document.querySelectorAll("#standings-tbody > tr").forEach(elem => {
+        document.querySelectorAll(".standings-perf, .standings-rate").forEach((elem) => elem.remove());
+        document.querySelectorAll("#standings-tbody > tr").forEach((elem) => {
             if (elem.firstElementChild.textContent === "-") {
                 const longCell = elem.getElementsByClassName("standings-result")[0];
                 longCell.setAttribute("colspan", (parseInt(longCell.getAttribute("colspan")) + 2).toString());
@@ -304,20 +307,20 @@ async function afterAppend(): Promise<void> {
             const rateElem = !result ? "-" : getRatingChangeElem(result);
             elem.insertAdjacentHTML("beforeend", `<td class="standings-result standings-perf">${perfElem}</td>`);
             elem.insertAdjacentHTML("beforeend", `<td class="standings-result standings-rate">${rateElem}</td>`);
-            function getRatingChangeElem(result): string {
+            function getRatingChangeElem(result: Result): string {
                 return result.IsRated && contest.IsRated
                     ? getChangedRatingElem(result.OldRating, result.NewRating)
                     : getUnratedElem(result.OldRating);
             }
-            function getChangedRatingElem(oldRate, newRate): string {
+            function getChangedRatingElem(oldRate: number, newRate: number): string {
                 return `<span class="bold">${getRatingSpan(oldRate)}</span> → <span class="bold">${getRatingSpan(
                     newRate
                 )}</span> <span class="grey">(${newRate >= oldRate ? "+" : ""}${newRate - oldRate})</span>`;
             }
-            function getUnratedElem(rate): string {
+            function getUnratedElem(rate: number): string {
                 return `<span class="bold">${getRatingSpan(rate)}</span> <span class="grey">(unrated)</span>`;
             }
-            function getRatingSpan(rate): string {
+            function getRatingSpan(rate: number): string {
                 return `<span class="user-${getColor(rate)}">${rate}</span>`;
             }
         });
@@ -325,5 +328,5 @@ async function afterAppend(): Promise<void> {
 }
 
 async function afterOpen(): Promise<void> {
-    getPerformanceHistories(await getHistoryDataAsync(userScreenName)).forEach(elem => historyData.push(elem));
+    getPerformanceHistories(await getHistoryDataAsync(userScreenName)).forEach((elem) => historyData.push(elem));
 }
