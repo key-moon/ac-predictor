@@ -12,6 +12,7 @@ export class OnDemandResults extends Results {
         this.TemplateResults = templateResults;
     }
     getUserResult(userScreenName: string): Result {
+        if (!Object.prototype.hasOwnProperty.call(this.TemplateResults, userScreenName)) return null;
         const baseResults = this.TemplateResults[userScreenName];
         if (!baseResults) return null;
         if (!baseResults.Performance) {
