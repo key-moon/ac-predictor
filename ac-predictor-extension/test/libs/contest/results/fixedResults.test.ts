@@ -2,13 +2,11 @@ import { FixedResults } from "../../../../src/libs/contest/results/fIxedResults"
 import * as fs from "fs";
 import { dataDir } from "../../../data/data";
 import { Result } from "../../../../src/libs/contest/results/result";
+import { results, standings } from "../../../data/wtf19";
 
 // TODO: resultsを作る処理を纏める
 test("test FixedResults", () => {
-    const standingsJson = fs.readFileSync(dataDir + "/wtf19_standings.json").toString();
-    const resultsJson = fs.readFileSync(dataDir + "/wtf19_results.json").toString();
-    const standingsData = JSON.parse(standingsJson) as Standings;
-    const sortedStandingsData = Array.from(standingsData.StandingsData).filter(
+    const sortedStandingsData = Array.from(standings.StandingsData).filter(
         x => x.TotalResult.Count !== 0
     );
     sortedStandingsData.sort((a, b) => {
@@ -21,10 +19,10 @@ test("test FixedResults", () => {
         if (b.UserIsDeleted) return 1;
         return 0;
     });
-    const rawResult = JSON.parse(resultsJson) as Result[];
+    const rawResult = results;
     let deletedCount = 0;
     let lastPerformance = Infinity;
-    const results = new FixedResults(
+    const fixedResults = new FixedResults(
         sortedStandingsData.map((data, index) => {
             let result = rawResult[index - deletedCount];
             if (!result || data.OldRating !== result.OldRating) {
@@ -45,13 +43,14 @@ test("test FixedResults", () => {
             );
         })
     );
-    expect(results.getUserResult("apiad").Place).toBe(1);
-    expect(results.getUserResult("yutaka1999").Place).toBe(2);
-    expect(results.getUserResult("Petr").Place).toBe(3);
-    expect(results.getUserResult("LHiC").Place).toBe(4);
-    expect(results.getUserResult("Um_nik").Place).toBe(5);
-    expect(results.getUserResult("ksun48").Place).toBe(6);
-    expect(results.getUserResult("tourist").Place).toBe(7);
-    expect(results.getUserResult("cospleermusora").Place).toBe(8);
-    expect(results.getUserResult("keymoon")).toBeNull();
+    expect(fixedResults.getUserResult("apiad").Place).toBe(1);
+    expect(fixedResults.getUserResult("yutaka1999").Place).toBe(2);
+    expect(fixedResults.getUserResult("Petr").Place).toBe(3);
+    expect(fixedResults.getUserResult("LHiC").Place).toBe(4);
+    expect(fixedResults.getUserResult("Um_nik").Place).toBe(5);
+    expect(fixedResults.getUserResult("ksun48").Place).toBe(6);
+    expect(fixedResults.getUserResult("tourist").Place).toBe(7);
+    expect(fixedResults.getUserResult("cospleermusora").Place).toBe(8);
+    expect(fixedResults.getUserResult("keymoon")).toBeNull();
+    expect(fixedResults.getUserResult("constructor")).toBeNull();
 });

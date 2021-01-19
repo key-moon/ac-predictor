@@ -7,6 +7,7 @@ import {
 import * as fs from "fs";
 import Mock = jest.Mock;
 import {dataDir} from "../../data/data";
+import {aperfsPath, contestInformation, infoPath, resultsPath, standingsPath} from "../../data/wtf19";
 
 function isNodeEnv(): boolean {
     return (
@@ -35,33 +36,33 @@ afterEach(() => {
 });
 
 test("standingsData", async () => {
-    const standingsData = content = fs.readFileSync(dataDir + "/wtf19_standings.json").toString();
+    content = fs.readFileSync(standingsPath).toString();
     const standings = await getStandingsDataAsync("wtf19");
-    expect(standings).toEqual(JSON.parse(standingsData));
+    expect(standings).toEqual(standings);
     expect(fetchMock.mock.calls.length).toBe(1);
     expect(fetchMock.mock.calls[0][0]).toBe("https://atcoder.jp/contests/wtf19/standings/json");
 });
 
 test("resultsData", async () => {
-    const resultsJson = content = fs.readFileSync(dataDir + "/wtf19_results.json").toString();
+    content = fs.readFileSync(resultsPath).toString();
     const results = await getResultsDataAsync("wtf19");
-    expect(results).toEqual(JSON.parse(resultsJson));
+    expect(results).toEqual(results);
     expect(fetchMock.mock.calls.length).toBe(1);
     expect(fetchMock.mock.calls[0][0]).toBe("https://atcoder.jp/contests/wtf19/results/json");
 });
 
 test("aperfsData", async () => {
-    const aperfsJson = content = fs.readFileSync(dataDir + "/wtf19_aperfs.json").toString();
+    content = fs.readFileSync(aperfsPath).toString();
     const aperfs = await getAPerfsDataAsync("wtf19");
-    expect(aperfs).toEqual(JSON.parse(aperfsJson));
+    expect(aperfs).toEqual(aperfs);
     expect(fetchMock.mock.calls.length).toBe(1);
     expect(fetchMock.mock.calls[0][0]).toBe("https://data.ac-predictor.com/aperfs/wtf19.json");
 });
 
 test("test getContestInformation", async () => {
-    const infoHtml = content = fs.readFileSync(dataDir + "/wtf19_info.html").toString();
+    content = fs.readFileSync(infoPath).toString();
     const results = await getContestInformationAsync("wtf19");
-    expect(results).toEqual(new ContestInformation([0, -1], [0, Infinity], 5 * 60 * 1000));
+    expect(results).toEqual(contestInformation);
     expect(fetchMock.mock.calls.length).toBe(1);
     expect(fetchMock.mock.calls[0][0]).toBe("https://atcoder.jp/contests/wtf19");
 });
