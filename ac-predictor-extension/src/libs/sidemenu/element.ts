@@ -1,29 +1,14 @@
 ﻿/**
  * サイドメニューに追加される要素のクラス
  */
-export class SideMenuElement {
-    title: string;
-    match: RegExp;
-    id: string;
-    document: string;
-    afterAppend: () => unknown;
-    afterOpen: () => unknown;
+export abstract class SideMenuElement {
+    abstract title: string;
+    abstract match: RegExp;
+    abstract id: string;
+    abstract document: string;
 
-    constructor(
-        id: string,
-        title: string,
-        match: RegExp,
-        document: string,
-        afterAppend: () => unknown,
-        afterOpen: () => unknown
-    ) {
-        this.id = id;
-        this.title = title;
-        this.match = match;
-        this.document = document;
-        this.afterAppend = afterAppend;
-        this.afterOpen = afterOpen;
-    }
+    abstract afterAppend(): void;
+    abstract afterOpen(): void;
 
     shouldDisplayed(url: string): boolean {
         return this.match.test(url);
