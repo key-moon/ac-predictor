@@ -6,12 +6,6 @@ export class PerfAndRateChangeAppender extends StandingsRowModifier {
     results: Results;
     isRated: boolean;
 
-    constructor(results: Results, isRated: boolean) {
-        super();
-        this.results = results;
-        this.isRated = isRated;
-    }
-
     modifyContent(content: HTMLTableRowElement): void {
         this.removeOldElem(content);
         if (content.firstElementChild.textContent === "-") {
