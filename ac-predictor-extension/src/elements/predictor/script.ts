@@ -19,8 +19,8 @@ import {
 import { Results } from "../../libs/contest/results/results";
 import { SideMenuElement } from "../../libs/sidemenu/element";
 import { contestScreenName, startTime, userScreenName } from "../../libs/utils/global";
-import { AllRowUpdater } from "./view/standingsTableUpdater/allRowUpdater";
-import { PerfAndRateChangeAppender } from "./view/standingsRowModifier/perfAndRateChangeAppender";
+import { AllRowUpdater } from "./controller/standingsTableUpdater/allRowUpdater";
+import { PerfAndRateChangeAppender } from "./controller/standingsRowModifier/perfAndRateChangeAppender";
 
 class PredictorElement extends SideMenuElement {
     id = "predictor";
