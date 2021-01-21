@@ -15,13 +15,15 @@ export class PerfAndRateChangeAppender extends StandingsRowModifier {
         }
         const userScreenName = content.querySelector(".standings-username .username span").textContent;
         const result = this.results?.getUserResult(userScreenName);
-        const performance = Math.round(positivizeRating(result.Performance));
 
-        const perfElem = result.IsSubmitted ? this.getRatingSpan(performance) : "-";
-        const ratingElem =
-            result?.IsRated && this?.isRated
+        const perfElem = result?.IsSubmitted
+            ? this.getRatingSpan(Math.round(positivizeRating(result.Performance)))
+            : "-";
+        const ratingElem = !result
+            ? result?.IsRated && this?.isRated
                 ? this.getChangedRatingElem(result.OldRating, result.NewRating)
-                : this.getUnratedElem(result.OldRating);
+                : this.getUnratedElem(result.OldRating)
+            : "-";
 
         content.insertAdjacentHTML("beforeend", `<td class="standings-result standings-perf">${perfElem}</td>`);
         content.insertAdjacentHTML("beforeend", `<td class="standings-result standings-rate">${ratingElem}</td>`);
@@ -54,7 +56,7 @@ export class PerfAndRateChangeAppender extends StandingsRowModifier {
         this.removeOldElem(header);
         header.insertAdjacentHTML(
             "beforeend",
-            '<th class="standings-result-th" style="width:84px;min-width:84px;">perf</th><th class="standings-result-th" style="width:168px;min-width:168px;">レート変化</th>'
+            '<th class="standings-result-th standings-perf" style="width:84px;min-width:84px;">perf</th><th class="standings-result-th standings-rate" style="width:168px;min-width:168px;">レート変化</th>'
         );
     }
 
