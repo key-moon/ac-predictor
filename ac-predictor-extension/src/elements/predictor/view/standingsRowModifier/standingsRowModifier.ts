@@ -1,6 +1,6 @@
 export abstract class StandingsRowModifier {
     isHeader(row: HTMLTableRowElement): boolean {
-        return row.parentElement.tagName == "thead";
+        return row.parentElement.tagName.toLowerCase() == "thead";
     }
     isFooter(row: HTMLTableRowElement): boolean {
         return row.firstElementChild.hasAttribute("colspan") && row.firstElementChild.getAttribute("colspan") == "3";
