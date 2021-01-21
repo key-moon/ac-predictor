@@ -50,7 +50,17 @@ class PredictorElement extends SideMenuElement {
         return this._results;
     }
 
-    async afterAppend(): Promise<void> {
+    afterAppend(): void {
+        const loadingElem = document.getElementById("vue-standings").getElementsByClassName("loading-show")[0];
+        const loaded = () => !!document.getElementById("standings-tbody");
+        if (loaded()) void this.initialize();
+        else
+            new MutationObserver(() => {
+                if (loaded()) void this.initialize();
+            }).observe(loadingElem, { attributes: true });
+    }
+
+    async initialize(): Promise<void> {
         const firstContestDate = new Date(2016, 6, 16, 21);
         const predictorElements = [
             "predictor-input-rank",
@@ -159,7 +169,7 @@ class PredictorElement extends SideMenuElement {
             if (isStandingsPage) {
                 new MutationObserver(() => {
                     tableUpdater.update(tableElement);
-                }).observe(tableElement, {
+                }).observe(tableElement.tBodies[0], {
                     childList: true,
                 });
                 const refreshElem = document.getElementById("refresh");
