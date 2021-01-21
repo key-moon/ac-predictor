@@ -33,7 +33,7 @@ class EstimatorElement extends SideMenuElement {
     id = "estimator";
     title = "Estimator";
     document = dom;
-    match: RegExp;
+    match = /atcoder.jp/;
 
     afterAppend(): void {
         //nothing to do
