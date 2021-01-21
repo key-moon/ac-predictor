@@ -31,7 +31,7 @@ class PredictorElement extends SideMenuElement {
     historyData: number[] = [];
 
     _contest: Contest;
-    contestOnUpdated: ((Contest) => void)[];
+    contestOnUpdated: ((Contest) => void)[] = [];
     set contest(val: Contest) {
         this._contest = val;
         this.resultsOnUpdated.forEach((func) => func(val));
@@ -41,7 +41,7 @@ class PredictorElement extends SideMenuElement {
     }
 
     _results: Results;
-    resultsOnUpdated: ((Results) => void)[];
+    resultsOnUpdated: ((Results) => void)[] = [];
     set results(val: Results) {
         this._results = val;
         this.resultsOnUpdated.forEach((func) => func(val));
