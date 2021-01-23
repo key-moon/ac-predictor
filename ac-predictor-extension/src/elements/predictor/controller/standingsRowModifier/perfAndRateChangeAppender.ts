@@ -19,7 +19,7 @@ export class PerfAndRateChangeAppender extends StandingsRowModifier {
         const perfElem = result?.IsSubmitted
             ? this.getRatingSpan(Math.round(positivizeRating(result.Performance)))
             : "-";
-        const ratingElem = !result
+        const ratingElem = result
             ? result?.IsRated && this?.isRated
                 ? this.getChangedRatingElem(result.OldRating, result.NewRating)
                 : this.getUnratedElem(result.OldRating)
