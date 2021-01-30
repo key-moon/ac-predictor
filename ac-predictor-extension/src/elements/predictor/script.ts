@@ -50,14 +50,20 @@ class PredictorElement extends SideMenuElement {
         return this._results;
     }
 
+    isStandingsPage() {
+        return /standings([^/]*)?$/.test(document.location.href);
+    }
+
     afterAppend(): void {
-        const loadingElem = document.getElementById("vue-standings").getElementsByClassName("loading-show")[0];
         const loaded = () => !!document.getElementById("standings-tbody");
-        if (loaded()) void this.initialize();
-        else
-            new MutationObserver(() => {
-                if (loaded()) void this.initialize();
-            }).observe(loadingElem, { attributes: true });
+        if (!this.isStandingsPage() || loaded()) {
+            void this.initialize();
+            return;
+        }
+        const loadingElem = document.getElementById("vue-standings").getElementsByClassName("loading-show")[0];
+        new MutationObserver(() => {
+            if (loaded()) void this.initialize();
+        }).observe(loadingElem, { attributes: true });
     }
 
     async initialize(): Promise<void> {
@@ -69,8 +75,7 @@ class PredictorElement extends SideMenuElement {
             "predictor-current",
             "predictor-reload",
         ];
-
-        const isStandingsPage = /standings([^/]*)?$/.test(document.location.href);
+        const isStandingsPage = this.isStandingsPage();
         const contestInformation = await getContestInformationAsync(contestScreenName);
         const rowUpdater: PerfAndRateChangeAppender = new PerfAndRateChangeAppender();
         this.resultsOnUpdated.push((val: Results) => {
@@ -82,7 +87,7 @@ class PredictorElement extends SideMenuElement {
         const tableUpdater: AllRowUpdater = new AllRowUpdater();
         tableUpdater.rowModifier = rowUpdater;
 
-        const tableElement = document.getElementById("standings-tbody").parentElement as HTMLTableElement;
+        const tableElement = document.getElementById("standings-tbody")?.parentElement as HTMLTableElement;
 
         let model: PredictorModel = new PredictorModel({
             rankValue: 0,
