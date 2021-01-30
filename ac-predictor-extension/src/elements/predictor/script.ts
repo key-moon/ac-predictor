@@ -34,7 +34,7 @@ class PredictorElement extends SideMenuElement {
     contestOnUpdated: ((Contest) => void)[] = [];
     set contest(val: Contest) {
         this._contest = val;
-        this.resultsOnUpdated.forEach((func) => func(val));
+        this.contestOnUpdated.forEach((func) => func(val));
     }
     get contest(): Contest {
         return this._contest;
