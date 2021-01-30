@@ -180,7 +180,7 @@ class PredictorElement extends SideMenuElement {
                 const refreshElem = document.getElementById("refresh");
                 if (refreshElem)
                     new MutationObserver((mutationRecord) => {
-                        const disabled = (mutationRecord[0].target as HTMLButtonElement).disabled;
+                        const disabled = (mutationRecord[0].target as HTMLButtonElement).classList.contains("disabled");
                         if (disabled) {
                             void (async (): Promise<void> => {
                                 await updateStandingsFromAPI();
