@@ -345,6 +345,7 @@ function getRatedLimit(contestScreenName) {
     var maxDic = [
         { pattern: /^abc12[6-9]$/, maxPerf: 2000 },
         { pattern: /^abc1[3-9]\d$/, maxPerf: 2000 },
+        { pattern: /^abc[2-9]\d{2}$/, maxPerf: 2000 },
         { pattern: /^abc\d{3}$/, maxPerf: 1200 },
         { pattern: /^arc\d{3}$/, maxPerf: 2800 },
         { pattern: /^agc\d{3}$/, maxPerf: Infinity },
