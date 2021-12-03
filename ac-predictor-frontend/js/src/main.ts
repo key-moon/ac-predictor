@@ -105,7 +105,7 @@ async function DrawTable(contestScreenName: string, drawUnrated: boolean): Promi
 
     function isRated(standingData: StandingData): boolean {
         const rate = standings.Fixed ? standingData.OldRating : standingData.Rating;
-        return standingData.IsRated || (ratedLowerBound <= rate && rate < ratedUpperBound);
+        return standingData.IsRated; // || (ratedLowerBound <= rate && rate < ratedUpperBound);
     }
 
     standings.StandingsData.forEach(function(element) {
