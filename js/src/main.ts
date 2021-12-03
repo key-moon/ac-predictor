@@ -113,7 +113,6 @@ async function DrawTable(contestScreenName: string, drawUnrated: boolean): Promi
         const isUnrated =
             element.UserIsDeleted ||
             !isRated(element) ||
-            element.TotalResult.Count === 0 ||
             addedSet.has(userScreenName);
         if (isUnrated) return;
         addedSet.add(userScreenName);
@@ -137,7 +136,7 @@ async function DrawTable(contestScreenName: string, drawUnrated: boolean): Promi
     }
 
     standings.StandingsData.forEach(function(element) {
-        if ((!drawUnrated && !element.IsRated) || element.TotalResult.Count === 0) return;
+        if (!drawUnrated && !element.IsRated) return;
         if (lastRank !== element.Rank) {
             addRow();
             tiedList.length = 0;

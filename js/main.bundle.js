@@ -427,7 +427,6 @@ function DrawTable(contestScreenName, drawUnrated) {
                         var userScreenName = element.UserScreenName;
                         var isUnrated = element.UserIsDeleted ||
                             !isRated(element) ||
-                            element.TotalResult.Count === 0 ||
                             addedSet.has(userScreenName);
                         if (isUnrated)
                             return;
@@ -441,7 +440,7 @@ function DrawTable(contestScreenName, drawUnrated) {
                     ratedCount = 0;
                     table.rows.length = 0;
                     standings.StandingsData.forEach(function (element) {
-                        if ((!drawUnrated && !element.IsRated) || element.TotalResult.Count === 0)
+                        if (!drawUnrated && !element.IsRated)
                             return;
                         if (lastRank !== element.Rank) {
                             addRow();
