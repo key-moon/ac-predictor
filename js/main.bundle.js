@@ -380,7 +380,7 @@ function DrawTable(contestScreenName, drawUnrated) {
     return __awaiter(this, void 0, Promise, function () {
         function isRated(standingData) {
             var rate = standings.Fixed ? standingData.OldRating : standingData.Rating;
-            return standingData.IsRated || (ratedLowerBound <= rate && rate < ratedUpperBound);
+            return standingData.IsRated; // || (ratedLowerBound <= rate && rate < ratedUpperBound);
         }
         function addRow() {
             var fixRank = ratedRank + Math.max(0, ratedCount - 1) / 2;
@@ -388,7 +388,7 @@ function DrawTable(contestScreenName, drawUnrated) {
                 table.rows.push(getRow(standings.Fixed, fixRank, calculator, standingsData));
             });
         }
-        var tableDom, table, calculator, addedSet, value, aperfs, standings, watching, officialResultLink, userScreptInstallLink, warningStr, div, newAPerfs, ratedUpperBound, ratedLowerBound, defaultAPerf, tiedList, ratedRank, lastRank, ratedCount;
+        var tableDom, table, calculator, addedSet, value, aperfs, standings, watching, officialResultLink, userScreptInstallLink, warningStr, div, newAPerfs, ratedUpperBound, defaultAPerf, tiedList, ratedRank, lastRank, ratedCount;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -420,7 +420,6 @@ function DrawTable(contestScreenName, drawUnrated) {
                     }
                     newAPerfs = [];
                     ratedUpperBound = getRatedLimit(contestScreenName);
-                    ratedLowerBound = ratedUpperBound === Infinity ? 1200 : 0;
                     defaultAPerf = getDefaultPerf(ratedUpperBound);
                     calculator.maxPerf = ratedUpperBound + 400;
                     standings.StandingsData.forEach(function (element) {
