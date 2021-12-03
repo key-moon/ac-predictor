@@ -4,8 +4,6 @@ styles: [base.css, standingstable.css]
 scripts: [main.bundle.js]
 ---
 
-<div class="alert alert-warning" role="alert">Rated/Unrated 登録機能追加に伴い、Web サイト版では現在不正確な結果が提供されています。<a href="/userscript">UserScript 版</a>で用いているアルゴリズムでは同様の問題が起こらないため、正確な結果はそちらでご確認下さい。お手数をおかけしてしまい、申し訳ありません。</div>
-
 <div class="my-2">
     <div class="form-row my-0">
         <select class="form-control col-sm-6 col-md-5 col-lg-4" id="contest-selector"></select>
