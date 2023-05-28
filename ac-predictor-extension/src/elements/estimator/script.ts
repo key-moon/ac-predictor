@@ -7,6 +7,7 @@ import { SideMenuElement } from "../../libs/sidemenu/element";
 import { getHistoryDataAsync, getPerformanceHistories } from "../../libs/utils/data";
 import { EstimatorModel } from "./model/EstimatorModel";
 import { userScreenName } from "../../libs/utils/global";
+import { getColor } from "../../libs/utils/rating";
 
 function getLS<T>(key: string): T {
     const val = localStorage.getItem(key);
@@ -83,6 +84,8 @@ class EstimatorElement extends SideMenuElement {
             document.getElementById("estimator-res-desc").innerText = model.resultDesc;
             estimatorInputSelector.value = String(roundedInput);
             estimatorResultSelector.value = String(roundedResult);
+            estimatorInputSelector.className = `form-control user-${getColor(model.inputValue)}`;
+            estimatorResultSelector.className = `form-control user-${getColor(model.resultValue)}`;
 
             const tweetStr = `AtCoderのハンドルネーム: ${userScreenName}\n${model.inputDesc}: ${roundedInput}\n${model.resultDesc}: ${roundedResult}\n`;
             (document.getElementById("estimator-tweet") as HTMLAnchorElement).href = GetEmbedTweetLink(
