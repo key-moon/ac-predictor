@@ -283,8 +283,12 @@ class PredictorElement extends SideMenuElement {
             (document.getElementById("predictor-input-rank") as HTMLInputElement).value = roundedRankValue;
             (document.getElementById("predictor-input-perf") as HTMLInputElement).value = roundedPerfValue;
             (document.getElementById("predictor-input-rate") as HTMLInputElement).value = roundedRateValue;
-            (document.getElementById("predictor-input-perf") as HTMLInputElement).className = `form-control user-${getColor(model.perfValue)}`;
-            (document.getElementById("predictor-input-rate") as HTMLInputElement).className = `form-control user-${getColor(model.rateValue)}`;
+            (document.getElementById(
+                "predictor-input-perf"
+            ) as HTMLInputElement).className = `form-control user-${getColor(model.perfValue)}`;
+            (document.getElementById(
+                "predictor-input-rate"
+            ) as HTMLInputElement).className = `form-control user-${getColor(model.rateValue)}`;
 
             document.getElementById("predictor-alert").innerHTML = `<h5 class='sidemenu-txt'>${model.information}</h5>`;
 
