@@ -7,10 +7,10 @@ beforeEach(() => {
 });
 
 test("availableFor should return proper values", () => {
-  expect(provider.getPerformance("user1")).toBe(true);
-  expect(provider.getPerformance("user2")).toBe(true);
-  expect(provider.getPerformance("user3")).toBe(true);
-  expect(provider.getPerformance("constructor")).toBe(true);
+  expect(provider.availableFor("user1")).toBe(true);
+  expect(provider.availableFor("user2")).toBe(true);
+  expect(provider.availableFor("user3")).toBe(true);
+  expect(provider.availableFor("constructor")).toBe(true);
   expect(provider.availableFor("toString")).toBe(false);
   expect(provider.availableFor("__proto__")).toBe(false);
 });
