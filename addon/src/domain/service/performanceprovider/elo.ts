@@ -1,4 +1,4 @@
-import hasOwnProperty from "../../util/hasOwnProperty";
+import hasOwnProperty from "../../../util/hasOwnProperty";
 import PerformanceProvider from "./performancepredictor";
 
 type Ranks = { [userScreenName: string]: number };
@@ -14,8 +14,12 @@ class EloPerformanceProvicer implements PerformanceProvider {
     this.rankMemo = {};
   }
 
+  availableFor(userScreenName: string): boolean {
+    return hasOwnProperty(this.ranks, userScreenName);
+  }
+
   getPerformance(userScreenName: string): number {
-    if (!hasOwnProperty(this.ranks, userScreenName)){
+    if (!this.availableFor(userScreenName)){
       throw new Error(`User ${userScreenName} not found`);
     }
 

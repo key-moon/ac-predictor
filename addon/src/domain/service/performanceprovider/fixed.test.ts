@@ -6,6 +6,15 @@ beforeEach(() => {
   provider = new FixedPerformanceProvider({ "user1": 0, "user2": 100, "user3": -0.01, "constructor": 1 })
 });
 
+test("availableFor should return proper values", () => {
+  expect(provider.getPerformance("user1")).toBe(true);
+  expect(provider.getPerformance("user2")).toBe(true);
+  expect(provider.getPerformance("user3")).toBe(true);
+  expect(provider.getPerformance("constructor")).toBe(true);
+  expect(provider.availableFor("toString")).toBe(false);
+  expect(provider.availableFor("__proto__")).toBe(false);
+});
+
 test("getPerformance should return proper values", () => {
   expect(provider.getPerformance("user1")).toBe(0);
   expect(provider.getPerformance("user2")).toBe(100);

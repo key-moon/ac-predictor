@@ -1,4 +1,4 @@
-import hasOwnProperty from "../../util/hasOwnProperty";
+import hasOwnProperty from "../../../util/hasOwnProperty";
 import PerformanceProvider from "./performancepredictor";
 
 type Result = { [userScreenName: string]: number };
@@ -8,9 +8,13 @@ class FixedPerformanceProvider implements PerformanceProvider {
   constructor(result: Result) {
     this.result = result;
   }
+  
+  availableFor(userScreenName: string): boolean {
+    return hasOwnProperty(this.result, userScreenName);
+  }
 
   getPerformance(userScreenName: string): number {
-    if (!hasOwnProperty(this.result, userScreenName)){
+    if (!this.availableFor(userScreenName)){
       throw new Error(`User ${userScreenName} not found`);
     }
 
