@@ -1,6 +1,7 @@
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Literal
+from ac_predictor_crawler.logger import logger
 from ac_predictor_crawler.requests import get_atcodersession
 
 @dataclass
@@ -25,5 +26,6 @@ def get_history(user_screen_name: str, contest_type: Literal["algorithm", "heuri
   session = get_atcodersession()
   res = session.get(f"/users/{user_screen_name}/history/json", params={ "contestType":  contest_type })
   if not res.ok:
-    raise Exception(f"failed to get history ({res.reason})", user_screen_name)
+    logger.error(f"failed to get history ({res.reason}), {user_screen_name=}")
+    exit(1)
   return res.json(object_hook=_hook)

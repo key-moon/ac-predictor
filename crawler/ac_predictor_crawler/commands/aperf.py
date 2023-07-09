@@ -1,12 +1,10 @@
-from argparse import ArgumentParser, Namespace
-import logging
-from math import log
-from typing import List, Mapping, Tuple
+from typing import List, Mapping
 from tqdm import  tqdm
-from datetime import datetime
+from argparse import ArgumentParser, Namespace
 from ac_predictor_crawler.client.history import get_history
 from ac_predictor_crawler.client.results import get_results
 
+from ac_predictor_crawler.logger import logger
 from ac_predictor_crawler.client.standings import get_standings
 from ac_predictor_crawler.commands.subcommand import SubCommand
 from ac_predictor_crawler.config import get_repository
@@ -37,9 +35,10 @@ def _handler(res: Namespace):
   histories: Mapping[str, List[int]] = {}
   
   affective_contests = [contest for contest in contests if contest.contest_type == this_info.contest_type and contest.is_rated() and contest.start_time < this_info.start_time]
-  logging.debug(f'{len(affective_contests)=}')
+  logger.debug(f'{len(affective_contests)=}')
   missing_users = set([data["UserScreenName"] for data in standings["StandingsData"] if data["IsRated"] and data["UserScreenName"] not in aperfs])
-  logging.debug(f'{len(missing_users)=}')
+  logger.debug(f'{len(missing_users)=}')
+  logger.info(f"gathering histories from results...")
   for contest in tqdm(sorted(affective_contests, key=lambda contest: contest.start_time)):
     if res.use_results_cache:
       results = repo.get_results(contest.contest_screen_name)
@@ -53,7 +52,8 @@ def _handler(res: Namespace):
       histories[user_screen_name].append(result["Performance"])
 
   missing_users.difference_update(histories.keys())
-  for standingsData in standings["StandingsData"]:
+  logger.info(f"gathering histories...")
+  for standingsData in tqdm(standings["StandingsData"]):
     user_screen_name = standingsData["UserScreenName"]
     if user_screen_name not in missing_users: continue
     if standingsData["UserIsDeleted"]: continue
@@ -66,6 +66,7 @@ def _handler(res: Namespace):
     valid_contests.sort(key=lambda x: x.EndTime)
     histories[user_screen_name] = list(map(lambda x: x.InnerPerformance, valid_contests))
 
+  logger.info(f"gathering histories from results...")
   aperfs.update({ key: calc_aperf(history) for key, history in histories.items() })
   repo.store_aperfs(contest_screen_name, aperfs)
 

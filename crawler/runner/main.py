@@ -8,6 +8,8 @@ from runner.util import has_start_within, is_over, is_rated
 
 RETRY_COUNT = 3
 
+LEVEL = ["--quiet", "", "--verbose"]
+
 repository_path: str
 
 def clean_and_pull():
@@ -27,7 +29,17 @@ def commit_and_push():
 
 def update_contests():
   print("[+] updating contests...")
-  run(["ac-predictor-crawler", "--quiet", "contests"])
+  for retry in range(RETRY_COUNT):
+    try:
+      run(["ac-predictor-crawler", LEVEL[retry], "contests"])
+    except KeyboardInterrupt:
+      raise KeyboardInterrupt()
+    except:
+      print("[*] update failed")
+      continue
+    break
+  else:
+    raise Exception("request failed")
 
 def get_contests():
   return json.load(open(os.path.join(repository_path, "contest-details.json"), "r"))
@@ -39,9 +51,9 @@ def refresh_results():
   for contest in tqdm(contests):
     if not is_rated(contest) or not is_over(contest): continue
     contest_screen_name = contest["contest_screen_name"]
-    for _ in range(RETRY_COUNT):
+    for retry in range(RETRY_COUNT):
       try:
-        run(["ac-predictor-crawler", "--quiet", "results", contest_screen_name], check=True)
+        run(["ac-predictor-crawler", LEVEL[retry], "results", contest_screen_name], check=True)
       except KeyboardInterrupt:
         raise KeyboardInterrupt()
       except:
@@ -56,9 +68,9 @@ def update_aperfs(contests):
   for contest in tqdm(contests):
     if not is_rated(contest): continue
     contest_screen_name = contest["contest_screen_name"]
-    for _ in range(RETRY_COUNT):
+    for retry in range(RETRY_COUNT):
       try:
-        run(["ac-predictor-crawler", "--quiet", "aperfs", "--use-results-cache", contest_screen_name], check=True)
+        run(["ac-predictor-crawler", LEVEL[retry], "aperfs", "--use-results-cache", contest_screen_name], check=True)
       except KeyboardInterrupt:
         raise KeyboardInterrupt()
       except:
@@ -79,7 +91,7 @@ def main():
   update_contests()
   
   contests = get_contests()
-  update_required = [contest for contest in contests if has_start_within(contest, timedelta(hours=25))]
+  update_required = [contest for contest in contests if has_start_within(contest, timedelta(hours=5))]
   print(f"[+] {len(update_required)=}")
   if any(map(aperf_not_calculated, update_required)):
     refresh_results()

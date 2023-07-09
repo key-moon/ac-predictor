@@ -1,7 +1,7 @@
-import os
 import logging
-import configparser
+import os
 from argparse import ArgumentParser
+from ac_predictor_crawler.logger import logger
 
 from ac_predictor_crawler.config import set_repository, set_session_path, set_should_store
 from ac_predictor_crawler.requests import init_atcodersession, save_atcodersession
@@ -42,7 +42,7 @@ def main():
 
   args = parser.parse_args()
 
-  logging.basicConfig(level=logging.DEBUG if args.verbose else logging.WARN if args.quiet else logging.INFO)
+  logger.setLevel(logging.DEBUG if args.verbose else logging.WARN if args.quiet else logging.INFO)
 
   session_path = os.path.expanduser(os.environ.get(SESSION_PATH_KEY, "~/.config/ac-predictor-crawler/session.txt"))
   set_session_path(session_path)

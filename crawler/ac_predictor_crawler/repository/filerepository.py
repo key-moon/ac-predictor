@@ -2,10 +2,12 @@ from datetime import datetime, timedelta, timezone
 import json
 import os.path as path
 from typing import List, Mapping
+from venv import logger
 
 from ac_predictor_crawler.domain.contestinfo import ContestInfo
 from ac_predictor_crawler.domain.raterange import RateRange
 from ac_predictor_crawler.util.file import write
+from ac_predictor_crawler.logger import logger
 
 class FileRepository:
   def __init__(self, path: str) -> None:    
@@ -13,18 +15,20 @@ class FileRepository:
 
   def _get_file(self, relative_path: str):
     file_path = path.join(self.path, relative_path)
+    logger.debug(f"read file from {relative_path}")
     with open(file_path, "rb") as f:
       return f.read()
 
   def _save_file(self, relative_path: str, data: bytes):
     file_path = path.join(self.path, relative_path)
+    logger.debug(f"write file to {file_path}")
     write(file_path, data)
 
   def get_contests(self) -> List[ContestInfo]:
     content = self._get_file("contest-details.json")
     def hook(obj):
       if "start_time" in obj:
-        obj["start_time"] = datetime.fromtimestamp(obj["start_time"], tz=timezone.utc)
+        obj["start_time"] = datetime.fromtimestamp(obj["start_time"])
         obj["duration"] = timedelta(seconds=obj["duration"])
         obj["ratedrange"] = RateRange(obj["ratedrange"][0], obj["ratedrange"][1])
         return ContestInfo(**obj)
@@ -49,7 +53,7 @@ class FileRepository:
     contests.sort(key=lambda x: x.start_time, reverse=True)
     self._save_file("contest-details.json", json.dumps(contests, default=hook).encode())
     # legacy
-    self._save_file("contests.json", json.dumps([c.contest_screen_name for c in contests if c.start_time <= datetime.now(timezone.utc) + timedelta(hours=3)]).encode())
+    self._save_file("contests.json", json.dumps([c.contest_screen_name for c in contests if c.start_time <= datetime.now() + timedelta(hours=3)]).encode())
 
   def _aperfs_path(self, contest_screen_name: str):
     return f"aperfs/{contest_screen_name}.json"

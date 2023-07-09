@@ -1,5 +1,6 @@
 from argparse import ArgumentParser, Namespace
-import logging
+
+from ac_predictor_crawler.logger import logger
 from ac_predictor_crawler.client.contests import get_archived_contests, get_upcoming_contests
 from ac_predictor_crawler.commands.subcommand import SubCommand
 from ac_predictor_crawler.config import get_repository
@@ -11,13 +12,17 @@ def _handler(res: Namespace):
   repo = get_repository()
   if res.cache:
     try:
+      logger.info("fetching contests from cache...")
       contests = repo.get_contests()
     except:
-      logging.warn("contests cache not found")
+      logger.warn("contests cache not found")
+      logger.info("fetching contests...")
       contests = get_archived_contests()
   else:
+    logger.info("fetching contests...")
     contests = get_archived_contests()
 
+  logger.info("fetching upcomings...")
   upcomings = get_upcoming_contests()
   for upcoming in upcomings:
     if any([c.contest_screen_name == upcoming.contest_screen_name for c in contests]):

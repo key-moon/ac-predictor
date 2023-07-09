@@ -1,12 +1,12 @@
-import logging
 
 from typing import List
 from datetime import datetime, timedelta
 from bs4 import BeautifulSoup, ResultSet, Tag
 
-from ac_predictor_crawler.domain.contestinfo import ContestInfo
-from ac_predictor_crawler.domain.raterange import RateRange
+from ac_predictor_crawler.logger import logger
 from ac_predictor_crawler.requests import get_atcodersession
+from ac_predictor_crawler.domain.raterange import RateRange
+from ac_predictor_crawler.domain.contestinfo import ContestInfo
 
 def parse_contest_row(tr: Tag):
   tds: ResultSet[Tag] = tr.find_all("td")
@@ -35,7 +35,7 @@ def parse_contest_row(tr: Tag):
   rated_range = RateRange.parse(rated_range_text)
 
   parsed = ContestInfo(start_time, contest_type, contest_name, contest_screen_name, duration, rated_range)
-  logging.debug(f"{parsed=}")
+  logger.debug(f"{parsed=}")
   return parsed
 
 def get_upcoming_contests():
@@ -48,7 +48,7 @@ def get_upcoming_contests():
   trs: ResultSet[Tag] = tbody.find_all("tr")
   contests: List[ContestInfo] = []
 
-  logging.debug(f"found {len(trs)} row(s)")
+  logger.debug(f"found {len(trs)} row(s)")
   for tr in trs:
     contests.append(parse_contest_row(tr))
 
@@ -68,7 +68,7 @@ def get_archived_contests():
   contests: List[ContestInfo] = []
 
   for page in range(1, last_page + 1):
-    logging.debug(f"page {page}/{last_page}")
+    logger.debug(f"page {page}/{last_page}")
     parsed = BeautifulSoup(session.get("/contests/archive", params={ "lang": "en", "page": page }).text, features="html.parser")
     upcoming_div = parsed.find(class_="table-responsive")
     if type(upcoming_div) is not Tag: raise Exception("invalid html")
@@ -76,7 +76,7 @@ def get_archived_contests():
     if type(tbody) is not Tag: raise Exception("invalid html")
     trs: ResultSet[Tag] = tbody.find_all("tr")
 
-    logging.debug(f"found {len(trs)} row(s)")
+    logger.debug(f"found {len(trs)} row(s)")
     for tr in trs:
       contests.append(parse_contest_row(tr))
 

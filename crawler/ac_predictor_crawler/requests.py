@@ -1,4 +1,3 @@
-import logging
 import os
 import time
 
@@ -7,8 +6,9 @@ from typing import Optional
 from requests import Session
 from urllib.parse import urljoin
 
-from ac_predictor_crawler.config import get_atcoder_base_url, get_session_path
+from ac_predictor_crawler.logger import logger
 from ac_predictor_crawler.util.file import write
+from ac_predictor_crawler.config import get_atcoder_base_url, get_session_path
 
 class AtCoderSession(Session):
   def __init__(self, base_url: Optional[str]=None, interval=timedelta(seconds=2)):
@@ -24,6 +24,7 @@ class AtCoderSession(Session):
     self._wait_interval()
 
     joined_url = urljoin(self.base_url, url)
+    logger.debug(f"requests to {joined_url}")
     res = super().request(method, joined_url, *args, **kwargs)
     self._update_session_info(res.text)
 
@@ -45,12 +46,13 @@ class AtCoderSession(Session):
     return res.status_code == 200
 
   def check_logged_in(self):
-    if self.user_screen_name == "":
-      raise Exception("not logged in")
+    if self.user_screen_name is None or self.user_screen_name == "":
+      logger.error("not logged in")
+      exit(1)
 
   def _wait_interval(self):
     wait = max(((self.last_request + self.interval) - datetime.now()).total_seconds(), 0)
-    logging.debug(f"waiting {wait} secs...")
+    logger.debug(f"waiting {wait} secs...")
     time.sleep(wait)
     self.last_request = datetime.now()
 
@@ -67,6 +69,7 @@ class AtCoderSession(Session):
       return match.group(1)
     self.csrf_token = get_js_variable("csrfToken")
     self.user_screen_name = get_js_variable("userScreenName")
+    logger.debug(f"session updated. user: {self.user_screen_name}")
 
 _session: AtCoderSession
 def init_atcodersession():

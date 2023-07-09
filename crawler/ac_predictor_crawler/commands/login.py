@@ -1,7 +1,7 @@
-import logging
 import getpass
-
 from argparse import ArgumentParser, Namespace
+
+from ac_predictor_crawler.logger import logger
 from ac_predictor_crawler.client.results import get_results
 from ac_predictor_crawler.commands.subcommand import SubCommand
 from ac_predictor_crawler.config import get_repository
@@ -20,9 +20,9 @@ def _handler(res: Namespace):
 
   session = get_atcodersession()
   if session.login(user_screen_name, password):
-    logging.info("login succeeded")
+    logger.info("login succeeded")
   else:
-    logging.error("login failed")
+    logger.error("login failed")
     exit(1)
 
 login_command = SubCommand(
