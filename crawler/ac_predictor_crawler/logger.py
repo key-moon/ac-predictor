@@ -6,7 +6,7 @@ BOLD = "\033[1m"
 BANNER = {
   "DEBUG": ("", "[-]"),
   "INFO":  ("\033[32m", "[*]"), # Green
-  "WARN":  ("\033[33m", "[+]"), # Yellow
+  "WARNING":  ("\033[33m", "[+]"), # Yellow
   "ERROR": ("\033[31m", "[!]"), # Red
   "CRITICAL": ("\033[35m", "CRITICAL: "), # Purple
 }

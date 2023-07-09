@@ -26,7 +26,11 @@ def _handler(res: Namespace):
     standings = get_standings(contest_screen_name)
 
   if res.use_aperf_cache:
-    aperfs = repo.get_aperfs(contest_screen_name)
+    try:
+      aperfs = repo.get_aperfs(contest_screen_name)
+    except:
+      logger.warn("aperfs cache not found")
+      aperfs = {}
   else:
     aperfs = {}
 

@@ -3,7 +3,6 @@ from typing import List
 
 def unpositivize_rating(rating: float):
   if rating >= 400: return rating
-  print(rating)
   return 400.0 + 400.0 * log(rating / 400.0)
 
 def calc_aperf(performances: List[int]):

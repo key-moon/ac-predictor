@@ -1,6 +1,6 @@
 
 from typing import List
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from bs4 import BeautifulSoup, ResultSet, Tag
 
 from ac_predictor_crawler.logger import logger
@@ -14,7 +14,7 @@ def parse_contest_row(tr: Tag):
   datetime_anchor = tds[0].find("a")
   if type(datetime_anchor) is not Tag: raise Exception("invalid html")
   datetime_str = datetime_anchor["href"].split("?")[1][4:17] # type: ignore
-  start_time = datetime.strptime(datetime_str, "%Y%m%dT%H%M") + timedelta(hours=-9)
+  start_time = datetime.strptime(datetime_str, "%Y%m%dT%H%M").replace(tzinfo=timezone(timedelta(hours=9)))
 
   contest_type_span = tds[1].find("span")
   if type(contest_type_span) is not Tag: raise Exception("invalid html")

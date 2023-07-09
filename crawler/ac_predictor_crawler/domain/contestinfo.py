@@ -1,5 +1,5 @@
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from dataclasses import dataclass
 from typing import Literal
 
@@ -16,4 +16,4 @@ class ContestInfo:
   def is_rated(self):
     return self.ratedrange.has_value()
   def is_over(self):
-    return self.start_time + self.duration <= datetime.now()
+    return self.start_time + self.duration <= datetime.now(timezone.utc)

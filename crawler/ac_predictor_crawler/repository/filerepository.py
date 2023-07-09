@@ -28,7 +28,7 @@ class FileRepository:
     content = self._get_file("contest-details.json")
     def hook(obj):
       if "start_time" in obj:
-        obj["start_time"] = datetime.fromtimestamp(obj["start_time"])
+        obj["start_time"] = datetime.fromtimestamp(obj["start_time"], tz=timezone.utc)
         obj["duration"] = timedelta(seconds=obj["duration"])
         obj["ratedrange"] = RateRange(obj["ratedrange"][0], obj["ratedrange"][1])
         return ContestInfo(**obj)
@@ -53,7 +53,7 @@ class FileRepository:
     contests.sort(key=lambda x: x.start_time, reverse=True)
     self._save_file("contest-details.json", json.dumps(contests, default=hook).encode())
     # legacy
-    self._save_file("contests.json", json.dumps([c.contest_screen_name for c in contests if c.start_time <= datetime.now() + timedelta(hours=3)]).encode())
+    self._save_file("contests.json", json.dumps([c.contest_screen_name for c in contests if c.start_time <= datetime.now(timezone.utc) + timedelta(hours=3)]).encode())
 
   def _aperfs_path(self, contest_screen_name: str):
     return f"aperfs/{contest_screen_name}.json"

@@ -46,6 +46,7 @@ class AtCoderSession(Session):
     return res.status_code == 200
 
   def check_logged_in(self):
+    self._ensure_session_info()
     if self.user_screen_name is None or self.user_screen_name == "":
       logger.error("not logged in")
       exit(1)
