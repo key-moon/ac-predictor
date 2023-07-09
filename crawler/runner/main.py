@@ -4,7 +4,7 @@ import json
 
 from tqdm import tqdm
 from subprocess import run
-from runner.util import has_start_within, is_over, is_rated
+from runner.util import has_start_within, is_over, is_rated, is_running
 
 RETRY_COUNT = 3
 
@@ -79,10 +79,9 @@ def update_aperfs(contests):
       break
     else:
       raise Exception("request failed")
-    
 
 def aperf_not_calculated(contest):
-  return not os.path.exists(os.path.join(repository_path, f"results/{contest['contest_screen_name']}.json"))
+  return not os.path.exists(os.path.join(repository_path, f"aperfs/{contest['contest_screen_name']}.json"))
 def main():
   global repository_path
   repository_path = os.environ["REPOSITORY_PATH"]
@@ -91,7 +90,7 @@ def main():
   update_contests()
   
   contests = get_contests()
-  update_required = [contest for contest in contests if has_start_within(contest, timedelta(hours=5))]
+  update_required = [contest for contest in contests if has_start_within(contest, timedelta(hours=5)) or is_running(contest)]
   print(f"[+] {len(update_required)=}")
   if any(map(aperf_not_calculated, update_required)):
     refresh_results()
