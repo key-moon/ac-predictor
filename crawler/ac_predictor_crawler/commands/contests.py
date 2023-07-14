@@ -14,8 +14,8 @@ def _handler(res: Namespace):
     try:
       logger.info("fetching contests from cache...")
       contests = repo.get_contests()
-    except:
-      logger.warn("contests cache not found")
+    except Exception as e:
+      logger.warn(f"contests cache not found {e}")
       logger.info("fetching contests...")
       contests = get_archived_contests()
   else:

@@ -61,7 +61,7 @@ def refresh_results():
   print("[+] refreshing results caches...")
   for contest in tqdm(contests):
     if not is_rated(contest) or not is_over(contest): continue
-    contest_screen_name = contest["contest_screen_name"]
+    contest_screen_name = contest["contestScreenName"]
     for retry in range(RETRY_COUNT):
       try:
         run(["ac-predictor-crawler", LEVEL[retry], "results", contest_screen_name], check=True)
@@ -78,7 +78,7 @@ def update_aperfs(contests):
   print("[+] calculating  aperfs...")
   for contest in tqdm(contests):
     if not is_rated(contest): continue
-    contest_screen_name = contest["contest_screen_name"]
+    contest_screen_name = contest["contestScreenName"]
     for retry in range(RETRY_COUNT):
       try:
         run(["ac-predictor-crawler", LEVEL[retry], "aperfs", "--use-results-cache", contest_screen_name], check=True)
@@ -92,7 +92,7 @@ def update_aperfs(contests):
       raise Exception("request failed")
 
 def aperf_not_calculated(contest):
-  return not os.path.exists(os.path.join(repository_path, f"aperfs/{contest['contest_screen_name']}.json"))
+  return not os.path.exists(os.path.join(repository_path, f"aperfs/{contest['contestScreenName']}.json"))
 
 def main():
   global repository_path

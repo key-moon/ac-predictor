@@ -27,12 +27,16 @@ class FileRepository:
   def get_contests(self) -> List[ContestInfo]:
     content = self._get_file("contest-details.json")
     def hook(obj):
-      if "start_time" in obj:
-        obj["start_time"] = datetime.fromtimestamp(obj["start_time"], tz=timezone.utc)
-        obj["duration"] = timedelta(seconds=obj["duration"])
-        obj["ratedrange"] = RateRange(obj["ratedrange"][0], obj["ratedrange"][1])
-        return ContestInfo(**obj)
-      raise obj
+      if "startTime" in obj:
+        args = {}
+        args["contest_name"] = obj["contestName"]
+        args["contest_screen_name"] = obj["contestScreenName"]
+        args["contest_type"] = obj["contestType"]
+        args["start_time"] = datetime.fromtimestamp(obj["startTime"], tz=timezone.utc)
+        args["duration"] = timedelta(seconds=obj["duration"])
+        args["ratedrange"] = RateRange(obj["ratedrange"][0], obj["ratedrange"][1])
+        return ContestInfo(**args)
+      return obj
 
     contests = json.loads(content, object_hook=hook)
     if not (isinstance(contests, list) and all([isinstance(contest, ContestInfo) for contest in contests])):
@@ -42,10 +46,10 @@ class FileRepository:
     def hook(elem):
       if isinstance(elem, ContestInfo):
         return {
-          "contest_name": elem.contest_name,
-          "contest_screen_name": elem.contest_screen_name,
-          "contest_type": elem.contest_type,
-          "start_time": int(elem.start_time.timestamp()),
+          "contestName": elem.contest_name,
+          "contestScreenName": elem.contest_screen_name,
+          "contestType": elem.contest_type,
+          "startTime": int(elem.start_time.timestamp()),
           "duration": int(elem.duration.total_seconds()),
           "ratedrange": [elem.ratedrange.lower, elem.ratedrange.upper],
         }
