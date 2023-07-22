@@ -2,13 +2,15 @@ import toSignedString from "../util/toSignedString";
 import getRatingSpan from "./components/ratingspan";
 import getSpan from "./components/span";
 
-type RatedResultData = { type: "rated", performance: number, oldRating: number, newRating: number }
-type UnratedResultData = { type: "unrated", performance: number, oldRating: number }
-type DefferedResultData = { type: "deffered", performance: number, oldRating: number, newRatingCalculator: () => number }
+type RatedResultData = { type: "rated", performance: number, oldRating: number, newRating: number };
+type ErrorResultData = { type: "error", message: string };
+type UnratedResultData = { type: "unrated", performance: number, oldRating: number };
+type DefferedResultData = { type: "deffered", performance: number, oldRating: number, newRatingCalculator: () => Promise<number> };
 
-type ResultData = RatedResultData | UnratedResultData | DefferedResultData
-type ResultsData = { [userScreenName: string]: ResultData }
+type NonErrorResultData = RatedResultData | UnratedResultData | DefferedResultData;
+type ResultData = NonErrorResultData | ErrorResultData;
 
+type ResultDataProvider = (userScreenName: string) => ResultData;
 
 function getFadedSpan(innerElements: (string | HTMLElement)[]) {
   return getSpan(innerElements, ["grey"]);
@@ -44,12 +46,12 @@ function getDefferedRatingElem(result: DefferedResultData): HTMLElement {
     getFadedSpan(["(click to calculate)"])
   );
   
-  function listener() {
+  async function listener() {
     elem.removeEventListener("click", listener);
     elem.replaceChildren(getFadedSpan(["loading..."]));
     let newRating;
     try {
-      newRating = result.newRatingCalculator();
+      newRating = await result.newRatingCalculator();
     }
     catch(e) {
       elem.replaceChildren(getSpan(["error on load"], []), " ", getSpan(["(hover to see details)"], []), getSpan([Object.prototype.toString.call(e)], ["tooltiptext"]));
@@ -64,14 +66,23 @@ function getDefferedRatingElem(result: DefferedResultData): HTMLElement {
   return elem;
 }
 
+function getErrorRatingElem(result: ErrorResultData): HTMLElement {
+  const elem = document.createElement("div");
+  elem.append(getSpan(["error on load"], []), " ", getSpan(["(hover to see details)"], []), getSpan([result.message], ["tooltiptext"]));
+  elem.classList.add("tooltip");
+  return elem;
+}
+
 function getRatingElem(result: ResultData) {
   if (result.type == "rated") return getRatedRatingElem(result);
   if (result.type == "unrated") return getUnratedRatingElem(result);
   if (result.type == "deffered") return getDefferedRatingElem(result);
+  if (result.type == "error") return getErrorRatingElem(result);
   throw new Error("unreachable");
 }
 
 function getPerfElem(result: ResultData) {
+  if (result.type == "error") return getSpan(["-"], []);
   return getRatingSpan(result.performance);
 }
 
@@ -84,7 +95,7 @@ function modifyHeader(header: HTMLElement) {
 function isFooter(row: HTMLElement) {
   return row.firstElementChild?.classList.contains("colspan");
 }
-function modifyStandingsRow(row: HTMLElement, results: ResultsData) {
+function modifyStandingsRow(row: HTMLElement, results: ResultDataProvider) {
   const userScreenName = row.querySelector(".standings-username .username span")?.textContent;
 
   const perfCell = document.createElement("td"); 
@@ -92,13 +103,14 @@ function modifyStandingsRow(row: HTMLElement, results: ResultsData) {
   const ratingCell = document.createElement("td"); 
   ratingCell.classList.add("ac-predictor-standings-elem");
 
+  
   if (userScreenName === null || userScreenName === undefined) {
     console.warn(`user ${userScreenName} not found`, results);
     perfCell.append("-");
     ratingCell.append("-");    
   }
   else {
-    const result = results[userScreenName];
+    const result = results(userScreenName);
     perfCell.append(getPerfElem(result));
     ratingCell.append(getRatingElem(result));
   }  
@@ -115,10 +127,13 @@ function modifyFooter(footer: HTMLElement) {
 
 class StandingsTableView {
   private element: HTMLTableElement;
-  constructor(element: HTMLTableElement) {
+  private provider: ResultDataProvider;
+  constructor(element: HTMLTableElement, resultDataProvider: ResultDataProvider) {
     this.element = element;
+    this.provider = resultDataProvider;
+    this.initHandler();
   }
-  update(results: ResultsData): void {
+  update(): void {
     this.removeOldElement();
     
     const header = this.element.querySelector<HTMLElement>("thead tr");
@@ -127,16 +142,21 @@ class StandingsTableView {
   
     this.element.querySelectorAll<HTMLElement>("tbody tr").forEach((row) => {
       if (isFooter(row)) modifyFooter(row);
-      else modifyStandingsRow(row, results);
+      else modifyStandingsRow(row, this.provider);
     });
   }
   private removeOldElement(): void {
     this.element.querySelectorAll(".ac-predictor-standings-elem").forEach((elem) => elem.remove());
   }
+  private initHandler() {
+    new MutationObserver(this.update).observe(this.element.tBodies[0], {
+      childList: true,
+    });
+  }
 
-  static Get() {
+  static Get(resultDataProvider: ResultDataProvider) {
     const tableElem = document.querySelector(".table-responsive table") as HTMLTableElement;
-    return new StandingsTableView(tableElem);
+    return new StandingsTableView(tableElem, resultDataProvider);
   }
 }
 
