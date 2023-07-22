@@ -21,17 +21,40 @@ type Result = {
   AtCoderRank: number,
 };
 
-export function convertToResultObject(results: Result[]): { [userScreenName: string]: number } {
-  const res: { [userScreenName: string]: number } = {};
-  for (const result of results) {
-    res[result.UserScreenName] = result.Performance;
+class ResultsWrapper {
+  data: Result[];
+  constructor(data: Result[]) {
+    this.data = data;
   }
-  return res;
+
+  public toPerformances() {
+    const res: { [userScreenName: string]: number } = {};
+    for (const result of this.data) {
+      res[result.UserScreenName] = result.Performance;
+    }
+    return res;
+  }
+  
+  public toIsRatedMaps(): { [userScreenName: string]: boolean } {
+    const res: { [userScreenName: string]: boolean } = {};
+    for (const result of this.data) {
+      res[result.UserScreenName] = result.IsRated;
+    }
+    return res;
+  }
+
+  public toOldRatings(): { [userScreenName: string]: number } {
+    const res: { [userScreenName: string]: number } = {};
+    for (const result of this.data) {
+      res[result.UserScreenName] = result.OldRating;
+    }
+    return res;
+  }
 }
 
 const RESULTS_CACHE_DURATION = 10 * 1000;
 const cache = new Cache<Result[]>(RESULTS_CACHE_DURATION);
-export async function getResults(contestScreenName: string): Promise<Result[]> {
+export default async function getResults(contestScreenName: string): Promise<ResultsWrapper> {
   if (!cache.has(contestScreenName)) {
     const result = await fetch(`https://atcoder.jp/contests/${contestScreenName}/results/json`);
     if (!result.ok) {
@@ -39,7 +62,7 @@ export async function getResults(contestScreenName: string): Promise<Result[]> {
     }
     cache.set(contestScreenName, await result.json());
   }
-  return cache.get(contestScreenName)!;
+  return new ResultsWrapper(cache.get(contestScreenName)!);
 }
 
 addHandler(

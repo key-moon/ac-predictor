@@ -57,7 +57,7 @@ class StandingsWrapper {
   constructor(data: Standings) {
     this.data = data;
   }
-  getRanks(): { [userScreenName: string]: number } {
+  toRanks(): { [userScreenName: string]: number } {
     const res: { [userScreenName: string]: number } = {};
     for (const data of this.data.StandingsData) {
       res[data.UserScreenName] = data.Rank;
@@ -65,12 +65,28 @@ class StandingsWrapper {
     return res;
   }
 
-  getRatedUsers(): string[] {
+  toRatedUsers(): string[] {
     const res: string[] = [];
     for (const data of this.data.StandingsData) {
       if (data.IsRated) {
         res.push(data.UserScreenName);
       }
+    }
+    return res;
+  }
+
+  toIsRatedMaps(): { [userScreenName: string]: boolean } {
+    const res: { [userScreenName: string]: boolean } = {};
+    for (const data of this.data.StandingsData) {
+      res[data.UserScreenName] = data.IsRated;
+    }
+    return res;
+  }
+
+  toOldRatings(): { [userScreenName: string]: number } {
+    const res: { [userScreenName: string]: number } = {};
+    for (const data of this.data.StandingsData) {
+      res[data.UserScreenName] = this.data.Fixed ? data.OldRating : data.Rating;
     }
     return res;
   }
