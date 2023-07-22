@@ -67,7 +67,7 @@ export default class StandingsPageController {
       if (!this.performanceProvider.availableFor(userScreenName)) return { "type": "error", "message": "performance not available" };
 
       const originalPerformance = this.performanceProvider.getPerformance(userScreenName);
-      const positivizedPerformance = positivizeRating(originalPerformance);
+      const positivizedPerformance = Math.round(positivizeRating(originalPerformance));
       if (this.isRatedMaps[userScreenName]) {
         if (!hasOwnProperty(this.ratingProviders, userScreenName)) return { "type": "error", "message": `ratingProvider not found for ${userScreenName}` };
         const ratingProvider = this.ratingProviders[userScreenName];
