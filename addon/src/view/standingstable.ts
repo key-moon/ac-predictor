@@ -105,7 +105,6 @@ function modifyStandingsRow(row: HTMLElement, results: ResultDataProvider) {
 
   
   if (userScreenName === null || userScreenName === undefined) {
-    console.warn(`user ${userScreenName} not found`);
     perfCell.append("-");
     ratingCell.append("-");    
   }
@@ -149,7 +148,7 @@ class StandingsTableView {
     this.element.querySelectorAll(".ac-predictor-standings-elem").forEach((elem) => elem.remove());
   }
   private initHandler() {
-    new MutationObserver(this.update).observe(this.element.tBodies[0], {
+    new MutationObserver(() => this.update()).observe(this.element.tBodies[0], {
       childList: true,
     });
   }
