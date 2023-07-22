@@ -9,7 +9,7 @@ class FromHistoryHeuristicRatingProvider implements RatingProvider {
 
   getRating(newPerformance: number): number {
     const performances = [...this.performances, newPerformance];
-    return calcHeuristicRatingFromHistory(performances);
+    return Math.round(calcHeuristicRatingFromHistory(performances));
   }
 }
 

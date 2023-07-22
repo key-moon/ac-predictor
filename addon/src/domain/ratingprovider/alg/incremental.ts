@@ -10,7 +10,7 @@ class IncrementalAlgRatingProvider implements RatingProvider {
   }
 
   getRating(newPerformance: number): number {
-    return calcAlgRatingFromLast(this.rating, newPerformance, this.competitions);    
+    return Math.round(calcAlgRatingFromLast(this.rating, newPerformance, this.competitions));
   }
 }
 
