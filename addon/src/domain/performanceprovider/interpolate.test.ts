@@ -1,7 +1,7 @@
-import ComplementPerformanceProvider from "./complement";
+import InterpolatePerformanceProvider from "./interpolate";
 import PerformanceProvider from "./performancepredictor";
 
-let provider: ComplementPerformanceProvider;
+let provider: InterpolatePerformanceProvider;
 let basePerformanceProviderMock: PerformanceProvider
 
 beforeEach(() => {
@@ -10,7 +10,7 @@ beforeEach(() => {
     getPerformance: jest.fn((val) => { if (val == "user3") return 2; if (val == "user5") return 1; throw new Error(); }),
     getPerformances: jest.fn()
   };
-  provider = new ComplementPerformanceProvider({ "user1": 1, "user2": 2, "user3": 2, "user4": 4, "user5": 5, "user6": 6 }, basePerformanceProviderMock);
+  provider = new InterpolatePerformanceProvider({ "user1": 1, "user2": 2, "user3": 2, "user4": 4, "user5": 5, "user6": 6 }, basePerformanceProviderMock);
 });
 
 test("availableFor should return proper values", () => {

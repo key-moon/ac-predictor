@@ -18,7 +18,7 @@ function getMaxRank(ranks: Ranks) {
 }
 
 // TODO: 命名
-class ComplementPerformanceProvider implements PerformanceProvider {
+class InterpolatePerformanceProvider implements PerformanceProvider {
   private ranks: Ranks;
   private maxRank: number;
   private rankToUsers: RankToUsers;
@@ -80,4 +80,4 @@ class ComplementPerformanceProvider implements PerformanceProvider {
   }
 }
 
-export default ComplementPerformanceProvider
+export default InterpolatePerformanceProvider
