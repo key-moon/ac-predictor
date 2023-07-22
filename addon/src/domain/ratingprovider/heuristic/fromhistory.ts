@@ -1,5 +1,4 @@
-import hasOwnProperty from "../../../../util/hasOwnProperty";
-import { calcRatingFromHistory } from "../../../util/rating";
+import hasOwnProperty from "../../../util/hasOwnProperty";
 import RatingProvider from "../ratingprovider";
 
 type Result = { performance: number, date: Date };

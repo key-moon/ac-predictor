@@ -1,4 +1,4 @@
-import { calcRatingFromLast } from "../../../util/rating";
+import { calcRatingFromLast } from "../../rating";
 import RatingProvider from "../ratingprovider";
 
 class IncrementalAlgRatingProvider implements RatingProvider {

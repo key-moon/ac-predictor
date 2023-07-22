@@ -1,4 +1,4 @@
-import toSignedString from "../domain/util/toSignedString";
+import toSignedString from "../util/toSignedString";
 import getRatingSpan from "./components/ratingspan";
 import getSpan from "./components/span";
 
@@ -132,6 +132,11 @@ class StandingsTableView {
   }
   private removeOldElement(): void {
     this.element.querySelectorAll(".ac-predictor-standings-elem").forEach((elem) => elem.remove());
+  }
+
+  static Get() {
+    const tableElem = document.querySelector(".table-responsive table") as HTMLTableElement;
+    return new StandingsTableView(tableElem);
   }
 }
 
