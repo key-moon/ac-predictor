@@ -4,7 +4,6 @@ type Result = {
   OldRating: number,
   NewRating: number,
   Performance: number,
-  InnerPerformance: number,
   ContestName: string,
   ContestNameEn: string,
   ContestScreenName: string,
