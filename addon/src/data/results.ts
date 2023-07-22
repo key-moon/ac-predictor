@@ -30,6 +30,7 @@ class ResultsWrapper {
   public toPerformances() {
     const res: { [userScreenName: string]: number } = {};
     for (const result of this.data) {
+      if (!result.IsRated) continue;
       res[result.UserScreenName] = result.Performance;
     }
     return res;
