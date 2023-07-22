@@ -107,7 +107,7 @@ export default async function getStandings(contestScreenName: string): Promise<S
 
 addHandler(
   (content, path) => {
-    const match = path.match(/^\/contests\/(.*)\/standings\/json$/);
+    const match = path.match(/^\/contests\/([^/]*)\/standings\/json$/);
     if (!match) return;
     const contestScreenName = match[1];
     cache.set(contestScreenName, JSON.parse(content));

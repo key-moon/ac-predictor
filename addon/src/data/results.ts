@@ -67,7 +67,7 @@ export default async function getResults(contestScreenName: string): Promise<Res
 
 addHandler(
   (content, path) => {
-    const match = path.match(/^\/contests\/(.*)\/results\/json$/);
+    const match = path.match(/^\/contests\/([^/]*)\/results\/json$/);
     if (!match) return;
     const contestScreenName = match[1];
     cache.set(contestScreenName, JSON.parse(content));

@@ -105,7 +105,7 @@ function modifyStandingsRow(row: HTMLElement, results: ResultDataProvider) {
 
   
   if (userScreenName === null || userScreenName === undefined) {
-    console.warn(`user ${userScreenName} not found`, results);
+    console.warn(`user ${userScreenName} not found`);
     perfCell.append("-");
     ratingCell.append("-");    
   }

@@ -19,7 +19,7 @@ import StandingsTableView from "../view/standingstable";
 
 type RatingProviderInfo = { provider: RatingProvider, lazy: false } | { providerGenerator: () => Promise<RatingProvider>, lazy: true }
 
-class StandingsPageController {
+export default class StandingsPageController {
   contestDetails?: ContestDetails;
 
   performanceProvider?: PerformanceProvider;
@@ -30,9 +30,24 @@ class StandingsPageController {
   standingsTableView?: StandingsTableView;
 
   public async register() {
+    const loaded = () => !!document.getElementById("standings-tbody");
+    if (loaded()) {
+      this.initialize();
+      return;
+    }
+    const loadingElem = document.querySelector("#vue-standings .loading-show");
+    if (!loadingElem) {
+      throw new Error("loading elem not found");
+    }
+    new MutationObserver(() => {
+      if (loaded()) this.initialize();
+    }).observe(loadingElem, { attributes: true });
+  }
+
+  private async initialize() {
     const contestScreenName = getContestScreenName();
 
-    const contestDetailsList = await getContestDetailsList(contestScreenName);    
+    const contestDetailsList = await getContestDetailsList();    
     const contestDetails = contestDetailsList.find(details => details.contestScreenName == contestScreenName);
     if (contestDetails === undefined) {
       throw new Error("contest details not found");
@@ -68,9 +83,10 @@ class StandingsPageController {
       }
     });
     await this.updateData();
+    this.standingsTableView.update();
   }
 
-  async updateData() {
+  private async updateData() {
     if (!this.contestDetails) throw new Error("contestDetails missing");
 
     const standings = await getStandings(this.contestDetails.contestScreenName);
