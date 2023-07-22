@@ -6,7 +6,7 @@ export default class ContestDetails {
   contestType: "algorithm" | "heuristic"
   startTime: Date
   duration: number
-  ratedRange: Range
+  ratedrange: Range
   
   constructor(contestName: string, contestScreenName: string, contestType: "algorithm" | "heuristic", startTime: Date, duration: number, ratedRange: Range) {
     this.contestName = contestName;
@@ -14,7 +14,7 @@ export default class ContestDetails {
     this.contestType = contestType;
     this.startTime = startTime;
     this.duration = duration;
-    this.ratedRange = ratedRange;
+    this.ratedrange = ratedRange;
   }
 
   public get endTime(): Date {
@@ -24,13 +24,13 @@ export default class ContestDetails {
   public get defaultAPerf(): number {
     if (this.contestType == "heuristic") return 1000;
 
-    if (!this.ratedRange.hasValue()) {
+    if (!this.ratedrange.hasValue()) {
       throw new Error("unrated contest");
     }
 
-    if (this.ratedRange.end == 2000) return 800;
-    if (this.ratedRange.end == 2800) return 1000;
-    if (4000 <= this.ratedRange.end) return 1200;
+    if (this.ratedrange.end == 2000) return 800;
+    if (this.ratedrange.end == 2800) return 1000;
+    if (4000 <= this.ratedrange.end) return 1200;
 
     throw new Error("unknown contest type");
   }
