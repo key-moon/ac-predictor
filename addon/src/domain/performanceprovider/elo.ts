@@ -4,13 +4,15 @@ import PerformanceProvider from "./performanceprovider";
 type Ranks = { [userScreenName: string]: number };
 type Ratings = number[];
 
-class EloPerformanceProvicer implements PerformanceProvider {
+class EloPerformanceProvider implements PerformanceProvider {
   ranks: Ranks
   ratings: Ratings
+  cap: number
   private rankMemo: { [rank: number]: number };
-  constructor(ranks: Ranks, ratings: Ratings) {
+  constructor(ranks: Ranks, ratings: Ratings, cap: number) {
     this.ranks = ranks;
     this.ratings = ratings;
+    this.cap = cap;
     this.rankMemo = {};
   }
 
@@ -43,7 +45,7 @@ class EloPerformanceProvicer implements PerformanceProvider {
         if (rank > this.getRankForPerformance(mid)) upper = mid;
         else lower = mid;
     }
-    return Math.round((upper + lower) / 2);
+    return Math.min(this.cap, Math.round((upper + lower) / 2));
   }
 
   private getRankForPerformance(performance: number): number {
@@ -56,4 +58,4 @@ class EloPerformanceProvicer implements PerformanceProvider {
   }
 }
 
-export default EloPerformanceProvicer
+export default EloPerformanceProvider

@@ -9,6 +9,7 @@ import FixedPerformanceProvider from "../domain/performanceprovider/fixed";
 import InterpolatePerformanceProvider from "../domain/performanceprovider/interpolate";
 import PerformanceProvider from "../domain/performanceprovider/performanceprovider";
 import { normalizeRank } from "../domain/ranks";
+import { positivizeRating, unpositivizeRating } from "../domain/rating";
 import IncrementalAlgRatingProvider from "../domain/ratingprovider/alg/incremental";
 import ConstRatingProvider from "../domain/ratingprovider/const";
 import FromHistoryHeuristicRatingProvider from "../domain/ratingprovider/heuristic/fromhistory";
@@ -65,21 +66,22 @@ export default class StandingsPageController {
 
       if (!this.performanceProvider.availableFor(userScreenName)) return { "type": "error", "message": "performance not available" };
 
-      const performance = this.performanceProvider.getPerformance(userScreenName);
+      const originalPerformance = this.performanceProvider.getPerformance(userScreenName);
+      const positivizedPerformance = positivizeRating(originalPerformance);
       if (this.isRatedMaps[userScreenName]) {
         if (!hasOwnProperty(this.ratingProviders, userScreenName)) return { "type": "error", "message": `ratingProvider not found for ${userScreenName}` };
         const ratingProvider = this.ratingProviders[userScreenName];
         if (ratingProvider.lazy) {
-          const newRatingCalculator = async () => (await ratingProvider.providerGenerator()).getRating(performance);
-          return { type: "deffered", oldRating, performance, newRatingCalculator };
+          const newRatingCalculator = async () => (await ratingProvider.providerGenerator()).getRating(originalPerformance);
+          return { type: "deffered", oldRating, performance: positivizedPerformance, newRatingCalculator };
         }
         else {
-          const newRating = ratingProvider.provider.getRating(performance);
-          return { type: "rated", oldRating, performance, newRating };
+          const newRating = ratingProvider.provider.getRating(originalPerformance);
+          return { type: "rated", oldRating, performance: positivizedPerformance, newRating };
         }
       }
       else {
-        return { type: "unrated", oldRating, performance };
+        return { type: "unrated", oldRating, performance: positivizedPerformance };
       }
     });
     await this.updateData();
@@ -117,14 +119,14 @@ export default class StandingsPageController {
       const defaultAPerf = this.contestDetails.defaultAPerf;
       const normalizedRanks = normalizeRank(standings.toRanks(true));
       const aperfsList = standings.toRatedUsers().map(user => aperfsDict[user] ?? defaultAPerf);
-      basePerformanceProvider = new EloPerformanceProvider(normalizedRanks, aperfsList);
+      basePerformanceProvider = new EloPerformanceProvider(normalizedRanks, aperfsList, this.contestDetails.performanceCap);
 
       this.isRatedMaps = standings.toIsRatedMaps();
       this.oldRatings = standings.toOldRatings();
 
       for (const standingsData of standings.data.StandingsData) {
         if (this.contestDetails.contestType == "algorithm") {
-          const provider = new IncrementalAlgRatingProvider(standingsData.Rating, standingsData.Competitions);
+          const provider = new IncrementalAlgRatingProvider(unpositivizeRating(standingsData.Rating), standingsData.Competitions);
           this.ratingProviders[standingsData.UserScreenName] = { provider, lazy: false }
         }
         else {

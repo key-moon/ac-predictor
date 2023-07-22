@@ -1,4 +1,4 @@
-import { calcHeuristicRatingFromHistory } from "../../rating";
+import { calcHeuristicRatingFromHistory, positivizeRating } from "../../rating";
 import RatingProvider from "../ratingprovider";
 
 class FromHistoryHeuristicRatingProvider implements RatingProvider {
@@ -9,7 +9,7 @@ class FromHistoryHeuristicRatingProvider implements RatingProvider {
 
   getRating(newPerformance: number): number {
     const performances = [...this.performances, newPerformance];
-    return Math.round(calcHeuristicRatingFromHistory(performances));
+    return Math.round(positivizeRating(calcHeuristicRatingFromHistory(performances)));
   }
 }
 

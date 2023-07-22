@@ -35,6 +35,20 @@ export default class ContestDetails {
     throw new Error("unknown contest type");
   }
 
+  public get performanceCap(): number {
+    if (this.contestType == "heuristic") return Infinity;
+
+    if (!this.ratedrange.hasValue()) {
+      throw new Error("unrated contest");
+    }
+
+    if (this.ratedrange.end == 1999) return 2400;
+    if (this.ratedrange.end == 2799) return 3200;
+    if (4000 <= this.ratedrange.end) return Infinity;
+
+    throw new Error("unknown contest type");
+  }
+
   public isOver(dateTime: Date) {
     return this.endTime < dateTime;
   }
