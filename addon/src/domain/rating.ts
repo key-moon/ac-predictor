@@ -26,7 +26,7 @@ function f(n: number): number {
  * @param {Number[]} [history] performance history with ascending order
  * @returns {Number} unpositivized rating
  */
-export function calcRatingFromHistory(history: number[]): number {
+export function calcAlgRatingFromHistory(history: number[]): number {
     const n = history.length;
     let pow = 1;
     let numerator = 0.0;
@@ -46,13 +46,39 @@ export function calcRatingFromHistory(history: number[]): number {
  * @param {Number} [ratedMatches] count of participated rated contest
  * @returns {number} estimated unpositivized rating
  */
-export function calcRatingFromLast(last: number, perf: number, ratedMatches: number): number {
+export function calcAlgRatingFromLast(last: number, perf: number, ratedMatches: number): number {
     if (ratedMatches === 0) return perf - 1200;
     last += f(ratedMatches);
     const weight = 9 - 9 * 0.9 ** ratedMatches;
     const numerator = weight * 2 ** (last / 800.0) + 2 ** (perf / 800.0);
     const denominator = 1 + weight;
     return Math.log2(numerator / denominator) * 800.0 - f(ratedMatches + 1);
+}
+
+
+/**
+ * calculate unpositivized rating from performance history
+ * @param {Number[]} [history] performance histories
+ * @returns {Number} unpositivized rating
+ */
+export function calcHeuristicRatingFromHistory(history: number[]): number {
+    const S = 724.4744301;
+    const R = 0.8271973364;
+    const qs: number[] = [];
+    for (const perf of history) {
+        for (let i = 1; i <= 100; i++) {
+            qs.push(perf - S * Math.log(i));
+        }
+    }
+    qs.sort((a, b) => b - a);
+
+    let num = 0.0;
+    let den = 0.0;
+    for (let i = 99; i >= 0; i--) {
+        num = num * R + qs[i];
+        den = den * R + 1.0;
+    }
+    return num / den;
 }
 
 /**
@@ -77,24 +103,6 @@ export function unpositivizeRating(rating: number): number {
         return rating;
     }
     return 400.0 + 400.0 * Math.log(rating / 400.0);
-}
-
-/**
- * calculate the performance required to reach a target rate
- * @param {Number} [targetRating] targeted unpositivized rating
- * @param {Number[]} [history] performance history with ascending order
- * @returns {number} performance
- */
-export function calcRequiredPerformance(targetRating: number, history: number[]): number {
-    let valid = 10000.0;
-    let invalid = -10000.0;
-    for (let i = 0; i < 100; ++i) {
-        const mid = (invalid + valid) / 2;
-        const rating = Math.round(calcRatingFromHistory(history.concat([mid])));
-        if (targetRating <= rating) valid = mid;
-        else invalid = mid;
-    }
-    return valid;
 }
 
 export const colorBounds = {

@@ -19,12 +19,21 @@ class HistoriesWrapper {
     this.data = data;
   }
 
+  public toPerformances() {
+    const results: number[] = [];
+    for (const history of this.data) {
+      if (!history.IsRated) continue;
+      results.push(history.Performance);
+    }
+    return results;
+  }
+
   public toPerformanceAndTimes() {
     const results: { performance: number, date: Date }[] = [];
     for (const history of this.data) {
       if (!history.IsRated) continue;
       const date = new Date(history.EndTime);
-      results.push({ performance: history.InnerPerformance, date });
+      results.push({ performance: history.Performance, date });
     }
     return results;
   }

@@ -1,4 +1,4 @@
-import { calcRatingFromHistory } from "../../rating";
+import { calcAlgRatingFromHistory } from "../../rating";
 import RatingProvider from "../ratingprovider";
 
 type Result = { performance: number, date: Date };
@@ -12,7 +12,7 @@ class FromHistoryAlgRatingProvider implements RatingProvider {
   getRating(newPerformance: number): number {
     const sortedPerformances = this.results.sort((a, b) => a.date.getTime() - b.date.getTime()).map((x) => x.performance);
     sortedPerformances.push(newPerformance)
-    return calcRatingFromHistory(sortedPerformances);
+    return calcAlgRatingFromHistory(sortedPerformances);
   }
 }
 

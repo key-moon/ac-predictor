@@ -1,4 +1,4 @@
-import { calcRatingFromLast } from "../../rating";
+import { calcAlgRatingFromLast } from "../../rating";
 import RatingProvider from "../ratingprovider";
 
 class IncrementalAlgRatingProvider implements RatingProvider {
@@ -10,7 +10,7 @@ class IncrementalAlgRatingProvider implements RatingProvider {
   }
 
   getRating(newPerformance: number): number {
-    return calcRatingFromLast(this.rating, newPerformance, this.competitions);    
+    return calcAlgRatingFromLast(this.rating, newPerformance, this.competitions);    
   }
 }
 
