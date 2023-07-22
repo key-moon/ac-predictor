@@ -18,7 +18,7 @@ export default async function getContestDetails(): Promise<ContestDetails[]> {
     if (elem.contestType !== "algorithm" && elem.contestType !== "heuristic") throw new Error("invalid object returned");
     const contestType: "algorithm" | "heuristic" = elem.contestType;
     if (typeof elem.startTime !== "number") throw new Error("invalid object returned");
-    const startTime: Date = new Date(elem.startTime);
+    const startTime: Date = new Date(elem.startTime * 1000);
     if (typeof elem.duration !== "number") throw new Error("invalid object returned");
     const duration: number = elem.duration;
     if (typeof elem.ratedrange !== "object" || typeof elem.ratedrange[0] !== "number" || typeof elem.ratedrange[1] !== "number") throw new Error("invalid object returned");

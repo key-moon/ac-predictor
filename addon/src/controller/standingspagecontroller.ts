@@ -133,7 +133,12 @@ export default class StandingsPageController {
           for (const standingsData of standings.data.StandingsData) {
             this.ratingProviders[standingsData.UserScreenName] = {
               providerGenerator: async () => {
-                const histories = await getHistory(standingsData.UserScreenName);
+                const histories = await getHistory(standingsData.UserScreenName, "heuristic");
+
+                histories.data = histories.data.filter(x => {
+                  console.log(x.EndTime, new Date(x.EndTime), this.contestDetails!.endTime);
+                  return new Date(x.EndTime) < this.contestDetails!.endTime;
+                });
                 return new FromHistoryHeuristicRatingProvider(histories.toPerformances());
               },
               lazy: true
