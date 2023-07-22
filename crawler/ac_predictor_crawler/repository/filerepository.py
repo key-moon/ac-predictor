@@ -9,6 +9,11 @@ from ac_predictor_crawler.domain.raterange import RateRange
 from ac_predictor_crawler.util.file import write
 from ac_predictor_crawler.logger import logger
 
+def my_round(val: float, precision: int):
+  res = round(val, precision)
+  if res == round(res): return int(res)
+  return res
+
 class FileRepository:
   def __init__(self, path: str) -> None:    
     self.path = path
@@ -65,7 +70,7 @@ class FileRepository:
     content = self._get_file(self._aperfs_path(contest_screen_name))
     return json.loads(content)
   def store_aperfs(self, contest_screen_name: str, aperfs: Mapping[str, float]):
-    aperfs = { key: round(val, 1) for key, val in aperfs.items() }
+    aperfs = { key: my_round(val, 2) for key, val in aperfs.items() }
     self._save_file(self._aperfs_path(contest_screen_name), json.dumps(aperfs).encode())
 
   def _results_path(self, contest_screen_name: str):
