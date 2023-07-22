@@ -44,6 +44,7 @@ type StandingsData = {
     Additional: null,
   },
 };
+
 type Standings = {
   Fixed: boolean,
   AdditionalColumns: null,
@@ -51,9 +52,33 @@ type Standings = {
   StandingsData: StandingsData[],
 }
 
+class StandingsWrapper {
+  data: Standings
+  constructor(data: Standings) {
+    this.data = data;
+  }
+  getRanks(): { [userScreenName: string]: number } {
+    const res: { [userScreenName: string]: number } = {};
+    for (const data of this.data.StandingsData) {
+      res[data.UserScreenName] = data.Rank;
+    }
+    return res;
+  }
+
+  getRatedUsers(): string[] {
+    const res: string[] = [];
+    for (const data of this.data.StandingsData) {
+      if (data.IsRated) {
+        res.push(data.UserScreenName);
+      }
+    }
+    return res;
+  }
+}
+
 const STANDINGS_CACHE_DURATION = 10 * 1000;
 const cache = new Cache<Standings>(STANDINGS_CACHE_DURATION);
-export default async function getStandings(contestScreenName: string): Promise<Standings> {
+export default async function getStandings(contestScreenName: string): Promise<StandingsWrapper> {
   if (!cache.has(contestScreenName)) {
     const result = await fetch(`https://atcoder.jp/contests/${contestScreenName}/standings/json`);
     if (!result.ok) {
@@ -61,7 +86,7 @@ export default async function getStandings(contestScreenName: string): Promise<S
     }
     cache.set(contestScreenName, await result.json());
   }
-  return cache.get(contestScreenName)!;
+  return new StandingsWrapper(cache.get(contestScreenName)!);
 }
 
 addHandler(

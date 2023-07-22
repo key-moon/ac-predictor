@@ -13,9 +13,26 @@ type History = {
   EndTime: string,
 }
 
+class HistoriesWrapper {
+  data: History[]
+  constructor(data: History[]) {
+    this.data = data;
+  }
+
+  public toPerformanceAndTimes() {
+    const results: { performance: number, date: Date }[] = [];
+    for (const history of this.data) {
+      if (!history.IsRated) continue;
+      const date = new Date(history.EndTime);
+      results.push({ performance: history.InnerPerformance, date });
+    }
+    return results;
+  }
+}
+
 const HISTORY_CACHE_DURATION = 60 * 60 * 1000;
 const cache = new Cache<History[]>(HISTORY_CACHE_DURATION);
-export default async function getHistory(userScreenName: string, contestType: ("algorithm" | "heuristic")="algorithm"): Promise<History[]> {
+export default async function getHistory(userScreenName: string, contestType: ("algorithm" | "heuristic")="algorithm"): Promise<HistoriesWrapper> {
   const key = `${userScreenName}:${contestType}`;
   if (!cache.has(key)) {
     const result = await fetch(`https://atcoder.jp/users/${userScreenName}/history/json?contestType=${contestType}`);
@@ -24,5 +41,5 @@ export default async function getHistory(userScreenName: string, contestType: ("
     }
     cache.set(key, await result.json());
   }
-  return cache.get(key)!;
+  return new HistoriesWrapper(cache.get(key)!);
 }
