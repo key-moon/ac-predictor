@@ -28,8 +28,8 @@ export default class ContestDetails {
       throw new Error("unrated contest");
     }
 
-    if (this.ratedrange.end == 2000) return 800;
-    if (this.ratedrange.end == 2800) return 1000;
+    if (this.ratedrange.end == 1999) return 800;
+    if (this.ratedrange.end == 2799) return 1000;
     if (4000 <= this.ratedrange.end) return 1200;
 
     throw new Error("unknown contest type");
