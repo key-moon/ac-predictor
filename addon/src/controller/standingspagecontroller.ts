@@ -115,7 +115,7 @@ export default class StandingsPageController {
     if (basePerformanceProvider === undefined) {
       const aperfsDict = await getAPerfs(this.contestDetails.contestScreenName);
       const defaultAPerf = this.contestDetails.defaultAPerf;
-      const normalizedRanks = normalizeRank(standings.toRanks());
+      const normalizedRanks = normalizeRank(standings.toRanks(true));
       const aperfsList = standings.toRatedUsers().map(user => aperfsDict[user] ?? defaultAPerf);
       basePerformanceProvider = new EloPerformanceProvider(normalizedRanks, aperfsList);
 

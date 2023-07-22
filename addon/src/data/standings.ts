@@ -57,9 +57,10 @@ class StandingsWrapper {
   constructor(data: Standings) {
     this.data = data;
   }
-  toRanks(): { [userScreenName: string]: number } {
+  toRanks(onlyRated: boolean=false): { [userScreenName: string]: number } {
     const res: { [userScreenName: string]: number } = {};
     for (const data of this.data.StandingsData) {
+      if (onlyRated && !data.IsRated) continue;
       res[data.UserScreenName] = data.Rank;
     }
     return res;
