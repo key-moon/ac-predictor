@@ -1,7 +1,7 @@
 type Rank = { [userScreenName: string]: number };
 
 export function normalizeRank(ranks: Rank): Rank {
-  const rankValues = Object.values(ranks);
+  const rankValues = [...new Set(Object.values(ranks)).values()];
   const rankToUsers: { [rank: number]: string[] } = {};
   for (const userScreenName in ranks) {
     const rank = ranks[userScreenName];
@@ -9,7 +9,7 @@ export function normalizeRank(ranks: Rank): Rank {
     rankToUsers[rank].push(userScreenName);
   }
 
-  rankValues.sort();
+  rankValues.sort((a, b) => a - b);
 
   const res: Rank = {};
   let currentRank = 1;
