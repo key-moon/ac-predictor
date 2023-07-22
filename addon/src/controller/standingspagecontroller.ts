@@ -15,6 +15,7 @@ import ConstRatingProvider from "../domain/ratingprovider/const";
 import FromHistoryHeuristicRatingProvider from "../domain/ratingprovider/heuristic/fromhistory";
 import RatingProvider from "../domain/ratingprovider/ratingprovider";
 import getContestScreenName from "../parse/contestScreenName";
+import { getConfig } from "../util/config";
 import hasOwnProperty from "../util/hasOwnProperty";
 import StandingsTableView from "../view/standingstable";
 
@@ -54,6 +55,8 @@ export default class StandingsPageController {
       throw new Error("contest details not found");
     }
     this.contestDetails = contestDetails;
+
+    if (getConfig("hideDuringContest") && this.contestDetails.duringContest(new Date())) return;
 
     this.standingsTableView = StandingsTableView.Get(userScreenName => {
       if (!this.ratingProviders) return { "type": "error", "message": "ratingProviders missing" };
@@ -95,7 +98,7 @@ export default class StandingsPageController {
 
     let basePerformanceProvider: PerformanceProvider | undefined = undefined;
     this.ratingProviders = {};
-    if (standings.data.Fixed) {
+    if (standings.data.Fixed && getConfig("useResults")) {
       try {
         const results = await getResults(this.contestDetails.contestScreenName);
         basePerformanceProvider = new FixedPerformanceProvider(results.toPerformances());
