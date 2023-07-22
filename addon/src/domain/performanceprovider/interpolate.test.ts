@@ -1,5 +1,5 @@
 import InterpolatePerformanceProvider from "./interpolate";
-import PerformanceProvider from "./performancepredictor";
+import PerformanceProvider from "./performanceprovider";
 
 let provider: InterpolatePerformanceProvider;
 let basePerformanceProviderMock: PerformanceProvider

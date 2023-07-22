@@ -1,5 +1,5 @@
 import hasOwnProperty from "../../util/hasOwnProperty";
-import PerformanceProvider from "./performancepredictor";
+import PerformanceProvider from "./performanceprovider";
 
 type Ranks = { [userScreenName: string]: number }
 type RankToUsers = { [rank: number]: string[] }
@@ -43,7 +43,7 @@ class InterpolatePerformanceProvider implements PerformanceProvider {
     let rank = this.ranks[userScreenName];
     while (rank <= this.maxRank) {
       const perf = this.getPerformanceIfAvailable(rank);
-      if (perf !== undefined) return perf;
+      if (perf !== null) return perf;
       rank++;
     }
     return -Infinity;
@@ -59,7 +59,7 @@ class InterpolatePerformanceProvider implements PerformanceProvider {
       const users = this.rankToUsers[rank];
       if (!users) continue;
       const perf = this.getPerformanceIfAvailable(rank);
-      if (perf !== undefined) currentPerformance = perf;
+      if (perf !== null) currentPerformance = perf;
       for (const userScreenName of users) {
         res[userScreenName] = currentPerformance;
       }
@@ -68,15 +68,15 @@ class InterpolatePerformanceProvider implements PerformanceProvider {
   }
 
   private cacheForRank: { [rank: number]: number; } = {};
-  private getPerformanceIfAvailable(rank: number) {
-    if (!this.rankToUsers[rank]) return;
+  private getPerformanceIfAvailable(rank: number): number | null {
+    if (!this.rankToUsers[rank]) return null;
     if (this.cacheForRank[rank]) return this.cacheForRank[rank];
 
     for (const userScreenName of this.rankToUsers[rank]) {
       if (!this.baseProvider.availableFor(userScreenName)) continue;
       return this.cacheForRank[rank] = this.baseProvider.getPerformance(userScreenName);
     }
-    return;
+    return null;
   }
 }
 

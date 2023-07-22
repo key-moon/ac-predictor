@@ -1,5 +1,5 @@
 import hasOwnProperty from "../../util/hasOwnProperty";
-import PerformanceProvider from "./performancepredictor";
+import PerformanceProvider from "./performanceprovider";
 
 type Ranks = { [userScreenName: string]: number };
 type Ratings = number[];

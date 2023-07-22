@@ -7,7 +7,7 @@ import ContestDetails from "../domain/contestdetails";
 import EloPerformanceProvider from "../domain/performanceprovider/elo";
 import FixedPerformanceProvider from "../domain/performanceprovider/fixed";
 import InterpolatePerformanceProvider from "../domain/performanceprovider/interpolate";
-import PerformanceProvider from "../domain/performanceprovider/performancepredictor";
+import PerformanceProvider from "../domain/performanceprovider/performanceprovider";
 import { normalizeRank } from "../domain/ranks";
 import IncrementalAlgRatingProvider from "../domain/ratingprovider/alg/incremental";
 import ConstRatingProvider from "../domain/ratingprovider/const";
