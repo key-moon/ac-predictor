@@ -1,4 +1,4 @@
-import hasOwnProperty from "../../../util/hasOwnProperty";
+import hasOwnProperty from "../../util/hasOwnProperty";
 import PerformanceProvider from "./performancepredictor";
 
 type Result = { [userScreenName: string]: number };

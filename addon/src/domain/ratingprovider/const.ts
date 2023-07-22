@@ -15,4 +15,4 @@ class ConstRatingProvider implements RatingProvider {
   }
 }
 
-export default RatingProvider
+export default ConstRatingProvider
