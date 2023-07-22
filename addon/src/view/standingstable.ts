@@ -1,6 +1,10 @@
 import toSignedString from "../util/toSignedString";
+import addStyle from "./addstyle";
 import getRatingSpan from "./components/ratingspan";
 import getSpan from "./components/span";
+import style from "./standingstable.scss"
+
+addStyle(style);
 
 type RatedResultData = { type: "rated", performance: number, oldRating: number, newRating: number };
 type ErrorResultData = { type: "error", message: string };
@@ -42,7 +46,9 @@ function getDefferedRatingElem(result: DefferedResultData): HTMLElement {
   const elem = document.createElement("div");
   elem.append(
     getRatingSpan(result.oldRating),
-    " ",
+    " → ",
+    getSpan(["???"], ["bold"]),
+    document.createElement("br"),
     getFadedSpan(["(click to calculate)"])
   );
   
@@ -54,8 +60,8 @@ function getDefferedRatingElem(result: DefferedResultData): HTMLElement {
       newRating = await result.newRatingCalculator();
     }
     catch(e) {
-      elem.replaceChildren(getSpan(["error on load"], []), " ", getSpan(["(hover to see details)"], []), getSpan([Object.prototype.toString.call(e)], ["tooltiptext"]));
-      elem.classList.add("tooltip");
+      elem.append(getSpan(["error on load"], []), document.createElement("br"), getSpan(["(hover to see details)"], ["grey", "small"]), getSpan([e!.toString()], ["my-tooltiptext"]));
+      elem.classList.add("my-tooltip");
       return;
     }
     const newElem = getRatedRatingElem({ type: "rated", performance: result.performance, oldRating: result.oldRating, newRating: newRating });
@@ -68,8 +74,8 @@ function getDefferedRatingElem(result: DefferedResultData): HTMLElement {
 
 function getErrorRatingElem(result: ErrorResultData): HTMLElement {
   const elem = document.createElement("div");
-  elem.append(getSpan(["error on load"], []), " ", getSpan(["(hover to see details)"], []), getSpan([result.message], ["tooltiptext"]));
-  elem.classList.add("tooltip");
+  elem.append(getSpan(["error on load"], []), document.createElement("br"), getSpan(["(hover to see details)"], ["grey", "small"]), getSpan([result.message], ["my-tooltiptext"]));
+  elem.classList.add("my-tooltip");
   return elem;
 }
 
@@ -99,9 +105,9 @@ function modifyStandingsRow(row: HTMLElement, results: ResultDataProvider) {
   const userScreenName = row.querySelector(".standings-username .username span")?.textContent;
 
   const perfCell = document.createElement("td"); 
-  perfCell.classList.add("ac-predictor-standings-elem");
+  perfCell.classList.add("ac-predictor-standings-elem", "standings-result");
   const ratingCell = document.createElement("td"); 
-  ratingCell.classList.add("ac-predictor-standings-elem");
+  ratingCell.classList.add("ac-predictor-standings-elem", "standings-result");
 
   
   if (userScreenName === null || userScreenName === undefined) {

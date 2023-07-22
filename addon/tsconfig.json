@@ -1,5 +1,9 @@
 {
   "extends": "@tsconfig/node20/tsconfig.json",
+  "typeRoots": [
+    "./types",
+    "./node_modules/@types"
+  ],
   "compilerOptions": {
     "target": "es2022",
     "lib": ["es2022", "dom"]
