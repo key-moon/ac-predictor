@@ -1,3 +1,5 @@
+import Cache from "./cache";
+
 type History = {
   IsRated: boolean,
   Place: number,
@@ -12,20 +14,15 @@ type History = {
 }
 
 const HISTORY_CACHE_DURATION = 60 * 60 * 1000;
-
-const cacheExpires = new Map<string, Date>();
-const cacheData = new Map<string, History[]>();
+const cache = new Cache<History[]>(HISTORY_CACHE_DURATION);
 export default async function getHistory(userScreenName: string, contestType: ("algorithm" | "heuristic")="algorithm"): Promise<History[]> {
-  const now = new Date();
   const key = `${userScreenName}:${contestType}`;
-  if (!cacheExpires.has(key) || cacheExpires.get(key)! < now) {
+  if (!cache.has(key)) {
     const result = await fetch(`https://atcoder.jp/users/${userScreenName}/history/json?contestType=${contestType}`);
     if (!result.ok) {
       throw new Error(`Failed to fetch history: ${result.status}`);
     }
-    const expire = new Date(now.getTime() + HISTORY_CACHE_DURATION);
-    cacheExpires.set(key, expire);
-    cacheData.set(key, await result.json());
+    cache.set(key, await result.json());
   }
-  return cacheData.get(key)!;
+  return cache.get(key)!;
 }

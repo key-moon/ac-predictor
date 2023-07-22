@@ -1,3 +1,6 @@
+import Cache from "./cache";
+import { addHandler } from "./mitm";
+
 type TaskInfo = {
   Assignment: string,
   TaskName: string,
@@ -49,19 +52,23 @@ type Standings = {
 }
 
 const STANDINGS_CACHE_DURATION = 10 * 1000;
-
-const cacheExpires = new Map<string, Date>();
-const cacheData = new Map<string, Standings>();
+const cache = new Cache<Standings>(STANDINGS_CACHE_DURATION);
 export default async function getStandings(contestScreenName: string): Promise<Standings> {
-  const now = new Date();
-  if (!cacheExpires.has(contestScreenName) || cacheExpires.get(contestScreenName)! < now) {
+  if (!cache.has(contestScreenName)) {
     const result = await fetch(`https://atcoder.jp/contests/${contestScreenName}/standings/json`);
     if (!result.ok) {
       throw new Error(`Failed to fetch standings: ${result.status}`);
     }
-    const expire = new Date(now.getTime() + STANDINGS_CACHE_DURATION);
-    cacheExpires.set(contestScreenName, expire);
-    cacheData.set(contestScreenName, await result.json());
+    cache.set(contestScreenName, await result.json());
   }
-  return cacheData.get(contestScreenName)!;
+  return cache.get(contestScreenName)!;
 }
+
+addHandler(
+  (content, path) => {
+    const match = path.match(/^\/contests\/(.*)\/standings\/json$/);
+    if (!match) return;
+    const contestScreenName = match[1];
+    cache.set(contestScreenName, JSON.parse(content));
+  }
+)
