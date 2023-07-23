@@ -58,11 +58,11 @@ class StandingsWrapper {
   constructor(data: Standings) {
     this.data = data;
   }
-  toRanks(onlyRated: boolean=false): { [userScreenName: string]: number } {
-    const res: { [userScreenName: string]: number } = {};
+  toRanks(onlyRated: boolean=false): Map<string, number> {
+    const res = new Map<string, number>();
     for (const data of this.data.StandingsData) {
       if (onlyRated && !data.IsRated) continue;
-      res[data.UserScreenName] = data.Rank;
+      res.set(data.UserScreenName, data.Rank);
     }
     return res;
   }

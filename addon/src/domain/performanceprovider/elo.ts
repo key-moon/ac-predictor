@@ -1,23 +1,21 @@
-import hasOwnProperty from "../../util/hasOwnProperty";
 import PerformanceProvider from "./performanceprovider";
 
-type Ranks = { [userScreenName: string]: number };
+type Ranks = Map<string, number>;
 type Ratings = number[];
 
 class EloPerformanceProvider implements PerformanceProvider {
   ranks: Ranks
   ratings: Ratings
   cap: number
-  private rankMemo: { [rank: number]: number };
+  private rankMemo = new Map<number, number>();
   constructor(ranks: Ranks, ratings: Ratings, cap: number) {
     this.ranks = ranks;
     this.ratings = ratings;
     this.cap = cap;
-    this.rankMemo = {};
   }
 
   availableFor(userScreenName: string): boolean {
-    return hasOwnProperty(this.ranks, userScreenName);
+    return this.ranks.has(userScreenName);
   }
 
   getPerformance(userScreenName: string): number {
@@ -25,14 +23,14 @@ class EloPerformanceProvider implements PerformanceProvider {
       throw new Error(`User ${userScreenName} not found`);
     }
 
-    const rank = this.ranks[userScreenName];
+    const rank = this.ranks.get(userScreenName)!;
     return this.getPerformanceForRank(rank);
   }
 
-  getPerformances(): { [userScreenName: string]: number; } {
-    const performances: { [userScreenName: string]: number; } = {};
-    for (const userScreenName in this.ranks) {
-      performances[userScreenName] = this.getPerformance(userScreenName);
+  getPerformances(): Map<string, number> {
+    const performances = new Map<string, number>();
+    for (const userScreenName of this.ranks.keys()) {
+      performances.set(userScreenName, this.getPerformance(userScreenName));
     }
     return performances;
   }
@@ -49,12 +47,14 @@ class EloPerformanceProvider implements PerformanceProvider {
   }
 
   private getRankForPerformance(performance: number): number {
-    if (this.rankMemo[performance]) return this.rankMemo[performance];
+    if (this.rankMemo.has(performance)) return this.rankMemo.get(performance)!;
 
-    return (this.rankMemo[performance] = this.ratings.reduce(
+    const res = this.ratings.reduce(
         (val, APerf) => val + 1.0 / (1.0 + Math.pow(6.0, (performance - APerf) / 400.0)),
         0.5
-    ));
+    );
+    this.rankMemo.set(performance, res);
+    return res;
   }
 }
 

@@ -10,7 +10,7 @@ beforeEach(() => {
     getPerformance: jest.fn((val) => { if (val == "user3") return 2; if (val == "user5") return 1; throw new Error(); }),
     getPerformances: jest.fn()
   };
-  provider = new InterpolatePerformanceProvider({ "user1": 1, "user2": 2, "user3": 2, "user4": 4, "user5": 5, "user6": 6 }, basePerformanceProviderMock);
+  provider = new InterpolatePerformanceProvider(new Map<string, number>([["user1", 1], ["user2", 2], ["user3", 2], ["user4", 4], ["user5", 5], ["user6", 6]]), basePerformanceProviderMock);
 });
 
 test("availableFor should return proper values", () => {
@@ -39,5 +39,5 @@ test("getPerformance should raise error when unknown key specified", () => {
 });
 
 test("getPerformances should return proper value", () => {
-  expect(provider.getPerformances()).toStrictEqual({ "user1": 2, "user2": 2, "user3": 2, "user4": 1, "user5": 1, "user6": -Infinity });
+  expect(provider.getPerformances()).toStrictEqual(new Map<string, number>([["user1", 2], ["user2", 2], ["user3", 2], ["user4", 1], ["user5", 1], ["user6", -Infinity]]));
 });

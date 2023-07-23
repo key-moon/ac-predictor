@@ -3,7 +3,7 @@ import FixedPerformanceProvider from "./fixed";
 let provider: FixedPerformanceProvider;
 
 beforeEach(() => {
-  provider = new FixedPerformanceProvider({ "user1": 0, "user2": 100, "user3": -0.01, "constructor": 1 })
+  provider = new FixedPerformanceProvider(new Map<string, number>([["user1", 0], ["user2", 100], ["user3", -0.01], ["constructor", 1]]))
 });
 
 test("availableFor should return proper values", () => {
@@ -28,5 +28,5 @@ test("getPerformance should raise error when unknown key specified", () => {
 });
 
 test("getPerformances should return proper value", () => {
-  expect(provider.getPerformances()).toStrictEqual({ "user1": 0, "user2": 100, "user3": -0.01, "constructor": 1 });
+  expect(provider.getPerformances()).toStrictEqual(new Map<string, number>([["user1", 0], ["user2", 100], ["user3", -0.01], ["constructor", 1]]));
 });

@@ -1,29 +1,23 @@
-import hasOwnProperty from "../../util/hasOwnProperty";
 import PerformanceProvider from "./performanceprovider";
 
-type Ranks = { [userScreenName: string]: number }
-type RankToUsers = { [rank: number]: string[] }
-
-function getRankToUsers(ranks: Ranks) {
-  const rankToUsers: RankToUsers = {};
-  for (const userScreenName in ranks) {
-    const rank = ranks[userScreenName];
-    if (!rankToUsers[rank]) rankToUsers[rank] = [];
-    rankToUsers[rank].push(userScreenName);
+function getRankToUsers(ranks: Map<string, number>) {
+  const rankToUsers = new Map<number, string[]>();
+  for (const [userScreenName, rank] of ranks) {
+    if (!rankToUsers.has(rank)) rankToUsers.set(rank, []);
+    rankToUsers.get(rank)!.push(userScreenName);
   }
   return rankToUsers;
 }
-function getMaxRank(ranks: Ranks) {
-  return Math.max(...Object.values(ranks));
+function getMaxRank(ranks: Map<string, number>) {
+  return Math.max(...ranks.values());
 }
 
-// TODO: 命名
 class InterpolatePerformanceProvider implements PerformanceProvider {
-  private ranks: Ranks;
+  private ranks: Map<string, number>;
   private maxRank: number;
-  private rankToUsers: RankToUsers;
+  private rankToUsers: Map<number, string[]>;
   private baseProvider: PerformanceProvider;
-  constructor(ranks: Ranks, baseProvider: PerformanceProvider) {
+  constructor(ranks: Map<string, number>, baseProvider: PerformanceProvider) {
     this.ranks = ranks;
     this.maxRank = getMaxRank(ranks);
     this.rankToUsers = getRankToUsers(ranks);
@@ -31,7 +25,7 @@ class InterpolatePerformanceProvider implements PerformanceProvider {
   }
 
   availableFor(userScreenName: string): boolean {
-    return hasOwnProperty(this.ranks, userScreenName);
+    return this.ranks.has(userScreenName);
   }
 
   getPerformance(userScreenName: string): number {
@@ -39,42 +33,46 @@ class InterpolatePerformanceProvider implements PerformanceProvider {
       throw new Error(`User ${userScreenName} not found`);
     }
 
-    if (this.getPerformancesCache) return this.getPerformancesCache[userScreenName];
-    let rank = this.ranks[userScreenName];
+    if (this.performanceCache.has(userScreenName)) return this.performanceCache.get(userScreenName)!;
+    let rank = this.ranks.get(userScreenName)!;
     while (rank <= this.maxRank) {
       const perf = this.getPerformanceIfAvailable(rank);
-      if (perf !== null) return perf;
+      if (perf !== null) {
+        return perf;
+      }
       rank++;
     }
+    this.performanceCache.set(userScreenName, -Infinity);
     return -Infinity;
   }
   
-  private getPerformancesCache?: { [userScreenName: string]: number; };
-  getPerformances(): { [userScreenName: string]: number; } {
-    if (this.getPerformancesCache) return this.getPerformancesCache;
-
+  private performanceCache = new Map<string, number>();
+  getPerformances(): Map<string, number> {
     let currentPerformance = -Infinity;
-    const res: { [userScreenName: string]: number; } = {};
+    const res = new Map<string, number>();
     for (let rank = this.maxRank; rank >= 0; rank--) {
-      const users = this.rankToUsers[rank];
-      if (!users) continue;
+      const users = this.rankToUsers.get(rank);
+      if (users === undefined) continue;
       const perf = this.getPerformanceIfAvailable(rank);
       if (perf !== null) currentPerformance = perf;
       for (const userScreenName of users) {
-        res[userScreenName] = currentPerformance;
+        res.set(userScreenName, currentPerformance);
       }
     }
-    return this.getPerformancesCache = res;
+    this.performanceCache = res
+    return res;
   }
 
-  private cacheForRank: { [rank: number]: number; } = {};
+  private cacheForRank = new Map<number, number>();
   private getPerformanceIfAvailable(rank: number): number | null {
-    if (!this.rankToUsers[rank]) return null;
-    if (this.cacheForRank[rank]) return this.cacheForRank[rank];
+    if (!this.rankToUsers.has(rank)) return null;
+    if (this.cacheForRank.has(rank)) return this.cacheForRank.get(rank)!;
 
-    for (const userScreenName of this.rankToUsers[rank]) {
+    for (const userScreenName of this.rankToUsers.get(rank)!) {
       if (!this.baseProvider.availableFor(userScreenName)) continue;
-      return this.cacheForRank[rank] = this.baseProvider.getPerformance(userScreenName);
+      const perf = this.baseProvider.getPerformance(userScreenName);
+      this.cacheForRank.set(rank, perf);
+      return perf;
     }
     return null;
   }

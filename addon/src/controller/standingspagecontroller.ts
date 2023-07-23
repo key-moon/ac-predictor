@@ -9,14 +9,13 @@ import FixedPerformanceProvider from "../domain/performanceprovider/fixed";
 import InterpolatePerformanceProvider from "../domain/performanceprovider/interpolate";
 import PerformanceProvider from "../domain/performanceprovider/performanceprovider";
 import { normalizeRank } from "../domain/ranks";
-import { positivizeRating, unpositivizeRating } from "../domain/rating";
+import { positivizeRating } from "../domain/rating";
 import IncrementalAlgRatingProvider from "../domain/ratingprovider/alg/incremental";
 import ConstRatingProvider from "../domain/ratingprovider/const";
 import FromHistoryHeuristicRatingProvider from "../domain/ratingprovider/heuristic/fromhistory";
 import RatingProvider from "../domain/ratingprovider/ratingprovider";
 import getContestScreenName from "../parse/contestScreenName";
 import { getConfig } from "../util/config";
-import hasOwnProperty from "../util/hasOwnProperty";
 import StandingsLoadingView from "../view/standingsloading";
 import StandingsTableView from "../view/standingstable";
 
@@ -90,7 +89,7 @@ export default class StandingsPageController {
     if (standings.data.Fixed && getConfig("useResults")) {
       try {
         const results = await getResults(this.contestDetails.contestScreenName);
-        basePerformanceProvider = new FixedPerformanceProvider(results.toPerformances());
+        basePerformanceProvider = new FixedPerformanceProvider(results.toPerformanceMaps());
         
         this.isRatedMaps = results.toIsRatedMaps();
         this.oldRatings = results.toOldRatingMaps();

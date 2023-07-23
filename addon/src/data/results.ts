@@ -27,11 +27,11 @@ class ResultsWrapper {
     this.data = data;
   }
 
-  public toPerformances() {
-    const res: { [userScreenName: string]: number } = {};
+  public toPerformanceMaps() {
+    const res = new Map<string, number>();
     for (const result of this.data) {
       if (!result.IsRated) continue;
-      res[result.UserScreenName] = result.Performance;
+      res.set(result.UserScreenName, result.Performance);
     }
     return res;
   }

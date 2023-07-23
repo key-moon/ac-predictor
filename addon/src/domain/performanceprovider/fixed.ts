@@ -1,16 +1,13 @@
-import hasOwnProperty from "../../util/hasOwnProperty";
 import PerformanceProvider from "./performanceprovider";
 
-type Result = { [userScreenName: string]: number };
-
 class FixedPerformanceProvider implements PerformanceProvider {
-  result: Result
-  constructor(result: Result) {
+  result: Map<string, number>;
+  constructor(result: Map<string, number>) {
     this.result = result;
   }
   
   availableFor(userScreenName: string): boolean {
-    return hasOwnProperty(this.result, userScreenName);
+    return this.result.has(userScreenName);
   }
 
   getPerformance(userScreenName: string): number {
@@ -18,11 +15,10 @@ class FixedPerformanceProvider implements PerformanceProvider {
       throw new Error(`User ${userScreenName} not found`);
     }
 
-    const result = this.result[userScreenName];
-    return result;
+    return this.result.get(userScreenName)!;
   }
 
-  getPerformances(): { [userScreenName: string]: number } {
+  getPerformances(): Map<string, number> {
     return this.result;
   }
 }
