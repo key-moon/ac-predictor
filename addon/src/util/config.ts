@@ -5,11 +5,15 @@ const configKey = "ac-predictor-config";
 type Config = {
   useResults: boolean,
   hideDuringContest: boolean
+  isDebug: boolean,
+  useFinalResultOnVirtual: boolean
 };
 
 const defaultConfig: Config = {
   useResults: true,
-  hideDuringContest: false
+  hideDuringContest: false,
+  isDebug: false,
+  useFinalResultOnVirtual: false
 };
 
 function getConfigObj(): Config {
