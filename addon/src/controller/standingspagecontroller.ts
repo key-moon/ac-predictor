@@ -17,6 +17,7 @@ import RatingProvider from "../domain/ratingprovider/ratingprovider";
 import getContestScreenName from "../parse/contestScreenName";
 import { getConfig } from "../util/config";
 import hasOwnProperty from "../util/hasOwnProperty";
+import StandingsLoadingView from "../view/standingsloading";
 import StandingsTableView from "../view/standingstable";
 
 type RatingProviderInfo = { provider: RatingProvider, lazy: false } | { providerGenerator: () => Promise<RatingProvider>, lazy: true }
@@ -32,18 +33,8 @@ export default class StandingsPageController {
   standingsTableView?: StandingsTableView;
 
   public async register() {
-    const loaded = () => !!document.getElementById("standings-tbody");
-    if (loaded()) {
-      this.initialize();
-      return;
-    }
-    const loadingElem = document.querySelector("#vue-standings .loading-show");
-    if (!loadingElem) {
-      throw new Error("loading elem not found");
-    }
-    new MutationObserver(() => {
-      if (loaded()) this.initialize();
-    }).observe(loadingElem, { attributes: true });
+    const loading = StandingsLoadingView.Get();
+    loading.onLoad(() => this.initialize());
   }
 
   private async initialize() {
