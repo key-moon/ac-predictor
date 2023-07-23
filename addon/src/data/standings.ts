@@ -1,3 +1,4 @@
+import { unpositivizeRating } from "../domain/rating";
 import Cache from "./cache";
 import { addHandler } from "./mitm";
 
@@ -84,10 +85,19 @@ class StandingsWrapper {
     return res;
   }
 
-  toOldRatingMaps(): Map<string, number> {
+  toOldRatingMaps(unpositivize=false): Map<string, number> {
     const res = new Map<string, number>();
     for (const data of this.data.StandingsData) {
-      res.set(data.UserScreenName, this.data.Fixed ? data.OldRating : data.Rating);
+      const rating = this.data.Fixed ? data.OldRating : data.Rating;
+      res.set(data.UserScreenName, unpositivize ? unpositivizeRating(rating) : rating);
+    }
+    return res;
+  }
+
+  toCompetitionMaps(): Map<string, number> {
+    const res = new Map<string, number>();
+    for (const data of this.data.StandingsData) {
+      res.set(data.UserScreenName, data.Competitions);
     }
     return res;
   }

@@ -51,6 +51,14 @@ class ResultsWrapper {
     }
     return res;
   }
+
+  public toNewRatingMaps(): Map<string, number> {
+    const res = new Map<string, number>();
+    for (const result of this.data) {
+      res.set(result.UserScreenName, result.NewRating);
+    }
+    return res;
+  }
 }
 
 const RESULTS_CACHE_DURATION = 10 * 1000;

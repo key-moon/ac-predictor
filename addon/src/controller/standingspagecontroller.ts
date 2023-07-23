@@ -20,13 +20,13 @@ import hasOwnProperty from "../util/hasOwnProperty";
 import StandingsLoadingView from "../view/standingsloading";
 import StandingsTableView from "../view/standingstable";
 
-type RatingProviderInfo = { provider: RatingProvider, lazy: false } | { providerGenerator: () => Promise<RatingProvider>, lazy: true }
+type RatingProviderInfo = { provider: RatingProvider, lazy: boolean };
 
 export default class StandingsPageController {
   contestDetails?: ContestDetails;
 
   performanceProvider?: PerformanceProvider;
-  ratingProviders: { [userScreenName: string]: RatingProviderInfo } = {};
+  ratingProvider?: RatingProviderInfo;
   oldRatings = new Map<string, number>(); 
   isRatedMaps = new Map<string, boolean>();
 
@@ -49,8 +49,8 @@ export default class StandingsPageController {
 
     if (getConfig("hideDuringContest") && this.contestDetails.duringContest(new Date())) return;
 
-    this.standingsTableView = StandingsTableView.Get(userScreenName => {
-      if (!this.ratingProviders) return { "type": "error", "message": "ratingProviders missing" };
+    this.standingsTableView = StandingsTableView.Get(async userScreenName => {
+      if (!this.ratingProvider) return { "type": "error", "message": "ratingProvider missing" };
       if (!this.performanceProvider) return { "type": "error", "message": "performanceProvider missing" };
       if (!this.isRatedMaps) return { "type": "error", "message": "isRatedMapping missing" };
       if (!this.oldRatings) return { "type": "error", "message": "oldRatings missing" };
@@ -63,14 +63,13 @@ export default class StandingsPageController {
       const originalPerformance = this.performanceProvider.getPerformance(userScreenName);
       const positivizedPerformance = Math.round(positivizeRating(originalPerformance));
       if (this.isRatedMaps.get(userScreenName)) {
-        if (!hasOwnProperty(this.ratingProviders, userScreenName)) return { "type": "error", "message": `ratingProvider not found for ${userScreenName}` };
-        const ratingProvider = this.ratingProviders[userScreenName];
-        if (ratingProvider.lazy) {
-          const newRatingCalculator = async () => (await ratingProvider.providerGenerator()).getRating(originalPerformance);
+        if (!this.ratingProvider.provider.availableFor(userScreenName)) return { "type": "error", "message": `rating not available for ${userScreenName}` };
+        if (this.ratingProvider.lazy) {
+          const newRatingCalculator = () => this.ratingProvider!.provider.getRating(userScreenName, originalPerformance);
           return { type: "deffered", oldRating, performance: positivizedPerformance, newRatingCalculator };
         }
         else {
-          const newRating = ratingProvider.provider.getRating(originalPerformance);
+          const newRating = await this.ratingProvider.provider.getRating(userScreenName, originalPerformance);
           return { type: "rated", oldRating, performance: positivizedPerformance, newRating };
         }
       }
@@ -88,7 +87,6 @@ export default class StandingsPageController {
     const standings = await getStandings(this.contestDetails.contestScreenName);
 
     let basePerformanceProvider: PerformanceProvider | undefined = undefined;
-    this.ratingProviders = {};
     if (standings.data.Fixed && getConfig("useResults")) {
       try {
         const results = await getResults(this.contestDetails.contestScreenName);
@@ -96,13 +94,8 @@ export default class StandingsPageController {
         
         this.isRatedMaps = results.toIsRatedMaps();
         this.oldRatings = results.toOldRatingMaps();
-
-        for (const result of results.data) {
-          if (result.IsRated) {
-            const provider = new ConstRatingProvider(result.Performance, result.NewRating);
-            this.ratingProviders[result.UserScreenName] = { provider, lazy: false };
-          }
-        }
+        
+        this.ratingProvider = { provider: new ConstRatingProvider(results.toNewRatingMaps()), lazy: false };
       }
       catch(e) {
         console.warn("getResults failed", e);
@@ -118,26 +111,17 @@ export default class StandingsPageController {
       this.isRatedMaps = standings.toIsRatedMaps();
       this.oldRatings = standings.toOldRatingMaps();
 
-      for (const standingsData of standings.data.StandingsData) {
-        if (this.contestDetails.contestType == "algorithm") {
-          const provider = new IncrementalAlgRatingProvider(unpositivizeRating(standingsData.Rating), standingsData.Competitions);
-          this.ratingProviders[standingsData.UserScreenName] = { provider, lazy: false }
-        }
-        else {
-          for (const standingsData of standings.data.StandingsData) {
-            this.ratingProviders[standingsData.UserScreenName] = {
-              providerGenerator: async () => {
-                const histories = await getHistory(standingsData.UserScreenName, "heuristic");
-
-                histories.data = histories.data.filter(x => {
-                  console.log(x.EndTime, new Date(x.EndTime), this.contestDetails!.endTime);
-                  return new Date(x.EndTime) < this.contestDetails!.endTime;
-                });
-                return new FromHistoryHeuristicRatingProvider(histories.toPerformances());
-              },
-              lazy: true
-            }
-          }
+      if (this.contestDetails.contestType == "algorithm") {
+        this.ratingProvider = { provider: new IncrementalAlgRatingProvider(standings.toOldRatingMaps(true), standings.toCompetitionMaps()), lazy: false }
+      }
+      else {
+        this.ratingProvider = {
+          provider: new FromHistoryHeuristicRatingProvider(async userScreenName => {
+            const histories = await getHistory(userScreenName, "heuristic");
+            histories.data = histories.data.filter(x => new Date(x.EndTime) < this.contestDetails!.endTime);
+            return histories.toPerformances();
+          }),
+          lazy: true
         }
       }
     }

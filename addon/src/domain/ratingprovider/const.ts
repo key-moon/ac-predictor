@@ -1,18 +1,19 @@
 import RatingProvider from "./ratingprovider";
 
 class ConstRatingProvider implements RatingProvider {
-  private performance: number;
-  private rating: number;
-  constructor(performance: number, rating: number) {
-    this.performance = performance;
-    this.rating = rating;
+  private ratings: Map<string, number>;
+  constructor(ratings: Map<string, number>) {
+    this.ratings = ratings;
   }
-  getRating(newPerformance: number): number {
-    if (this.performance != newPerformance) {
-      throw new Error("unexpected performance");
+  availableFor(userScreenName: string): boolean {
+    return this.ratings.has(userScreenName);
+  }
+  async getRating(userScreenName: string, newPerformance: number): Promise<number> {
+    if (!this.availableFor(userScreenName)) {
+      throw new Error(`rating not available for ${userScreenName}`);
     }
-    return this.rating;
+    return this.ratings.get(userScreenName)!;
   }
 }
 
-export default ConstRatingProvider
+export default ConstRatingProvider;

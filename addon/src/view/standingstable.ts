@@ -8,13 +8,14 @@ addStyle(style);
 
 type RatedResultData = { type: "rated", performance: number, oldRating: number, newRating: number };
 type ErrorResultData = { type: "error", message: string };
+type PerfOnlyResultData = { type: "perfonly", performance: number };
 type UnratedResultData = { type: "unrated", performance: number, oldRating: number };
 type DefferedResultData = { type: "deffered", performance: number, oldRating: number, newRatingCalculator: () => Promise<number> };
 
-type NonErrorResultData = RatedResultData | UnratedResultData | DefferedResultData;
+type NonErrorResultData = RatedResultData | UnratedResultData | DefferedResultData | PerfOnlyResultData;
 type ResultData = NonErrorResultData | ErrorResultData;
 
-type ResultDataProvider = (userScreenName: string) => ResultData;
+type ResultDataProvider = (userScreenName: string) => Promise<ResultData>;
 
 function getFadedSpan(innerElements: (string | HTMLElement)[]) {
   return getSpan(innerElements, ["grey"]);
@@ -72,6 +73,14 @@ function getDefferedRatingElem(result: DefferedResultData): HTMLElement {
   return elem;
 }
 
+function getPerfOnlyRatingElem(result: PerfOnlyResultData): HTMLElement {
+  const elem = document.createElement("div");
+  elem.append(
+    getFadedSpan(["(not provided)"])
+  );
+  return elem;
+}
+
 function getErrorRatingElem(result: ErrorResultData): HTMLElement {
   const elem = document.createElement("div");
   elem.append(getSpan(["error on load"], []), document.createElement("br"), getSpan(["(hover to see details)"], ["grey", "small"]), getSpan([result.message], ["my-tooltiptext"]));
@@ -83,6 +92,7 @@ function getRatingElem(result: ResultData) {
   if (result.type == "rated") return getRatedRatingElem(result);
   if (result.type == "unrated") return getUnratedRatingElem(result);
   if (result.type == "deffered") return getDefferedRatingElem(result);
+  if (result.type == "perfonly") return getPerfOnlyRatingElem(result);
   if (result.type == "error") return getErrorRatingElem(result);
   throw new Error("unreachable");
 }
@@ -101,8 +111,11 @@ function modifyHeader(header: HTMLElement) {
 function isFooter(row: HTMLElement) {
   return row.firstElementChild?.classList.contains("colspan");
 }
-function modifyStandingsRow(row: HTMLElement, results: ResultDataProvider) {
-  const userScreenName = row.querySelector(".standings-username .username span")?.textContent;
+async function modifyStandingsRow(row: HTMLElement, results: ResultDataProvider) {
+  let userScreenName: string | null = row.querySelector(".standings-username .username span")?.textContent ?? null;
+  if (userScreenName !== null && row.querySelector(".standings-username .username img[src='//img.atcoder.jp/assets/icon/ghost.svg']")) {
+    userScreenName = `ghost:${userScreenName}`;
+  }
 
   const perfCell = document.createElement("td"); 
   perfCell.classList.add("ac-predictor-standings-elem", "standings-result");
@@ -110,12 +123,12 @@ function modifyStandingsRow(row: HTMLElement, results: ResultDataProvider) {
   ratingCell.classList.add("ac-predictor-standings-elem", "standings-result");
 
   
-  if (userScreenName === null || userScreenName === undefined) {
+  if (userScreenName === null) {
     perfCell.append("-");
     ratingCell.append("-");    
   }
   else {
-    const result = results(userScreenName);
+    const result = await results(userScreenName);
     perfCell.append(getPerfElem(result));
     ratingCell.append(getRatingElem(result));
   }  
