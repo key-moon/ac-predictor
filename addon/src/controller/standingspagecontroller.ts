@@ -26,8 +26,8 @@ export default class StandingsPageController {
 
   performanceProvider?: PerformanceProvider;
   ratingProviders: { [userScreenName: string]: RatingProviderInfo } = {};
-  oldRatings: { [userScreenName: string]: number } = {}; 
-  isRatedMaps: { [userScreenName: string]: boolean } = {};
+  oldRatings = new Map<string, number>(); 
+  isRatedMaps = new Map<string, boolean>();
 
   standingsTableView?: StandingsTableView;
 
@@ -63,15 +63,15 @@ export default class StandingsPageController {
       if (!this.performanceProvider) return { "type": "error", "message": "performanceProvider missing" };
       if (!this.isRatedMaps) return { "type": "error", "message": "isRatedMapping missing" };
       if (!this.oldRatings) return { "type": "error", "message": "oldRatings missing" };
-      if (!hasOwnProperty(this.oldRatings, userScreenName)) return { "type": "error", "message": `oldRating not found for ${userScreenName}` };
+      if (!this.oldRatings.has(userScreenName)) return { "type": "error", "message": `oldRating not found for ${userScreenName}` };
 
-      const oldRating = this.oldRatings[userScreenName];
+      const oldRating = this.oldRatings.get(userScreenName)!;
 
       if (!this.performanceProvider.availableFor(userScreenName)) return { "type": "error", "message": "performance not available" };
 
       const originalPerformance = this.performanceProvider.getPerformance(userScreenName);
       const positivizedPerformance = Math.round(positivizeRating(originalPerformance));
-      if (this.isRatedMaps[userScreenName]) {
+      if (this.isRatedMaps.get(userScreenName)) {
         if (!hasOwnProperty(this.ratingProviders, userScreenName)) return { "type": "error", "message": `ratingProvider not found for ${userScreenName}` };
         const ratingProvider = this.ratingProviders[userScreenName];
         if (ratingProvider.lazy) {
@@ -104,7 +104,7 @@ export default class StandingsPageController {
         basePerformanceProvider = new FixedPerformanceProvider(results.toPerformances());
         
         this.isRatedMaps = results.toIsRatedMaps();
-        this.oldRatings = results.toOldRatings();
+        this.oldRatings = results.toOldRatingMaps();
 
         for (const result of results.data) {
           if (result.IsRated) {
@@ -125,7 +125,7 @@ export default class StandingsPageController {
       basePerformanceProvider = new EloPerformanceProvider(normalizedRanks, aperfsList, this.contestDetails.performanceCap);
 
       this.isRatedMaps = standings.toIsRatedMaps();
-      this.oldRatings = standings.toOldRatings();
+      this.oldRatings = standings.toOldRatingMaps();
 
       for (const standingsData of standings.data.StandingsData) {
         if (this.contestDetails.contestType == "algorithm") {

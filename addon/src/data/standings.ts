@@ -76,18 +76,18 @@ class StandingsWrapper {
     return res;
   }
 
-  toIsRatedMaps(): { [userScreenName: string]: boolean } {
-    const res: { [userScreenName: string]: boolean } = {};
+  toIsRatedMaps(): Map<string, boolean> {
+    const res = new Map<string, boolean>();
     for (const data of this.data.StandingsData) {
-      res[data.UserScreenName] = data.IsRated;
+      res.set(data.UserScreenName, data.IsRated);
     }
     return res;
   }
 
-  toOldRatings(): { [userScreenName: string]: number } {
-    const res: { [userScreenName: string]: number } = {};
+  toOldRatingMaps(): Map<string, number> {
+    const res = new Map<string, number>();
     for (const data of this.data.StandingsData) {
-      res[data.UserScreenName] = this.data.Fixed ? data.OldRating : data.Rating;
+      res.set(data.UserScreenName, this.data.Fixed ? data.OldRating : data.Rating);
     }
     return res;
   }

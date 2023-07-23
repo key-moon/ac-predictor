@@ -36,18 +36,18 @@ class ResultsWrapper {
     return res;
   }
   
-  public toIsRatedMaps(): { [userScreenName: string]: boolean } {
-    const res: { [userScreenName: string]: boolean } = {};
+  public toIsRatedMaps(): Map<string, boolean> {
+    const res = new Map<string, boolean>();
     for (const result of this.data) {
-      res[result.UserScreenName] = result.IsRated;
+      res.set(result.UserScreenName, result.IsRated);
     }
     return res;
   }
 
-  public toOldRatings(): { [userScreenName: string]: number } {
-    const res: { [userScreenName: string]: number } = {};
+  public toOldRatingMaps(): Map<string, number> {
+    const res = new Map<string, number>();
     for (const result of this.data) {
-      res[result.UserScreenName] = result.OldRating;
+      res.set(result.UserScreenName, result.OldRating);
     }
     return res;
   }
