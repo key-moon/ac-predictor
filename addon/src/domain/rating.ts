@@ -55,6 +55,23 @@ export function calcAlgRatingFromLast(last: number, perf: number, ratedMatches: 
     return Math.log2(numerator / denominator) * 800.0 - f(ratedMatches + 1);
 }
 
+/**
+ * calculate the performance required to reach a target rate
+ * @param {Number} [targetRating] targeted unpositivized rating
+ * @param {Number[]} [history] performance history with ascending order
+ * @returns {number} performance
+ */
+export function calcRequiredPerformance(targetRating: number, history: number[]): number {
+    let valid = 10000.0;
+    let invalid = -10000.0;
+    for (let i = 0; i < 100; ++i) {
+        const mid = (invalid + valid) / 2;
+        const rating = Math.round(calcAlgRatingFromHistory(history.concat([mid])));
+        if (targetRating <= rating) valid = mid;
+        else invalid = mid;
+    }
+    return valid;
+}
 
 /**
  * calculate unpositivized rating from performance history
