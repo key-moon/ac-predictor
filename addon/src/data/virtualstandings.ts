@@ -9,7 +9,7 @@ type TaskInfo = {
 };
 type StandingsData = {
   Rank: number,
-  Additional: null,
+  Additional: { "standings.virtualElapsed": number },
   UserName: string,
   UserScreenName: string,
   UserIsDeleted: boolean,
@@ -60,11 +60,13 @@ class StandingsWrapper {
   constructor(data: Standings) {
     this.data = data;
   }
+
   toRanks(onlyRated: boolean=false): Map<string, number> {
     const res = new Map<string, number>();
     for (const data of this.data.StandingsData) {
-      if (onlyRated && !data.IsRated) continue;
-      res.set(data.UserScreenName, data.Rank);
+      if (onlyRated && (!data.IsRated || data.Additional["standings.virtualElapsed"] !== -2)) continue;
+      const userScreenName = data.Additional["standings.virtualElapsed"] === -2 ? `ghost:${data.UserScreenName}` : data.UserScreenName;
+      res.set(userScreenName, data.Rank);
     }
     return res;
   }
@@ -72,34 +74,9 @@ class StandingsWrapper {
   toRatedUsers(): string[] {
     const res: string[] = [];
     for (const data of this.data.StandingsData) {
-      if (data.IsRated) {
+      if (data.IsRated && data.Additional["standings.virtualElapsed"] === -2) {
         res.push(data.UserScreenName);
       }
-    }
-    return res;
-  }
-
-  toIsRatedMaps(): Map<string, boolean> {
-    const res = new Map<string, boolean>();
-    for (const data of this.data.StandingsData) {
-      res.set(data.UserScreenName, data.IsRated);
-    }
-    return res;
-  }
-
-  toOldRatingMaps(unpositivize=false): Map<string, number> {
-    const res = new Map<string, number>();
-    for (const data of this.data.StandingsData) {
-      const rating = this.data.Fixed ? data.OldRating : data.Rating;
-      res.set(data.UserScreenName, unpositivize ? unpositivizeRating(rating) : rating);
-    }
-    return res;
-  }
-
-  toCompetitionMaps(): Map<string, number> {
-    const res = new Map<string, number>();
-    for (const data of this.data.StandingsData) {
-      res.set(data.UserScreenName, data.Competitions);
     }
     return res;
   }
@@ -107,30 +84,37 @@ class StandingsWrapper {
   toScores(): Scores {
     const res = new Map<string, { score: number, penalty: number }>();
     for (const data of this.data.StandingsData) {
-      res.set(data.UserScreenName, { score: data.TotalResult.Score, penalty: data.TotalResult.Elapsed });
+      const userScreenName = data.Additional["standings.virtualElapsed"] === -2 ? `ghost:${data.UserScreenName}` : data.UserScreenName;
+      res.set(userScreenName, { score: data.TotalResult.Score, penalty: data.TotalResult.Elapsed });
     }
     return res;
   }
 }
 
+function createCacheKey(contestScreenName: string, showGhost: boolean) {
+  return `${contestScreenName}:${showGhost}`;
+}
+
 const STANDINGS_CACHE_DURATION = 10 * 1000;
 const cache = new Cache<Standings>(STANDINGS_CACHE_DURATION);
-export default async function getStandings(contestScreenName: string): Promise<StandingsWrapper> {
-  if (!cache.has(contestScreenName)) {
-    const result = await fetch(`https://atcoder.jp/contests/${contestScreenName}/standings/json`);
+export default async function getVirtualStandings(contestScreenName: string, showGhost: boolean): Promise<StandingsWrapper> {
+  const cacheKey = createCacheKey(contestScreenName, showGhost);
+  if (!cache.has(cacheKey)) {
+    const result = await fetch(`https://atcoder.jp/contests/${contestScreenName}/standings/virtual/json${showGhost ? "?showGhost=true" : ""}`);
     if (!result.ok) {
       throw new Error(`Failed to fetch standings: ${result.status}`);
     }
-    cache.set(contestScreenName, await result.json());
+    cache.set(cacheKey, await result.json());
   }
-  return new StandingsWrapper(cache.get(contestScreenName)!);
+  return new StandingsWrapper(cache.get(cacheKey)!);
 }
 
 addHandler(
   (content, path) => {
-    const match = path.match(/^\/contests\/([^/]*)\/standings\/json$/);
+    const match = path.match(/^\/contests\/([^/]*)\/standings\/virtual\/json(\?showGhost=true)?$/);
     if (!match) return;
     const contestScreenName = match[1];
-    cache.set(contestScreenName, JSON.parse(content));
+    const showGhost = match[2] != "";
+    cache.set(createCacheKey(contestScreenName, showGhost), JSON.parse(content));
   }
 )

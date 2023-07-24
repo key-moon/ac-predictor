@@ -16,6 +16,7 @@ import FromHistoryHeuristicRatingProvider from "../domain/ratingprovider/heurist
 import RatingProvider from "../domain/ratingprovider/ratingprovider";
 import getContestScreenName from "../parse/contestScreenName";
 import { getConfig } from "../util/config";
+import hasOwnProperty from "../util/hasOwnProperty";
 import StandingsLoadingView from "../view/standingsloading";
 import StandingsTableView from "../view/standingstable";
 
@@ -57,7 +58,7 @@ export default class StandingsPageController {
 
       const oldRating = this.oldRatings.get(userScreenName)!;
 
-      if (!this.performanceProvider.availableFor(userScreenName)) return { "type": "error", "message": "performance not available" };
+      if (!this.performanceProvider.availableFor(userScreenName)) return { "type": "error", "message": `performance not available for ${userScreenName}` };
 
       const originalPerformance = this.performanceProvider.getPerformance(userScreenName);
       const positivizedPerformance = Math.round(positivizeRating(originalPerformance));
@@ -104,7 +105,7 @@ export default class StandingsPageController {
       const aperfsDict = await getAPerfs(this.contestDetails.contestScreenName);
       const defaultAPerf = this.contestDetails.defaultAPerf;
       const normalizedRanks = normalizeRank(standings.toRanks(true));
-      const aperfsList = standings.toRatedUsers().map(user => aperfsDict[user] ?? defaultAPerf);
+      const aperfsList = standings.toRatedUsers().map(user => hasOwnProperty(aperfsDict, user) ? aperfsDict[user] : defaultAPerf);
       basePerformanceProvider = new EloPerformanceProvider(normalizedRanks, aperfsList, this.contestDetails.performanceCap);
 
       this.isRatedMaps = standings.toIsRatedMaps();
