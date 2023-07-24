@@ -1,3 +1,5 @@
+# crawler
+
 ## setup
 ```sh
 # install
@@ -31,4 +33,6 @@ ac-predictor-crawler standings [contestScreenName]
 ac-predictor-crawler results [contestScreenName]
 # aperfs を計算して更新（ローカルの成績表を使用）
 ac-predictor-crawler aperfs --use-results-cache [contestScreenName]
+# 全員の rating を計算して更新（ローカルの成績表を使用）
+ac-predictor-crawler ratings --use-results-cache [contestType]
 ```
