@@ -13,6 +13,7 @@ from ac_predictor_crawler.commands.results import results_command
 from ac_predictor_crawler.commands.standings import standings_command
 from ac_predictor_crawler.commands.aperf import aperfs_command
 from ac_predictor_crawler.commands.login import login_command
+from ac_predictor_crawler.commands.ratings import ratings_command
 
 
 SESSION_PATH_KEY = "SESSION_PATH"
@@ -36,7 +37,8 @@ def main():
       standings_command,
       aperfs_command,
       # TODO: users_command
-      login_command
+      login_command,
+      ratings_command
     ]
   )
 

@@ -88,3 +88,13 @@ class FileRepository:
     return json.loads(content)
   def store_standings(self, contest_screen_name: str, standings):
     self._save_file(self._standings_path(contest_screen_name), json.dumps(standings).encode())
+
+  def _ratings_path(self):
+    return f"ratings.json"
+  def get_ratings(self):
+    content = self._get_file(self._ratings_path())
+    return json.loads(content)
+  def store_ratings(self, aperfs: Mapping[str, float]):
+    aperfs = { key: my_round(val, 2) for key, val in aperfs.items() }
+    self._save_file(self._ratings_path(), json.dumps(aperfs).encode())
+
