@@ -11,6 +11,7 @@ import PerformanceProvider from "../domain/performanceprovider/performanceprovid
 import { normalizeRank } from "../domain/ranks";
 import { positivizeRating } from "../domain/rating";
 import getContestScreenName from "../parse/contestScreenName";
+import duringVirtualParticipation from "../parse/duringVirtualParticipation";
 import { getConfig } from "../util/config";
 import hasOwnProperty from "../util/hasOwnProperty";
 import StandingsLoadingView from "../view/standingsloading";
@@ -85,11 +86,9 @@ export default class VirtualStandingsPageController {
     const virtualStandings = await getVirtualStandings(this.contestDetails.contestScreenName, true);
     const results = await getResults(this.contestDetails.contestScreenName);
     
-
-
     let ranks: Map<string, number>;
     let basePerformanceProvider: PerformanceProvider;
-    if (getConfig("useFinalResultOnVirtual")) {
+    if (!duringVirtualParticipation() || getConfig("useFinalResultOnVirtual")) {
       const standings = await getStandings(this.contestDetails.contestScreenName);
       const referencePerformanceMap = remapKey(results.toPerformanceMaps(), userScreenName => `reference:${userScreenName}`);
       basePerformanceProvider = new FixedPerformanceProvider(referencePerformanceMap);
