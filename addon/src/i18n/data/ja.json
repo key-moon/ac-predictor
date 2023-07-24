@@ -1,0 +1,14 @@
+{
+  "config_header_text": "ac-predictor 設定",
+
+  "config_hideDuringContest_label": "コンテスト中に予測を非表示にする",
+  "config_useFinalResultOnVirtual_label": "バーチャル参加時のパフォーマンス表示に最終結果を用いる",
+
+  "config_dropdown": "ac-predictor 設定",
+
+  "standings_performance_column_label": "perf",
+  "standings_rate_change_column_label": "レート変化",
+  
+  "standings_click_to_compute_label": "クリックして計算",
+  "standings_not_provided_label": "提供不可"
+}

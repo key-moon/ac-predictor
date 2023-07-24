@@ -1,6 +1,7 @@
 import modalHTML from "./modal.html";
 import newDropdownElem from "./newDropdownElem.html";
 import legacyDropdownElem from "./legacyDropdownElem.html";
+import { substitute } from "../../i18n/i18n";
 
 export default class ConfigView {
   modalElement: HTMLElement;
@@ -27,14 +28,22 @@ export default class ConfigView {
     });
   }
 
+  public addHeader(level: 1 | 2 | 3 | 4 | 5 | 6, content: string) {
+    const settingsRow = this.getSettingsRow();
+
+    const div = document.createElement(`h${level}`);
+    div.textContent = content;
+    settingsRow.append(div);
+  }
+
   private getSettingsRow() {
     return this.modalElement.querySelector(".settings-row")!;
   }
 
   static Create() {
-    document.querySelector("body")?.insertAdjacentHTML("afterbegin", modalHTML);
-    document.querySelector(".header-mypage_list li:nth-last-child(1)")?.insertAdjacentHTML("beforebegin", newDropdownElem);
-    document.querySelector(".navbar-right .dropdown-menu .divider:nth-last-child(2)")?.insertAdjacentHTML("beforebegin", legacyDropdownElem);
+    document.querySelector("body")?.insertAdjacentHTML("afterbegin", substitute(modalHTML));
+    document.querySelector(".header-mypage_list li:nth-last-child(1)")?.insertAdjacentHTML("beforebegin", substitute(newDropdownElem));
+    document.querySelector(".navbar-right .dropdown-menu .divider:nth-last-child(2)")?.insertAdjacentHTML("beforebegin", substitute(legacyDropdownElem));
 
     const element = document.querySelector<HTMLElement>("#modal-ac-predictor-settings");
     if (element === null) {

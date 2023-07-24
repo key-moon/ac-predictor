@@ -1,0 +1,14 @@
+{
+  "config_header_text": "ac-predictor settings",
+
+  "config_hideDuringContest_label": "hide prediction during contests",
+  "config_useFinalResultOnVirtual_label": "use result at the end as a performance reference during virtual participation",
+
+  "config_dropdown": "ac-predictor",
+
+  "standings_performance_column_label": "perf",
+  "standings_rate_change_column_label": "rating Δ",
+  
+  "standings_click_to_compute_label": "click to compute",
+  "standings_not_provided_label": "not provided"
+}

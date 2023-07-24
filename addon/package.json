@@ -13,6 +13,7 @@
     "test": "jest"
   },
   "devDependencies": {
+    "@rollup/plugin-json": "^6.0.0",
     "@tsconfig/node20": "^1.0.2",
     "@types/jest": "^29.5.2",
     "@types/tampermonkey": "^4.0.10",

@@ -1,3 +1,4 @@
+import { getTranslation } from "../i18n/i18n";
 import toSignedString from "../util/toSignedString";
 import addStyle from "./addstyle";
 import getRatingSpan from "./components/ratingspan";
@@ -50,7 +51,7 @@ function getDefferedRatingElem(result: DefferedResultData): HTMLElement {
     " → ",
     getSpan(["???"], ["bold"]),
     document.createElement("br"),
-    getFadedSpan(["(click to calculate)"])
+    getFadedSpan([`(${getTranslation("standings_click_to_compute_label")})`])
   );
   
   async function listener() {
@@ -76,7 +77,7 @@ function getDefferedRatingElem(result: DefferedResultData): HTMLElement {
 function getPerfOnlyRatingElem(result: PerfOnlyResultData): HTMLElement {
   const elem = document.createElement("div");
   elem.append(
-    getFadedSpan(["(not provided)"])
+    getFadedSpan([`(${getTranslation("standings_not_provided_label")})`])
   );
   return elem;
 }
@@ -102,10 +103,11 @@ function getPerfElem(result: ResultData) {
   return getRatingSpan(result.performance);
 }
 
+const headerHtml = `<th class="ac-predictor-standings-elem" style="width:84px;min-width:84px;">${getTranslation("standings_performance_column_label")}</th><th class="ac-predictor-standings-elem" style="width:168px;min-width:168px;">${getTranslation("standings_rate_change_column_label")}</th>`;
 function modifyHeader(header: HTMLElement) {
   header.insertAdjacentHTML(
     "beforeend",
-    '<th class="ac-predictor-standings-elem" style="width:84px;min-width:84px;">perf</th><th class="ac-predictor-standings-elem" style="width:168px;min-width:168px;">レート変化</th>'
+    headerHtml
   );
 }
 function isFooter(row: HTMLElement) {
