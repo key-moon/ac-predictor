@@ -74,6 +74,21 @@ def refresh_results():
     else:
       raise Exception("request failed")
 
+def update_ratings():
+  print("[+] calculating ratings...")
+  for contest_type in ["algorithm", "heuristics"]:
+    for retry in range(RETRY_COUNT):
+      try:
+        run(["ac-predictor-crawler", LEVEL[retry], "ratings", "--use-results-cache", contest_type], check=True)
+      except KeyboardInterrupt:
+        raise KeyboardInterrupt()
+      except:
+        print("[*] rating calculation failed", contest_type)
+        continue
+      break
+    else:
+      raise Exception("request failed")
+
 def update_aperfs(contests):
   print("[+] calculating  aperfs...")
   for contest in tqdm(contests):
@@ -116,11 +131,12 @@ def main():
   try:
     update_contests()
     contests = get_contests()
-    update_required = [contest for contest in contests if has_start_within(contest, timedelta(hours=5)) or is_running(contest)]
+    update_required = [contest for contest in contests if (has_start_within(contest, timedelta(hours=5)) or is_running(contest)) and is_rated(contest)]
 
     print(f"[+] {len(update_required)=}")
     if any(map(aperf_not_calculated, update_required)):
-      refresh_results()  
+      refresh_results()
+      update_ratings()
 
     update_aperfs(update_required)
     commit_and_push()
