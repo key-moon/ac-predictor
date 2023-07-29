@@ -6,6 +6,7 @@ type Config = {
   useResults: boolean,
   hideDuringContest: boolean
   isDebug: boolean,
+  hideUntilFixed: boolean,
   useFinalResultOnVirtual: boolean
 };
 
@@ -13,6 +14,7 @@ const defaultConfig: Config = {
   useResults: true,
   hideDuringContest: false,
   isDebug: false,
+  hideUntilFixed: false,
   useFinalResultOnVirtual: false
 };
 

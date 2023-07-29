@@ -2,6 +2,7 @@
   "config_header_text": "ac-predictor 設定",
 
   "config_hideDuringContest_label": "コンテスト中に予測を非表示にする",
+  "config_hideUntilFixed_label": "パフォーマンスが確定するまで非表示にする",
   "config_useFinalResultOnVirtual_label": "バーチャル参加時のパフォーマンス表示に最終結果を用いる",
 
   "config_dropdown": "ac-predictor 設定",

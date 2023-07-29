@@ -51,6 +51,9 @@ export default class StandingsPageController {
     if (this.contestDetails.beforeContest(new Date())) return;
     if (getConfig("hideDuringContest") && this.contestDetails.duringContest(new Date())) return;
 
+    const standings = await getStandings(this.contestDetails.contestScreenName);
+    if (getConfig("hideUntilFixed") && !standings.data.Fixed) return;
+
     this.standingsTableView = StandingsTableView.Get(async userScreenName => {
       if (!this.ratingProvider) return { "type": "error", "message": "ratingProvider missing" };
       if (!this.performanceProvider) return { "type": "error", "message": "performanceProvider missing" };
