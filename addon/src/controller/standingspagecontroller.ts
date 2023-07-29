@@ -17,6 +17,7 @@ import RatingProvider from "../domain/ratingprovider/ratingprovider";
 import getContestScreenName from "../parse/contestScreenName";
 import { getConfig } from "../util/config";
 import hasOwnProperty from "../util/hasOwnProperty";
+import isDebugMode from "../util/isdebugmode";
 import StandingsLoadingView from "../view/standingsloading";
 import StandingsTableView from "../view/standingstable";
 
@@ -81,12 +82,17 @@ export default class StandingsPageController {
         return { type: "unrated", oldRating, performance: positivizedPerformance };
       }
     });
+    this.standingsTableView.onRefreshed(async () => {
+      await this.updateData();
+      this.standingsTableView!.update();
+    });
     await this.updateData();
     this.standingsTableView.update();
   }
 
   private async updateData() {
     if (!this.contestDetails) throw new Error("contestDetails missing");
+    if (isDebugMode()) console.log("data updating...");
 
     const standings = await getStandings(this.contestDetails.contestScreenName);
 
@@ -134,5 +140,6 @@ export default class StandingsPageController {
     }
     
     this.performanceProvider = new InterpolatePerformanceProvider(standings.toRanks(), basePerformanceProvider);
+    if (isDebugMode()) console.log("data updated");
   }
 }
