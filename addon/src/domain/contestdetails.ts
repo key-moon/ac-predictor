@@ -49,6 +49,10 @@ export default class ContestDetails {
     throw new Error("unknown contest type");
   }
 
+  public beforeContest(dateTime: Date) {
+    return dateTime < this.startTime;
+  }
+
   public duringContest(dateTime: Date) {
     return this.startTime < dateTime && dateTime < this.endTime;
   }

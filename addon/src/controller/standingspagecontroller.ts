@@ -47,6 +47,7 @@ export default class StandingsPageController {
     }
     this.contestDetails = contestDetails;
 
+    if (this.contestDetails.beforeContest(new Date())) return;
     if (getConfig("hideDuringContest") && this.contestDetails.duringContest(new Date())) return;
 
     this.standingsTableView = StandingsTableView.Get(async userScreenName => {
