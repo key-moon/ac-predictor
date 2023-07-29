@@ -97,6 +97,9 @@ export default class StandingsPageController {
     if (standings.data.Fixed && getConfig("useResults")) {
       try {
         const results = await getResults(this.contestDetails.contestScreenName);
+        if (results.data.length === 0) {
+          throw new Error("results missing");
+        }
         basePerformanceProvider = new FixedPerformanceProvider(results.toPerformanceMaps());
         
         this.isRatedMaps = results.toIsRatedMaps();
