@@ -8,7 +8,7 @@
   "config_dropdown": "ac-predictor",
 
   "standings_performance_column_label": "perf",
-  "standings_rate_change_column_label": "rating Δ",
+  "standings_rate_change_column_label": "rating delta",
   
   "standings_click_to_compute_label": "click to compute",
   "standings_not_provided_label": "not provided"
