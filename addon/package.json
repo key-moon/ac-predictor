@@ -2,6 +2,7 @@
   "name": "ac-predictor",
   "version": "2.0.0",
   "author": "keymoon",
+  "description": "コンテスト中にAtCoderのパフォーマンスを予測します",
   "typeRoots": [
     "types",
     "node_modules/@types"
