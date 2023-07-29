@@ -1,5 +1,4 @@
 import { getTranslation } from "../i18n/i18n";
-import isDebugMode from "../util/isdebugmode";
 import toSignedString from "../util/toSignedString";
 import addStyle from "./addstyle";
 import getRatingSpan from "./components/ratingspan";
@@ -149,14 +148,10 @@ function modifyFooter(footer: HTMLElement) {
 class StandingsTableView {
   private element: HTMLTableElement;
   private provider: ResultDataProvider;
-  private refreshHooks: (() => void)[] = [];
   constructor(element: HTMLTableElement, resultDataProvider: ResultDataProvider) {
     this.element = element;
     this.provider = resultDataProvider;
     this.initHandler();
-  }
-  onRefreshed(hook: () => void): void {
-    this.refreshHooks.push(hook);
   }
   update(): void {
     this.removeOldElement();
@@ -177,20 +172,6 @@ class StandingsTableView {
     new MutationObserver(() => this.update()).observe(this.element.tBodies[0], {
       childList: true,
     });
-
-    const statsRow = this.element.querySelector(".standings-statistics");
-    if (statsRow === null) {
-      throw new Error("statsRow not found");
-    }
-
-    const acElems = statsRow.querySelectorAll(".standings-ac")
-
-    const refreshObserver = new MutationObserver((records) => {
-      if (isDebugMode()) console.log("fire refreshHooks", records);
-      this.refreshHooks.forEach(f => f());
-    });
-
-    acElems.forEach(elem => refreshObserver.observe(elem, { childList: true }));
   }
 
   static Get(resultDataProvider: ResultDataProvider) {
