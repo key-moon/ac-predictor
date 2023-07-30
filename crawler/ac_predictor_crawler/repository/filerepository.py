@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 import json
 import os.path as path
-from typing import List, Mapping
+from typing import List, Literal, Mapping
 from venv import logger
 
 from ac_predictor_crawler.domain.contestinfo import ContestInfo
@@ -89,12 +89,12 @@ class FileRepository:
   def store_standings(self, contest_screen_name: str, standings):
     self._save_file(self._standings_path(contest_screen_name), json.dumps(standings).encode())
 
-  def _ratings_path(self):
-    return f"ratings.json"
-  def get_ratings(self):
-    content = self._get_file(self._ratings_path())
+  def _ratings_path(self, contest_type: Literal["algorithm", "heuristic"]):
+    return f"ratings/{contest_type}.json"
+  def get_ratings(self, contest_type: Literal["algorithm", "heuristic"]):
+    content = self._get_file(self._ratings_path(contest_type))
     return json.loads(content)
-  def store_ratings(self, aperfs: Mapping[str, float]):
-    aperfs = { key: my_round(val, 2) for key, val in aperfs.items() }
-    self._save_file(self._ratings_path(), json.dumps(aperfs).encode())
+  def store_ratings(self, contest_type: Literal["algorithm", "heuristic"], ratings: Mapping[str, float]):
+    ratings = { key: my_round(val, 2) for key, val in ratings.items() }
+    self._save_file(self._ratings_path(contest_type), json.dumps(ratings).encode())
 

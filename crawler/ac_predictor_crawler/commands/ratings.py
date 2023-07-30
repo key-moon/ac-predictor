@@ -36,7 +36,7 @@ def _handler(res: Namespace):
 
   logger.info(f"gathering histories from results...")
   ratings = ({ key: calc_rating(history, res.contest_type) for key, history in histories.items() })
-  repo.store_ratings(ratings)
+  repo.store_ratings(res.contest_type, ratings)
 
 ratings_command = SubCommand(
   "ratings",

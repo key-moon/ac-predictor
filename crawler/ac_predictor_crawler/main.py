@@ -24,6 +24,7 @@ def main():
 
   parser = ArgumentParser("ac-predictor-crawler")
   parser.add_argument("--quiet", action="store_true")
+  parser.add_argument("--normal", action="store_true")
   parser.add_argument("--verbose", action="store_true")
   parser.add_argument("--no-store", dest="store", action="store_false")
 

@@ -10,7 +10,7 @@ from runner.util import has_start_within, is_over, is_rated, is_running
 RETRY_COUNT = 3
 GRACE_PERIOD = 60 * 60 # 1 hour
 
-LEVEL = ["--quiet", "", "--verbose"]
+LEVEL = ["--quiet", "--normal", "--verbose"]
 
 repository_path: str
 
@@ -76,7 +76,7 @@ def refresh_results():
 
 def update_ratings():
   print("[+] calculating ratings...")
-  for contest_type in ["algorithm", "heuristics"]:
+  for contest_type in ["algorithm", "heuristic"]:
     for retry in range(RETRY_COUNT):
       try:
         run(["ac-predictor-crawler", LEVEL[retry], "ratings", "--use-results-cache", contest_type], check=True)
