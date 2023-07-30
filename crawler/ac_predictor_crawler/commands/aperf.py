@@ -39,7 +39,7 @@ def _handler(res: Namespace):
   histories: Mapping[str, List[int]] = {}
 
   BOUND_PERFORMANCE = [1200 + 400, 2000 + 400, 2800 + 400]
-  inaccurate_users = []
+  inaccurate_users = set()
 
   affective_contests = [contest for contest in contests if contest.contest_type == this_info.contest_type and contest.is_rated() and contest.start_time < this_info.start_time]
   logger.debug(f'{len(affective_contests)=}')
@@ -58,7 +58,7 @@ def _handler(res: Namespace):
       if user_screen_name not in histories: histories[user_screen_name] = []
 
       if result["Performance"] in BOUND_PERFORMANCE:
-        inaccurate_users.append(user_screen_name)
+        inaccurate_users.add(user_screen_name)
       histories[user_screen_name].append(result["Performance"])
 
   for user in inaccurate_users:
