@@ -76,6 +76,10 @@ export default class VirtualStandingsPageController {
       const positivizedPerformance = Math.round(positivizeRating(originalPerformance));
       return { type: "perfonly", performance: positivizedPerformance };
     });
+    this.standingsTableView.onRefreshed(async () => {
+      await this.updateData();
+      this.standingsTableView!.update();
+    });
     await this.updateData();
     this.standingsTableView.update();
   }
