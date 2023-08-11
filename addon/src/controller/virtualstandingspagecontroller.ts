@@ -92,7 +92,7 @@ export default class VirtualStandingsPageController {
     
     let ranks: Map<string, number>;
     let basePerformanceProvider: PerformanceProvider;
-    if (!duringVirtualParticipation() || getConfig("useFinalResultOnVirtual")) {
+    if ((!duringVirtualParticipation() || getConfig("useFinalResultOnVirtual")) && getConfig("useResults")) {
       const standings = await getStandings(this.contestDetails.contestScreenName);
       const referencePerformanceMap = remapKey(results.toPerformanceMaps(), userScreenName => `reference:${userScreenName}`);
       basePerformanceProvider = new FixedPerformanceProvider(referencePerformanceMap);
@@ -102,8 +102,8 @@ export default class VirtualStandingsPageController {
     else {
       const aperfsObj = await getAPerfs(this.contestDetails.contestScreenName);
       const defaultAPerf = this.contestDetails.defaultAPerf;
-      const normalizedRanks = normalizeRank(virtualStandings.toRanks(true));
-      const aperfsList = virtualStandings.toRatedUsers().map(userScreenName => hasOwnProperty(aperfsObj, userScreenName) ? aperfsObj[userScreenName] : defaultAPerf);
+      const normalizedRanks = normalizeRank(virtualStandings.toRanks(true, this.contestDetails.contestType));
+      const aperfsList = virtualStandings.toRatedUsers(this.contestDetails.contestType).map(userScreenName => hasOwnProperty(aperfsObj, userScreenName) ? aperfsObj[userScreenName] : defaultAPerf);
       
       basePerformanceProvider = new EloPerformanceProvider(normalizedRanks, aperfsList, this.contestDetails.performanceCap);
 

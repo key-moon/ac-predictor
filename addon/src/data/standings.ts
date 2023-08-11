@@ -60,29 +60,29 @@ class StandingsWrapper {
   constructor(data: Standings) {
     this.data = data;
   }
-  toRanks(onlyRated: boolean=false): Map<string, number> {
+  toRanks(onlyRated: boolean=false, contestType: "algorithm" | "heuristic"="algorithm"): Map<string, number> {
     const res = new Map<string, number>();
     for (const data of this.data.StandingsData) {
-      if (onlyRated && !data.IsRated) continue;
+      if (onlyRated && !this.isRated(data, contestType)) continue;
       res.set(data.UserScreenName, data.Rank);
     }
     return res;
   }
 
-  toRatedUsers(): string[] {
+  toRatedUsers(contestType: "algorithm" | "heuristic"): string[] {
     const res: string[] = [];
     for (const data of this.data.StandingsData) {
-      if (data.IsRated) {
+      if (this.isRated(data, contestType)) {
         res.push(data.UserScreenName);
       }
     }
     return res;
   }
 
-  toIsRatedMaps(): Map<string, boolean> {
+  toIsRatedMaps(contestType: "algorithm" | "heuristic"): Map<string, boolean> {
     const res = new Map<string, boolean>();
     for (const data of this.data.StandingsData) {
-      res.set(data.UserScreenName, data.IsRated);
+      res.set(data.UserScreenName, this.isRated(data, contestType));
     }
     return res;
   }
@@ -110,6 +110,16 @@ class StandingsWrapper {
       res.set(data.UserScreenName, { score: data.TotalResult.Score, penalty: data.TotalResult.Elapsed });
     }
     return res;
+  }
+
+  private isRated(data: StandingsData, contestType: "algorithm" | "heuristic"="algorithm") {
+    if (contestType === "algorithm") {
+      return data.IsRated;
+    }
+    if (contestType === "heuristic") {
+      return data.IsRated && data.TotalResult.Count !== 0;
+    }
+    throw new Error("unreachable");
   }
 }
 

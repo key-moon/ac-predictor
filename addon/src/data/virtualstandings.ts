@@ -61,20 +61,20 @@ class StandingsWrapper {
     this.data = data;
   }
 
-  toRanks(onlyRated: boolean=false): Map<string, number> {
+  toRanks(onlyRated: boolean=false, contestType: "algorithm" | "heuristic"="algorithm"): Map<string, number> {
     const res = new Map<string, number>();
     for (const data of this.data.StandingsData) {
-      if (onlyRated && (!data.IsRated || data.Additional["standings.virtualElapsed"] !== -2)) continue;
+      if (onlyRated && !this.isRated(data, contestType))  continue;
       const userScreenName = data.Additional["standings.virtualElapsed"] === -2 ? `ghost:${data.UserScreenName}` : data.UserScreenName;
       res.set(userScreenName, data.Rank);
     }
     return res;
   }
 
-  toRatedUsers(): string[] {
+  toRatedUsers(contestType: "algorithm" | "heuristic"): string[] {
     const res: string[] = [];
     for (const data of this.data.StandingsData) {
-      if (data.IsRated && data.Additional["standings.virtualElapsed"] === -2) {
+      if (this.isRated(data, contestType)) {
         res.push(data.UserScreenName);
       }
     }
@@ -88,6 +88,15 @@ class StandingsWrapper {
       res.set(userScreenName, { score: data.TotalResult.Score, penalty: data.TotalResult.Elapsed });
     }
     return res;
+  }
+
+  private isRated(data: StandingsData, contestType: "algorithm" | "heuristic") {
+    if (contestType === "algorithm") {
+      return data.IsRated && data.Additional["standings.virtualElapsed"] === -2;
+    }
+    else {
+      return data.IsRated && data.Additional["standings.virtualElapsed"] === -2 && data.TotalResult.Count !== 0;
+    }
   }
 }
 

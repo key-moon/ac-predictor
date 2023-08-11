@@ -117,11 +117,11 @@ export default class StandingsPageController {
     if (basePerformanceProvider === undefined) {
       const aperfsDict = await getAPerfs(this.contestDetails.contestScreenName);
       const defaultAPerf = this.contestDetails.defaultAPerf;
-      const normalizedRanks = normalizeRank(standings.toRanks(true));
-      const aperfsList = standings.toRatedUsers().map(user => hasOwnProperty(aperfsDict, user) ? aperfsDict[user] : defaultAPerf);
+      const normalizedRanks = normalizeRank(standings.toRanks(true, this.contestDetails.contestType));
+      const aperfsList = standings.toRatedUsers(this.contestDetails.contestType).map(user => hasOwnProperty(aperfsDict, user) ? aperfsDict[user] : defaultAPerf);
       basePerformanceProvider = new EloPerformanceProvider(normalizedRanks, aperfsList, this.contestDetails.performanceCap);
 
-      this.isRatedMaps = standings.toIsRatedMaps();
+      this.isRatedMaps = standings.toIsRatedMaps(this.contestDetails.contestType);
       this.oldRatings = standings.toOldRatingMaps();
 
       if (this.contestDetails.contestType == "algorithm") {
