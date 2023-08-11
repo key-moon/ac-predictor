@@ -28,9 +28,18 @@ export default class ContestDetails {
       throw new Error("unrated contest");
     }
 
+    if (this.ratedrange.end == 1199) return 800;
     if (this.ratedrange.end == 1999) return 800;
-    if (this.ratedrange.end == 2799) return 1000;
-    if (4000 <= this.ratedrange.end) return 1200;
+
+    const DEFAULT_CHANGED_AT = new Date("2019-05-25"); // maybe wrong
+    if (this.ratedrange.end == 2799) {
+      if (this.startTime < DEFAULT_CHANGED_AT) return 1600;
+      else return 1000;
+    }
+    if (4000 <= this.ratedrange.end) {
+      if (this.startTime < DEFAULT_CHANGED_AT) return 1600;
+      else return 1200;
+    }
 
     throw new Error("unknown contest type");
   }
@@ -42,6 +51,7 @@ export default class ContestDetails {
       throw new Error("unrated contest");
     }
 
+    if (this.ratedrange.end == 1199) return 1600;
     if (this.ratedrange.end == 1999) return 2400;
     if (this.ratedrange.end == 2799) return 3200;
     if (4000 <= this.ratedrange.end) return Infinity;
