@@ -116,8 +116,13 @@ function isFooter(row: HTMLElement) {
 }
 async function modifyStandingsRow(row: HTMLElement, results: ResultDataProvider) {
   let userScreenName: string | null = row.querySelector(".standings-username .username span")?.textContent ?? null;
+  // TODO: この辺のロジックがここにあるの嫌だね……
   if (userScreenName !== null && row.querySelector(".standings-username .username img[src='//img.atcoder.jp/assets/icon/ghost.svg']")) {
     userScreenName = `ghost:${userScreenName}`;
+  }
+  if (userScreenName !== null && row.classList.contains("info") && 3 <= row.children.length && row.children[2].textContent == "-") {
+    // 延長線順位表用
+    userScreenName = `extended:${userScreenName}`;
   }
 
   const perfCell = document.createElement("td"); 
