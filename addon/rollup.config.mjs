@@ -15,7 +15,7 @@ const userScriptBanner = `
 // @author       ${packageJson.author}
 // @license      ${packageJson.license}
 // @match        https://atcoder.jp/*
-// @exclude      https://atcoder.jp/*/json
+// @exclude      /^https://atcoder\\.jp/[^#?]*/json/
 // @grant        none
 // ==/UserScript==`.trim();
 
