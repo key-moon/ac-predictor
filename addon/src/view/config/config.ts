@@ -9,7 +9,7 @@ export default class ConfigView {
     this.modalElement = modalElement;
   }
 
-  public addCheckbox(label: string, val: boolean, handler: (val: boolean) => void) {
+  public addCheckbox(label: string, val: boolean, description: string | null, handler: (val: boolean) => void) {
     const settingsRow = this.getSettingsRow();
     
     const div = document.createElement("div");
@@ -20,6 +20,13 @@ export default class ConfigView {
     input.checked = val;
     labelElem.append(input);
     labelElem.append(label);
+    if (description) {
+      const descriptionDiv = document.createElement("div");
+      descriptionDiv.append(description);
+      descriptionDiv.classList.add("small");
+      descriptionDiv.classList.add("gray");
+      labelElem.append(descriptionDiv);
+    }
     div.append(labelElem);
     settingsRow.append(div);
 

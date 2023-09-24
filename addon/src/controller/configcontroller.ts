@@ -7,12 +7,13 @@ export default class ConfigController {
   public register() {
     const configView = ConfigView.Create();
     
-    configView.addCheckbox(getTranslation("config_useFinalResultOnVirtual_label"), getConfig("useFinalResultOnVirtual"), val => setConfig("useFinalResultOnVirtual", val));
-    configView.addCheckbox(getTranslation("config_hideDuringContest_label"), getConfig("hideDuringContest"), val => setConfig("hideDuringContest", val));
-    configView.addCheckbox(getTranslation("config_hideUntilFixed_label"), getConfig("hideUntilFixed"), val => setConfig("hideUntilFixed", val));
+    // TODO: 流石に処理をまとめたい
+    configView.addCheckbox(getTranslation("config_useFinalResultOnVirtual_label"), getConfig("useFinalResultOnVirtual"), getTranslation("config_useFinalResultOnVirtual_description"), val => setConfig("useFinalResultOnVirtual", val));
+    configView.addCheckbox(getTranslation("config_hideDuringContest_label"), getConfig("hideDuringContest"), null, val => setConfig("hideDuringContest", val));
+    configView.addCheckbox(getTranslation("config_hideUntilFixed_label"), getConfig("hideUntilFixed"), null, val => setConfig("hideUntilFixed", val));
     if (isDebugMode()) {
-      configView.addCheckbox("[DEBUG] enable debug mode", getConfig("isDebug"), val => setConfig("isDebug", val));
-      configView.addCheckbox("[DEBUG] use results", getConfig("useResults"), val => setConfig("useResults", val));
+      configView.addCheckbox("[DEBUG] enable debug mode", getConfig("isDebug"), null, val => setConfig("isDebug", val));
+      configView.addCheckbox("[DEBUG] use results", getConfig("useResults"), null, val => setConfig("useResults", val));
     }
   }
 }
