@@ -66,12 +66,16 @@ def _handler(res: Namespace):
 
   missing_users.difference_update(histories.keys())
   logger.info(f"gathering histories...")
+
+  history_required = []
   for standingsData in tqdm(standings["StandingsData"]):
     user_screen_name = standingsData["UserScreenName"]
     if user_screen_name not in missing_users: continue
     if standingsData["UserIsDeleted"]: continue
     if standingsData["Competitions"] == 0: continue
-    
+    history_required.append(user_screen_name)
+
+  for user_screen_name in tqdm(history_required):    
     history = get_history(user_screen_name, this_info.contest_type)
     
     valid_contests = [record for record in history if record.IsRated and record.EndTime < this_info.start_time]
