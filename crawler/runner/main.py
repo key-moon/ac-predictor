@@ -22,8 +22,8 @@ def get_dirty_files():
 
 def reset_and_clean():
   print("[+] cleaning...")
-  run(["git", "-C", repository_path, "reset", "--hard"])
-  run(["git", "-C", repository_path, "clean", "-fd"])
+  run(["git", "-C", repository_path, "reset", "--hard"], check=True)
+  run(["git", "-C", repository_path, "clean", "-fd"], check=True)
 
 def pull():
   print("[+] syncing...")
@@ -32,9 +32,9 @@ def pull():
 def commit_and_push():
   if run(["git", "-C", repository_path, "diff", "--quiet"], capture_output=True).returncode != 0:
     print("[+] commiting changes and syncing...")
-    run(["git", "-C", repository_path, "add", "."])
-    run(["git", "-C", repository_path, "commit", "-m", f"[auto] refresh caches"])
-    run(["git", "-C", repository_path, "push", "-f"])
+    run(["git", "-C", repository_path, "add", "."], check=True)
+    run(["git", "-C", repository_path, "commit", "-m", f"[auto] refresh caches"], check=True)
+    run(["git", "-C", repository_path, "push", "-f"], check=True)
   else:
     print("[+] no file changed")
 
@@ -42,7 +42,7 @@ def update_contests():
   print("[+] updating contests...")
   for retry in range(RETRY_COUNT):
     try:
-      run(["ac-predictor-crawler", LEVEL[retry], "contests"])
+      run(["ac-predictor-crawler", LEVEL[retry], "contests"], check=True)
     except KeyboardInterrupt:
       raise KeyboardInterrupt()
     except:
