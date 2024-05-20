@@ -3,7 +3,7 @@ import os
 from argparse import ArgumentParser
 from ac_predictor_crawler.logger import logger
 
-from ac_predictor_crawler.config import set_repository, set_session_path, set_should_store
+from ac_predictor_crawler.config import set_interval, set_repository, set_session_path, set_should_store
 from ac_predictor_crawler.requests import init_atcodersession, save_atcodersession
 from ac_predictor_crawler.repository.filerepository import FileRepository
 
@@ -27,6 +27,7 @@ def main():
   parser.add_argument("--normal", action="store_true")
   parser.add_argument("--verbose", action="store_true")
   parser.add_argument("--no-store", dest="store", action="store_false")
+  parser.add_argument("--interval", type=float, default=2)
 
   parser.add_argument("--repository-path", action="store")
 
@@ -47,17 +48,18 @@ def main():
 
   logger.setLevel(logging.DEBUG if args.verbose else logging.WARN if args.quiet else logging.INFO)
 
-  session_path = os.path.expanduser(os.environ.get(SESSION_PATH_KEY, "~/.config/ac-predictor-crawler/session.txt"))
-  set_session_path(session_path)
-  init_atcodersession()
-
   if args.repository_path is not None:
     set_repository(FileRepository(args.repository_path))
   else:
     set_repository(FileRepository(os.environ[REPOSITORY_PATH_KEY]))
 
+  set_interval(args.interval)
   set_should_store(args.store)
-  
+
+  session_path = os.path.expanduser(os.environ.get(SESSION_PATH_KEY, "~/.config/ac-predictor-crawler/session.txt"))
+  set_session_path(session_path)
+  init_atcodersession()
+
   if hasattr(args, "handler"):
     args.handler(args)
   else:

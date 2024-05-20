@@ -17,6 +17,14 @@ def set_should_store(should_store: bool):
 def should_store():
   return _should_store
 
+_interval: float
+def set_interval(interval: float):
+  global _interval
+  _interval = interval
+
+def get_interval():
+  return _interval
+
 _session_path: str
 def set_session_path(session_path: str):
   global _session_path

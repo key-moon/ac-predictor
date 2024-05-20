@@ -8,7 +8,7 @@ from urllib.parse import urljoin
 
 from ac_predictor_crawler.logger import logger
 from ac_predictor_crawler.util.file import write
-from ac_predictor_crawler.config import get_atcoder_base_url, get_session_path
+from ac_predictor_crawler.config import get_atcoder_base_url, get_interval, get_session_path
 
 class AtCoderSession(Session):
   def __init__(self, base_url: Optional[str]=None, interval=timedelta(seconds=2)):
@@ -75,7 +75,7 @@ class AtCoderSession(Session):
 _session: AtCoderSession
 def init_atcodersession():
   global _session
-  _session = AtCoderSession()
+  _session = AtCoderSession(interval=timedelta(seconds=get_interval()))
   if os.path.exists(get_session_path()):
     _session.set_session(open(get_session_path(), "r").read())
 
