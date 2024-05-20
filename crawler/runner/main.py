@@ -136,7 +136,7 @@ def main():
     print(f"[+] {len(update_required)=}")
     if any(map(aperf_not_calculated, update_required)):
       refresh_results()
-      # update_ratings()
+      update_ratings()
 
     update_aperfs(update_required)
     commit_and_push()
