@@ -8,6 +8,10 @@ setup(
         "tqdm==4.65.0",
         "requests==2.31.0"
     ],
+    packages=[
+      "ac_predictor_crawler",
+      "runner"
+    ],
     extras_require={
     },
     entry_points={
