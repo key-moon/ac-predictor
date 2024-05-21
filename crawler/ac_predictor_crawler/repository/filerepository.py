@@ -18,6 +18,11 @@ class FileRepository:
   def __init__(self, path: str) -> None:    
     self.path = path
 
+  def _has_file(self, relative_path: str):
+    file_path = path.join(self.path, relative_path)
+    logger.debug(f"check file {relative_path}")
+    return path.exists(file_path)
+
   def _get_file(self, relative_path: str):
     file_path = path.join(self.path, relative_path)
     logger.debug(f"read file from {relative_path}")
@@ -66,6 +71,8 @@ class FileRepository:
 
   def _aperfs_path(self, contest_screen_name: str):
     return f"aperfs/{contest_screen_name}.json"
+  def has_aperfs(self, contest_screen_name: str):
+    return self._has_file(self._aperfs_path(contest_screen_name))
   def get_aperfs(self, contest_screen_name: str):
     content = self._get_file(self._aperfs_path(contest_screen_name))
     return json.loads(content)
@@ -75,6 +82,8 @@ class FileRepository:
 
   def _results_path(self, contest_screen_name: str):
     return f"results/{contest_screen_name}.json"
+  def has_results(self, contest_screen_name: str):
+    return self._get_file(self._results_path(contest_screen_name))
   def get_results(self, contest_screen_name: str):
     content = self._get_file(self._results_path(contest_screen_name))
     return json.loads(content)
@@ -83,6 +92,8 @@ class FileRepository:
 
   def _standings_path(self, contest_screen_name: str):
     return f"standings/{contest_screen_name}.json"
+  def has_standings(self, contest_screen_name: str):
+    return self._has_file(self._standings_path(contest_screen_name))
   def get_standings(self, contest_screen_name: str):
     content = self._get_file(self._standings_path(contest_screen_name))
     return json.loads(content)
@@ -91,10 +102,11 @@ class FileRepository:
 
   def _ratings_path(self, contest_type: Literal["algorithm", "heuristic"]):
     return f"ratings/{contest_type}.json"
+  def has_ratings(self, contest_type: Literal["algorithm", "heuristic"]):
+    return self._has_file(self._ratings_path(contest_type))    
   def get_ratings(self, contest_type: Literal["algorithm", "heuristic"]):
     content = self._get_file(self._ratings_path(contest_type))
     return json.loads(content)
   def store_ratings(self, contest_type: Literal["algorithm", "heuristic"], ratings: Mapping[str, float]):
     ratings = { key: my_round(val, 2) for key, val in ratings.items() }
     self._save_file(self._ratings_path(contest_type), json.dumps(ratings).encode())
-
