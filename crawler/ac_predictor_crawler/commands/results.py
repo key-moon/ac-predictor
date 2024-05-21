@@ -8,7 +8,7 @@ def _initializer(parser: ArgumentParser):
 
 def _handler(res: Namespace):
   repo = get_repository()
-  results = get_results(res.contest)
+  results = repo.get_results(res.contest)
   repo.store_results(res.contest, results)
 
 results_command = SubCommand(

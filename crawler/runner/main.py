@@ -132,7 +132,7 @@ def do_crawl_results(refresh=False):
     contests = filter(lambda c: c.is_rated() and c.is_over(), repository.get_contests())
     if not refresh:
       contests = filter(lambda c: not repository.has_results(c.contest_screen_name), contests)
-    update_results(contests)
+    update_results(list(contests))
     update_ratings()
     commit_and_push(overwrite=refresh) # refresh takes too long, so we definetly don't want to lose the data
   finally:
@@ -146,9 +146,8 @@ def do_update_aperfs():
 
   try:
     update_contests()
-    update_required = [*filter(lambda c: (c.has_start_within(timedelta(hours=5)) or c.is_running()) and c.is_rated(), repository.get_contests())]
-    print(f"[+] {len(update_required)=}")
-    update_aperfs(update_required)
+    update_required = filter(lambda c: (c.has_start_within(timedelta(hours=5)) or c.is_running()) and c.is_rated(), repository.get_contests())
+    update_aperfs(list(update_required))
     commit_and_push()
   finally:
     reset_and_clean()
