@@ -15,5 +15,9 @@ class ContestInfo:
   ratedrange: RateRange
   def is_rated(self):
     return self.ratedrange.has_value()
+  def has_start_within(self, timedelta: timedelta):
+    return datetime.now() <= self.start_time <= datetime.now() + timedelta
+  def is_running(self):
+    return self.start_time <= datetime.now(timezone.utc) <= self.start_time + self.duration
   def is_over(self):
-    return datetime.now(timezone.utc) <= self.start_time + self.duration
+    return self.start_time + self.duration <= datetime.now(timezone.utc)

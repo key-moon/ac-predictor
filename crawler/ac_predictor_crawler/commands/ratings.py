@@ -20,7 +20,7 @@ def _handler(res: Namespace):
   histories: Mapping[str, List[int]] = {}
   
   contests = repo.get_contests()
-  affective_contests = [contest for contest in contests if contest.contest_type == res.contest_type and contest.is_rated() and not contest.is_over()]
+  affective_contests = [contest for contest in contests if contest.contest_type == res.contest_type and contest.is_rated() and contest.is_over()]
   logger.debug(f'{len(affective_contests)=}')
   logger.info(f"gathering histories from results...")
   for contest in tqdm(sorted(affective_contests, key=lambda contest: contest.start_time)):
