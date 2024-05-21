@@ -6,7 +6,7 @@ fi
 
 logfile_name="/tmp/crawler-$(date '+%Y%m%d-%H%M%S').log"
 
-ac-predictor-crawler-runner > $logfile_name 2>&1
+$1 > $logfile_name 2>&1
 curl -fsS -m 10 --retry 5 --data-binary "@$logfile_name" https://hc-ping.com/$HEALTHCHECK_UUID/$?
 
 rm $logfile_name
