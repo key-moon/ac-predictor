@@ -83,7 +83,7 @@ class FileRepository:
   def _results_path(self, contest_screen_name: str):
     return f"results/{contest_screen_name}.json"
   def has_results(self, contest_screen_name: str):
-    return self._get_file(self._results_path(contest_screen_name))
+    return self._has_file(self._results_path(contest_screen_name))
   def get_results(self, contest_screen_name: str):
     content = self._get_file(self._results_path(contest_screen_name))
     return json.loads(content)

@@ -131,7 +131,7 @@ def do_crawl_results(refresh=False):
     update_contests()
     contests = filter(lambda c: c.is_rated() and c.is_over(), repository.get_contests())
     if not refresh:
-      contests = filter(lambda c: not repository.has_aperfs(c.contest_screen_name), contests)
+      contests = filter(lambda c: not repository.has_results(c.contest_screen_name), contests)
     update_results(contests)
     update_ratings()
     commit_and_push(overwrite=refresh) # refresh takes too long, so we definetly don't want to lose the data
