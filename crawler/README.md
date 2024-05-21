@@ -13,12 +13,12 @@ ac-predictor-crawler login
 
 自動更新
 ```sh
-ac-predictor-crawler-runner
-```
-
-crontab
-```crontab
-*/20 * * * * export REPOSITORY_PATH=/path/to/ac-predictor-data; export HEALTHCHECK_UUID=your-uuid; /path/to/healthcheck.sh
+# 成績表の差分更新
+ac-predictor-crawler-runner crawl-results
+# 成績表の全体更新
+ac-predictor-crawler-runner refresh-results
+# aperfs の更新
+ac-predictor-crawler-runner update-aperfs
 ```
 
 手動で更新
