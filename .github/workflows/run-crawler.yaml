@@ -1,4 +1,4 @@
-name: refresh caches
+name: run crawler
 
 on:
   workflow_call:
@@ -14,13 +14,23 @@ on:
         required: true
       ATCODER_PASSWORD:
         required: true
+      HEALTHCHECK_UUID:
+        required: true
+      DATA_DEPLOY_KEY:
+        required: true
 
 jobs:
-  refresh-caches:
+  run-crawler:
     runs-on: ubuntu-latest
     env:
       REPOSITORY_PATH: ./ac-predictor-data # TODO: make absolute paths
     steps:
+      - name: Setup deploy key
+        run: |
+          mkdir -p ~/.ssh
+          echo '${{ secrets.DATA_DEPLOY_KEY }}' > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+
       - name: Checkout crawler
         uses: actions/checkout@v4
         with:
@@ -29,9 +39,9 @@ jobs:
       - name: Checkout data
         uses: actions/checkout@v4
         with:
-          repository: ${{ inputs.data-repository }}
-          path: ac-predictor-data
-          token: ${{ secrets.GITHUB_TOKEN }}
+            repository: ${{ inputs.data-repository }}
+            path: ac-predictor-data
+            ssh-key: ${{ secrets.DATA_DEPLOY_KEY }}
 
       - name: Install Python
         uses: actions/setup-python@v2
@@ -50,4 +60,6 @@ jobs:
           echo '${{ secrets.ATCODER_PASSWORD }}' | ac-predictor-crawler login '${{ secrets.ATCODER_USERNAME }}'
 
       - name: Run crawler
-        run: ${{ inputs.command }}
+        run: |
+          ${{ inputs.command }}
+          curl -fsS -m 10 --retry 5 https://hc-ping.com/${{ secrets.HEALTHCHECK_UUID }}/$?

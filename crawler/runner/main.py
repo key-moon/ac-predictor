@@ -34,13 +34,13 @@ def pull():
   print("[+] syncing...")
   run(["git", "-C", repository_path, "pull"], check=True)
 
-def commit_and_push(with_rebase=True):
+def commit_and_push(with_rebase=True, overwrite=False):
   if run(["git", "-C", repository_path, "diff", "--quiet"], capture_output=True).returncode != 0:
     print("[+] commiting changes and syncing...")
     run(["git", "-C", repository_path, "add", "."], check=True)
     run(["git", "-C", repository_path, "commit", "-m", f"[auto] refresh caches"], check=True)
     if with_rebase:
-      run(["git", "-C", repository_path, "pull", "--rebase"], check=True)
+      run(["git", "-C", repository_path, "pull", "--rebase"] + (["--strategy", "ours"] if overwrite else []), check=True)
     run(["git", "-C", repository_path, "push"] + (["-f"] if with_rebase else []), check=True)
   else:
     print("[+] no file changed")
@@ -134,7 +134,7 @@ def do_crawl_results(refresh=False):
       contests = filter(lambda c: not repository.has_aperfs(c.contest_screen_name), contests)
     update_results(contests)
     update_ratings()
-    commit_and_push()
+    commit_and_push(overwrite=refresh) # refresh takes too long, so we definetly don't want to lose the data
   finally:
     reset_and_clean()
 

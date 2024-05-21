@@ -8,17 +8,12 @@ on:
 
 jobs:
   update-aperfs:
-    runs-on: ubuntu-latest
-    env:
-      REPOSITORY_PATH: ./ac-predictor-data # TODO: make absolute paths
-    steps:
-      - name: Crawl
-        secrets:
-          ATCODER_USERNAME: ${{ secrets.ATCODER_USERNAME }}
-          ATCODER_PASSWORD: ${{ secrets.ATCODER_PASSWORD }}
-        uses: ./.github/workflows/run-crawler.yaml
-        with:
-          data-repository: key-moon/ac-predictor-data
-          command: |
-            ac-predictor-crawler-runner update-aperfs
-            curl -fsS -m 10 --retry 5 https://hc-ping.com/${{ secrets.UPDATE_APERFS_UUID }}/$?
+    uses: ./.github/workflows/run-crawler.yaml
+    with:
+      data-repository: key-moon/ac-predictor-data
+      command: ac-predictor-crawler-runner update-aperfs
+    secrets:
+      ATCODER_USERNAME: ${{ secrets.ATCODER_USERNAME }}
+      ATCODER_PASSWORD: ${{ secrets.ATCODER_PASSWORD }}
+      HEALTHCHECK_UUID: ${{ secrets.UPDATE_APERFS_UUID }}
+      DATA_DEPLOY_KEY: ${{ secrets.DATA_DEPLOY_KEY }}
