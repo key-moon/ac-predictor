@@ -1,18 +1,23 @@
 from datetime import timedelta
 import os
-import json
 import time
+from typing import Iterable
 
 from tqdm import tqdm
 from subprocess import check_output, run
-from runner.util import has_start_within, is_over, is_rated, is_running
+
+from ac_predictor_crawler.config import get_repository
+from ac_predictor_crawler.repository.filerepository import FileRepository
+from ac_predictor_crawler.domain.contestinfo import ContestInfo
+import argparse
 
 RETRY_COUNT = 3
 GRACE_PERIOD = 60 * 60 # 1 hour
 
 LEVEL = ["--quiet", "--normal", "--verbose"]
 
-repository_path: str
+repository_path = os.environ["REPOSITORY_PATH"]
+repository = FileRepository(repository_path)
 
 def get_dirty_files():
   print('[+] acquiring dirty files...')
@@ -29,12 +34,14 @@ def pull():
   print("[+] syncing...")
   run(["git", "-C", repository_path, "pull"], check=True)
 
-def commit_and_push():
+def commit_and_push(with_rebase=True):
   if run(["git", "-C", repository_path, "diff", "--quiet"], capture_output=True).returncode != 0:
     print("[+] commiting changes and syncing...")
     run(["git", "-C", repository_path, "add", "."], check=True)
     run(["git", "-C", repository_path, "commit", "-m", f"[auto] refresh caches"], check=True)
-    run(["git", "-C", repository_path, "push", "-f"], check=True)
+    if with_rebase:
+      run(["git", "-C", repository_path, "pull", "--rebase"], check=True)
+    run(["git", "-C", repository_path, "push"] + (["-f"] if with_rebase else []), check=True)
   else:
     print("[+] no file changed")
 
@@ -52,16 +59,11 @@ def update_contests():
   else:
     raise Exception("request failed")
 
-def get_contests():
-  return json.load(open(os.path.join(repository_path, "contest-details.json"), "r"))
-
-def refresh_results():
-  contests = get_contests()
-
+def update_results(contests: Iterable[ContestInfo]):
   print("[+] refreshing results caches...")
   for contest in tqdm(contests):
-    if not is_rated(contest) or not is_over(contest): continue
-    contest_screen_name = contest["contestScreenName"]
+    assert contest.is_rated() and contest.is_over()
+    contest_screen_name = contest.contest_screen_name
     for retry in range(RETRY_COUNT):
       try:
         run(["ac-predictor-crawler", LEVEL[retry], "results", contest_screen_name], check=True)
@@ -89,30 +91,23 @@ def update_ratings():
     else:
       raise Exception("request failed")
 
-def update_aperfs(contests):
-  print("[+] calculating  aperfs...")
+def update_aperfs(contests: Iterable[ContestInfo]):
+  print("[+] calculating aperfs...")
   for contest in tqdm(contests):
-    if not is_rated(contest): continue
-    contest_screen_name = contest["contestScreenName"]
+    if not contest.is_rated(): continue
     for retry in range(RETRY_COUNT):
       try:
-        run(["ac-predictor-crawler", LEVEL[retry], "aperfs", "--use-results-cache", contest_screen_name], check=True)
+        run(["ac-predictor-crawler", LEVEL[retry], "aperfs", "--use-results-cache", contest.contest_screen_name], check=True)
       except KeyboardInterrupt:
         raise KeyboardInterrupt()
       except:
-        print("[*] aperf calculation failed", contest_screen_name)
+        print("[*] aperf calculation failed", contest.contest_screen_name)
         continue
       break
     else:
       raise Exception("request failed")
 
-def aperf_not_calculated(contest):
-  return not os.path.exists(os.path.join(repository_path, f"aperfs/{contest['contestScreenName']}.json"))
-
 def init_repository():
-  global repository_path
-  repository_path = os.environ["REPOSITORY_PATH"]
-
   dirty_files = get_dirty_files()
   if dirty_files:
     print("[+] repository is dirty")
@@ -129,25 +124,46 @@ def init_repository():
 
   pull()
 
-def do_refresh_caches():
+def do_crawl_results(refresh=False):
   init_repository()
 
   try:
     update_contests()
-    refresh_results()
+    contests = filter(lambda c: c.is_rated() and c.is_over(), repository.get_contests())
+    if not refresh:
+      contests = filter(lambda c: not repository.has_aperfs(c.contest_screen_name), contests)
+    update_results(contests)
     update_ratings()
+    commit_and_push()
   finally:
     reset_and_clean()
+
+def do_refresh_results():
+  do_crawl_results(refresh=True)
 
 def do_update_aperfs():
   init_repository()
 
   try:
-    contests = get_contests()
-    update_required = [contest for contest in contests if (has_start_within(contest, timedelta(hours=5)) or is_running(contest)) and is_rated(contest)]
-
+    update_contests()
+    update_required = [*filter(lambda c: (c.has_start_within(timedelta(hours=5)) or c.is_running()) and c.is_rated(), repository.get_contests())]
     print(f"[+] {len(update_required)=}")
     update_aperfs(update_required)
     commit_and_push()
   finally:
     reset_and_clean()
+
+def main():
+  parser = argparse.ArgumentParser(description="AC Predictor Crawler")
+  subparsers = parser.add_subparsers(title="subcommands", dest="subcommand")
+
+  subparsers.add_parser("crawl-results", help="Crawl and update results").set_defaults(handler=do_crawl_results)
+  subparsers.add_parser("refresh-results", help="Refresh results").set_defaults(handler=do_refresh_results)
+  subparsers.add_parser("update-aperfs", help="Refresh results").set_defaults(handler=do_update_aperfs)
+
+  args = parser.parse_args()
+
+  if hasattr(args, "handler"):
+    args.handler()
+  else:
+    parser.print_help()
