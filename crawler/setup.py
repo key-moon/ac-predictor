@@ -17,7 +17,8 @@ setup(
     entry_points={
         "console_scripts": [
             "ac-predictor-crawler = ac_predictor_crawler.main:main",
-            "ac-predictor-crawler-runner = runner.main:main",
+            "ac-predictor-crawler-update-aperfs = runner.main:do_update_aperfs",
+            "ac-predictor-crawler-refresh-caches = runner.main:do_refresh_caches",
         ]
     }
 )

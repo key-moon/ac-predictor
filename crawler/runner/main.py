@@ -109,7 +109,7 @@ def update_aperfs(contests):
 def aperf_not_calculated(contest):
   return not os.path.exists(os.path.join(repository_path, f"aperfs/{contest['contestScreenName']}.json"))
 
-def main():
+def init_repository():
   global repository_path
   repository_path = os.environ["REPOSITORY_PATH"]
 
@@ -128,16 +128,25 @@ def main():
     exit(0)
 
   pull()
+
+def do_refresh_caches():
+  init_repository()
+
   try:
     update_contests()
+    refresh_results()
+    update_ratings()
+  finally:
+    reset_and_clean()
+
+def do_update_aperfs():
+  init_repository()
+
+  try:
     contests = get_contests()
     update_required = [contest for contest in contests if (has_start_within(contest, timedelta(hours=5)) or is_running(contest)) and is_rated(contest)]
 
     print(f"[+] {len(update_required)=}")
-    if any(map(aperf_not_calculated, update_required)):
-      refresh_results()
-      update_ratings()
-
     update_aperfs(update_required)
     commit_and_push()
   finally:
