@@ -1,5 +1,9 @@
-from math import log, log2
+from math import exp, log, log2
 from typing import List, Literal
+
+def positivize_rating(rating: float):
+  if rating >= 400: return rating
+  return 400.0 * exp((rating - 400.0) / 400.0)
 
 def unpositivize_rating(rating: float):
   if rating >= 400: return rating

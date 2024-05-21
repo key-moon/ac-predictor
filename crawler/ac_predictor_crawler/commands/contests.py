@@ -1,5 +1,9 @@
 from argparse import ArgumentParser, Namespace
+from datetime import timedelta, timezone
+import datetime
 
+from ac_predictor_crawler.domain.contestinfo import ContestInfo
+from ac_predictor_crawler.domain.raterange import RateRange
 from ac_predictor_crawler.logger import logger
 from ac_predictor_crawler.client.contests import get_archived_contests, get_upcoming_contests
 from ac_predictor_crawler.commands.subcommand import SubCommand
@@ -22,12 +26,24 @@ def _handler(res: Namespace):
     logger.info("fetching contests...")
     contests = get_archived_contests()
 
+  # there is a single unlisted rated contest
+  if len(list(filter(lambda c: c.contest_screen_name == "jrex2017", contests))) == 0:
+    contests.append(ContestInfo(
+      contest_name="Japan Russia Exchange Programming Contest 2017",
+      contest_screen_name="jrex2017",
+      contest_type="algorithm",
+      start_time=datetime.datetime(2017, 1, 21, 15, 30, tzinfo=timezone(timedelta(hours=9))),
+      duration=timedelta(hours=2),
+      ratedrange=RateRange.parse("All"),
+    ))
+
   logger.info("fetching upcomings...")
   upcomings = get_upcoming_contests()
   for upcoming in upcomings:
     for duplicate_contest in filter(lambda c: c.contest_screen_name == upcoming.contest_screen_name, contests):
       contests.remove(duplicate_contest)
     contests.append(upcoming)
+  contests.sort(key=lambda contest: contest.start_time)
   repo.store_contests(contests)
  
 

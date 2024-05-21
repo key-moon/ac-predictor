@@ -6,6 +6,7 @@ from venv import logger
 
 from ac_predictor_crawler.domain.contestinfo import ContestInfo
 from ac_predictor_crawler.domain.raterange import RateRange
+from ac_predictor_crawler.domain.result import Result
 from ac_predictor_crawler.util.file import write
 from ac_predictor_crawler.logger import logger
 
@@ -86,9 +87,9 @@ class FileRepository:
     return self._has_file(self._results_path(contest_screen_name))
   def get_results(self, contest_screen_name: str):
     content = self._get_file(self._results_path(contest_screen_name))
-    return json.loads(content)
-  def store_results(self, contest_screen_name: str, results):
-    self._save_file(self._results_path(contest_screen_name), json.dumps(results).encode())
+    return list(map(Result.from_dict, json.loads(content)))
+  def store_results(self, contest_screen_name: str, results: List[Result]):
+    self._save_file(self._results_path(contest_screen_name), json.dumps([result.to_dict() for result in results]).encode())
 
   def _standings_path(self, contest_screen_name: str):
     return f"standings/{contest_screen_name}.json"

@@ -52,14 +52,16 @@ def _handler(res: Namespace):
     else:
       results = get_results(contest.contest_screen_name)
     for result in results:
-      if not result["IsRated"]: continue
-      user_screen_name = result["UserScreenName"]
-      if user_screen_name not in missing_users: continue
-      if user_screen_name not in histories: histories[user_screen_name] = []
+      if not result.is_rated: continue
+      if result.user_screen_name not in missing_users: continue
+      if result.user_screen_name not in histories: histories[result.user_screen_name] = []
 
-      if result["Performance"] in BOUND_PERFORMANCE:
-        inaccurate_users.add(user_screen_name)
-      histories[user_screen_name].append(result["Performance"])
+      if result.inner_performance is not None:
+        histories[result.user_screen_name].append(result.inner_performance)
+      else:
+        histories[result.user_screen_name].append(result.performance)
+        if result.performance in BOUND_PERFORMANCE:
+          inaccurate_users.add(result.user_screen_name)
 
   for user in inaccurate_users:
     del histories[user]

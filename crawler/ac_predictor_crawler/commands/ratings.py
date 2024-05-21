@@ -1,14 +1,12 @@
 from typing import List, Mapping
 from tqdm import  tqdm
 from argparse import ArgumentParser, Namespace
-from ac_predictor_crawler.client.history import get_history
 from ac_predictor_crawler.client.results import get_results
 
 from ac_predictor_crawler.logger import logger
-from ac_predictor_crawler.client.standings import get_standings
 from ac_predictor_crawler.commands.subcommand import SubCommand
 from ac_predictor_crawler.config import get_repository
-from ac_predictor_crawler.domain.rating import calc_aperf, calc_rating
+from ac_predictor_crawler.domain.rating import calc_rating, positivize_rating, unpositivize_rating
 
 def _initializer(parser: ArgumentParser):
   parser.add_argument("contest_type", choices=["algorithm", "heuristic"])
@@ -18,6 +16,7 @@ def _handler(res: Namespace):
   repo = get_repository()
 
   histories: Mapping[str, List[int]] = {}
+  actual_ratings: Mapping[str, int] = {}
   
   contests = repo.get_contests()
   affective_contests = [contest for contest in contests if contest.contest_type == res.contest_type and contest.is_rated() and contest.is_over()]
@@ -29,16 +28,20 @@ def _handler(res: Namespace):
     else:
       results = get_results(contest.contest_screen_name)
     for result in results:
-      if not result["IsRated"]: continue
-      user_screen_name = result["UserScreenName"]
-      if user_screen_name not in histories: histories[user_screen_name] = []
-      histories[user_screen_name].append(result["Performance"])
+      if not result.is_rated: continue
+      if result.user_screen_name not in histories: histories[result.user_screen_name] = []
+      histories[result.user_screen_name].append(result.performance)
+      actual_ratings[result.user_screen_name] = result.new_rating
 
   logger.info(f"gathering histories from results...")
   ratings = {}
-  for key in list(histories.keys()):
-    ratings[key] = calc_rating(histories[key], res.contest_type)
-    del histories[key]
+  for user_screen_name in list(histories.keys()):
+    ratings[user_screen_name] = calc_rating(histories[user_screen_name], res.contest_type)
+    if actual_ratings[user_screen_name] != round(positivize_rating(ratings[user_screen_name])):
+      logger.warn(f"computed ratings of the user {user_screen_name} does not match (computed: {positivize_rating(ratings[user_screen_name]):.6}, actual: {actual_ratings[user_screen_name]}, history: {histories[user_screen_name]})")
+      ratings[user_screen_name] = unpositivize_rating(actual_ratings[user_screen_name])
+    del histories[user_screen_name]
+
   repo.store_ratings(res.contest_type, ratings)
 
 ratings_command = SubCommand(
