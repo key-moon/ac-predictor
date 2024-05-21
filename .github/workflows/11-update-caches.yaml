@@ -1,0 +1,23 @@
+name: refresh caches
+
+on:
+  workflow_dispatch: # for debugging
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  update-caches:
+    runs-on: ubuntu-latest
+    env:
+      REPOSITORY_PATH: ./ac-predictor-data # TODO: make absolute paths
+    steps:
+      - name: Crawl
+        secrets:
+          ATCODER_USERNAME: ${{ secrets.ATCODER_USERNAME }}
+          ATCODER_PASSWORD: ${{ secrets.ATCODER_PASSWORD }}
+        uses: ./.github/workflows/run-crawler.yaml
+        with:
+          data-repository: key-moon/ac-predictor-data
+          command: |
+            ac-predictor-crawler-runner crawl-results
+            curl -fsS -m 10 --retry 5 https://hc-ping.com/${{ secrets.CRAWL_RESULTS_UUID }}/$?

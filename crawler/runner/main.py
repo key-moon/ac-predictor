@@ -159,7 +159,7 @@ def main():
 
   subparsers.add_parser("crawl-results", help="Crawl and update results").set_defaults(handler=do_crawl_results)
   subparsers.add_parser("refresh-results", help="Refresh results").set_defaults(handler=do_refresh_results)
-  subparsers.add_parser("update-aperfs", help="Refresh results").set_defaults(handler=do_update_aperfs)
+  subparsers.add_parser("update-aperfs", help="Update aperfs").set_defaults(handler=do_update_aperfs)
 
   args = parser.parse_args()
 
