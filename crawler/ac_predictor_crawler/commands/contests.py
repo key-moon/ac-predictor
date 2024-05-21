@@ -25,8 +25,8 @@ def _handler(res: Namespace):
   logger.info("fetching upcomings...")
   upcomings = get_upcoming_contests()
   for upcoming in upcomings:
-    if any([c.contest_screen_name == upcoming.contest_screen_name for c in contests]):
-      continue
+    for duplicate_contest in filter(lambda c: c.contest_screen_name == upcoming.contest_screen_name, contests):
+      contests.remove(duplicate_contest)
     contests.append(upcoming)
   repo.store_contests(contests)
  

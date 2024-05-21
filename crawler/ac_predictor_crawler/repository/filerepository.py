@@ -62,7 +62,7 @@ class FileRepository:
     contests.sort(key=lambda x: x.start_time, reverse=True)
     self._save_file("contest-details.json", json.dumps(contests, default=hook).encode())
     # legacy
-    self._save_file("contests.json", json.dumps([c.contest_screen_name for c in contests if c.start_time <= datetime.now(timezone.utc) + timedelta(hours=3)]).encode())
+    self._save_file("contests.json", json.dumps([c.contest_screen_name for c in contests]).encode())
 
   def _aperfs_path(self, contest_screen_name: str):
     return f"aperfs/{contest_screen_name}.json"
