@@ -1,3 +1,4 @@
+import { CssBaseline } from "@mui/material";
 import {
   Links,
   Meta,
@@ -5,6 +6,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
+import { ThemeContextProvider } from "./lib/theme";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -16,7 +18,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        {children}
+        <ThemeContextProvider>
+          <CssBaseline />
+          {children}
+        </ThemeContextProvider>
         <ScrollRestoration />
         <Scripts />
       </body>

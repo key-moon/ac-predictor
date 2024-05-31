@@ -12,13 +12,20 @@
   "dependencies": {
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
+    "@mui/icons-material": "^5.15.18",
     "@mui/material": "^5.15.18",
     "@remix-run/node": "^2.9.2",
     "@remix-run/react": "^2.9.2",
     "@remix-run/serve": "^2.9.2",
+    "i18next": "^23.11.5",
+    "i18next-browser-languagedetector": "^8.0.0",
+    "i18next-fs-backend": "^2.3.1",
+    "i18next-http-backend": "^2.5.2",
     "isbot": "^4.1.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react": "19.0.0-rc-81c5ff2e04-20240521",
+    "react-dom": "19.0.0-rc-81c5ff2e04-20240521",
+    "react-i18next": "^14.1.2",
+    "remix-i18next": "^6.1.0"
   },
   "devDependencies": {
     "@remix-run/dev": "^2.9.2",
@@ -32,6 +39,7 @@
     "eslint-plugin-jsx-a11y": "^6.7.1",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "remix-development-tools": "^4.1.6",
     "typescript": "^5.1.6",
     "vite": "^5.1.0",
     "vite-tsconfig-paths": "^4.2.1"
