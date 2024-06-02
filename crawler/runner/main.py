@@ -35,7 +35,7 @@ def pull():
   run(["git", "-C", repository_path, "pull"], check=True)
 
 def commit_and_push(with_rebase=True, overwrite=False):
-  if run(["git", "-C", repository_path, "diff", "--quiet"], capture_output=True).returncode != 0:
+  if len(get_dirty_files()):
     print("[+] commiting changes and syncing...")
     run(["git", "-C", repository_path, "add", "."], check=True)
     run(["git", "-C", repository_path, "commit", "-m", f"[auto] refresh caches"], check=True)
