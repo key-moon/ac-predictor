@@ -5,7 +5,7 @@
     "./node_modules/@types"
   ],
   "compilerOptions": {
-    "moduleResolution": "Node16",
+    "moduleResolution": "node",
     "resolveJsonModule": true,
     "target": "es2022",
     "lib": ["es2022", "dom"]

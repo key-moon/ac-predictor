@@ -2,7 +2,7 @@ import typescript from "rollup-plugin-typescript";
 import html from "rollup-plugin-html";
 import scss from 'rollup-plugin-scss';
 import json from '@rollup/plugin-json';
-import packageJson from "./package.json" assert { type: "json" };
+import packageJson from "./package.json" with { type: "json" };
 
 const namespace = "http://ac-predictor.azurewebsites.net/";
 
