@@ -30,6 +30,7 @@ export class ContestDetails {
 
     if (this.ratedrange.end == 1199) return 800;
     if (this.ratedrange.end == 1999) return 800;
+    if (this.ratedrange.end == 2399) return 800; // value is not relevant as it is never used
 
     const DEFAULT_CHANGED_AT = new Date("2019-05-25"); // maybe wrong
     if (this.ratedrange.end == 2799) {
@@ -51,12 +52,13 @@ export class ContestDetails {
       throw new Error("unrated contest");
     }
 
-    if (this.ratedrange.end == 1199) return 1600;
-    if (this.ratedrange.end == 1999) return 2400;
-    if (this.ratedrange.end == 2799) return 3200;
     if (4000 <= this.ratedrange.end) return Infinity;
 
-    throw new Error("unknown contest type");
+    if (this.ratedrange.end % 400 != 399) {
+      throw new Error("unknown contest type");
+    }
+
+    return this.ratedrange.end + 1 + 400;
   }
 
   public beforeContest(dateTime: Date) {
