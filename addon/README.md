@@ -3,8 +3,8 @@
 ## ビルド
 
 ```
-yarn install
-yarn bundle
+pnpm install
+pnpm bundle
 ```
 
 ## 開発
