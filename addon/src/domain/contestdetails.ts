@@ -51,6 +51,8 @@ export default class ContestDetails {
     if (!this.ratedrange.hasValue()) {
       throw new Error("unrated contest");
     }
+    
+    if (4000 <= this.ratedrange.end) return Infinity;
 
     if (this.ratedrange.end % 400 != 399) {
       throw new Error("unknown contest type");
