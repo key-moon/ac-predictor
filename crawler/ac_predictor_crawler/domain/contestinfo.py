@@ -13,6 +13,9 @@ class ContestInfo:
   contest_screen_name: str
   duration: timedelta
   ratedrange: RateRange
+  @property
+  def end_time(self):
+    return self.start_time + self.duration
   def is_rated(self):
     return self.ratedrange.has_value()
   def has_start_within(self, timedelta: timedelta):
