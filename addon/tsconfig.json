@@ -5,7 +5,8 @@
     "./node_modules/@types"
   ],
   "compilerOptions": {
-    "moduleResolution": "node",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "target": "es2022",
     "lib": ["es2022", "dom"]

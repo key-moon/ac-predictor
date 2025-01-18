@@ -1,6 +1,8 @@
 //Copyright © 2017 koba-e964.
 //from : https://github.com/koba-e964/atcoder-rating-estimator
 
+import { RatingMaterial } from "../data/history";
+
 const finf = bigf(400);
 
 function bigf(n: number): number {
@@ -74,28 +76,45 @@ export function calcRequiredPerformance(targetRating: number, history: number[])
 }
 
 /**
+ * Gets the weight used in the heuristic rating calculation
+ * based on its start and end dates
+ * @param {Date} startAt - The start date of the contest.
+ * @param {Date} endAt - The end date of the contest.
+ * @returns {number} The weight of the contest.
+ */
+export function getWeight(startAt: Date, endAt: Date) {
+    const isShortContest = endAt.getTime() - startAt.getTime() < 24 * 60 * 60 * 1000;
+
+    if (endAt < new Date("2025-01-01T00:00:00+09:00")) {
+        return 1;
+    }
+    return isShortContest ? 0.5 : 1;
+}
+
+/**
  * calculate unpositivized rating from performance history
- * @param {Number[]} [history] performance histories
+ * @param {RatingMaterial[]} [history] performance histories
  * @returns {Number} unpositivized rating
  */
-export function calcHeuristicRatingFromHistory(history: number[]): number {
+export function calcHeuristicRatingFromHistory(history: RatingMaterial[]): number {
     const S = 724.4744301;
     const R = 0.8271973364;
-    const qs: number[] = [];
-    for (const perf of history) {
+    const qs: { q: number, weight: number }[] = [];
+    for (const material of history) {
+        const adjustedPerformance = material.Performance + 150 - 100 * material.DaysFromLatestContest / 365;
         for (let i = 1; i <= 100; i++) {
-            qs.push(perf - S * Math.log(i));
+            qs.push({ q: adjustedPerformance - S * Math.log(i), weight: material.Weight });
         }
     }
-    qs.sort((a, b) => b - a);
+    qs.sort((a, b) => b.q - a.q);
 
-    let num = 0.0;
-    let den = 0.0;
-    for (let i = 99; i >= 0; i--) {
-        num = num * R + qs[i];
-        den = den * R + 1.0;
+    let r = 0.0;
+    let s = 0.0;
+    for (const { q, weight } of qs) {
+        s += weight;
+        r += q * (R ** (s - weight) - R ** s);
     }
-    return num / den;
+    return r;
 }
 
 /**

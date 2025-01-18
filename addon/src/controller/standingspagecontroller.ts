@@ -9,7 +9,7 @@ import FixedPerformanceProvider from "../domain/performanceprovider/fixed";
 import InterpolatePerformanceProvider from "../domain/performanceprovider/interpolate";
 import PerformanceProvider from "../domain/performanceprovider/performanceprovider";
 import { normalizeRank } from "../domain/ranks";
-import { positivizeRating } from "../domain/rating";
+import { getWeight, positivizeRating } from "../domain/rating";
 import IncrementalAlgRatingProvider from "../domain/ratingprovider/alg/incremental";
 import ConstRatingProvider from "../domain/ratingprovider/const";
 import FromHistoryHeuristicRatingProvider from "../domain/ratingprovider/heuristic/fromhistory";
@@ -25,6 +25,7 @@ type RatingProviderInfo = { provider: RatingProvider, lazy: boolean };
 
 export default class StandingsPageController {
   contestDetails?: ContestDetails;
+  contestDetailsMap = new Map<string, ContestDetails>();
 
   performanceProvider?: PerformanceProvider;
   ratingProvider?: RatingProviderInfo;
@@ -47,6 +48,7 @@ export default class StandingsPageController {
       throw new Error("contest details not found");
     }
     this.contestDetails = contestDetails;
+    this.contestDetailsMap = new Map(contestDetailsList.map(details => [details.contestScreenName, details]));
 
     if (this.contestDetails.beforeContest(new Date())) return;
     if (getConfig("hideDuringContest") && this.contestDetails.duringContest(new Date())) return;
@@ -128,12 +130,27 @@ export default class StandingsPageController {
         this.ratingProvider = { provider: new IncrementalAlgRatingProvider(standings.toOldRatingMaps(true), standings.toCompetitionMaps()), lazy: false }
       }
       else {
+        const startAt = this.contestDetails.startTime;
+        const endAt = this.contestDetails.endTime;
         this.ratingProvider = {
-          provider: new FromHistoryHeuristicRatingProvider(async userScreenName => {
-            const histories = await getHistory(userScreenName, "heuristic");
-            histories.data = histories.data.filter(x => new Date(x.EndTime) < this.contestDetails!.endTime);
-            return histories.toPerformances();
-          }),
+          provider: new FromHistoryHeuristicRatingProvider(
+            getWeight(startAt, endAt),
+            async userScreenName => {
+              const histories = await getHistory(userScreenName, "heuristic");
+              histories.data = histories.data.filter(x => new Date(x.EndTime) < endAt);
+              return histories.toRatingMaterials(
+                endAt,
+                x => {
+                  const details = this.contestDetailsMap.get(x.split(".")[0]);
+                  if (!details) {
+                    console.warn(`contest details not found for ${x}`);
+                    return 0;
+                  }
+                  return details.duration;
+                }
+              );
+            }
+          ),
           lazy: true
         }
       }

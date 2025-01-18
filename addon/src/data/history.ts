@@ -1,3 +1,4 @@
+import { getWeight } from "../domain/rating";
 import Cache from "./cache";
 
 type History = {
@@ -13,27 +14,32 @@ type History = {
   EndTime: string,
 }
 
+export type RatingMaterial = {
+  Performance: number,
+  Weight: number,
+  DaysFromLatestContest: number,
+};
+
+
+
 class HistoriesWrapper {
   data: History[]
   constructor(data: History[]) {
     this.data = data;
   }
 
-  public toPerformances() {
-    const results: number[] = [];
+  public toRatingMaterials(latestContestDate: Date, contestDurationSecondProvider: (screenName: string) => number) {
+    const toUtcDate = (date: Date) => Math.floor(date.getTime() / (24 * 60 * 60 * 1000));
+    const results: RatingMaterial[] = [];
     for (const history of this.data) {
       if (!history.IsRated) continue;
-      results.push(history.Performance);
-    }
-    return results;
-  }
-
-  public toPerformanceAndTimes() {
-    const results: { performance: number, date: Date }[] = [];
-    for (const history of this.data) {
-      if (!history.IsRated) continue;
-      const date = new Date(history.EndTime);
-      results.push({ performance: history.Performance, date });
+      const endTime = new Date(history.EndTime);
+      const startTime = new Date(endTime.getTime() - contestDurationSecondProvider(history.ContestScreenName) * 1000);
+      results.push({
+        Performance: history.Performance,
+        Weight: getWeight(startTime, endTime),
+        DaysFromLatestContest: toUtcDate(latestContestDate) - toUtcDate(endTime),
+      });
     }
     return results;
   }
