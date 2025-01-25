@@ -59,8 +59,8 @@ class AtCoderSession(Session):
 
   def _ensure_session_info(self):
     if self.csrf_token is None:
-      self.get("/")
-      assert self.csrf_token is not None
+      result = self.get("/")
+      assert self.csrf_token is not None, f"csrf token not found, content: {result.content}" 
 
   def _update_session_info(self, body: str):
     def get_js_variable(name: str):
