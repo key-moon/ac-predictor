@@ -13,7 +13,6 @@ jobs:
       data-repository: key-moon/ac-predictor-data
       command: ac-predictor-crawler-runner update-aperfs
     secrets:
-      ATCODER_USERNAME: ${{ secrets.ATCODER_USERNAME }}
-      ATCODER_PASSWORD: ${{ secrets.ATCODER_PASSWORD }}
+      ATCODER_SESSION: ${{ secrets.ATCODER_SESSION }}
       HEALTHCHECK_UUID: ${{ secrets.UPDATE_APERFS_UUID }}
       DATA_DEPLOY_KEY: ${{ secrets.DATA_DEPLOY_KEY }}
