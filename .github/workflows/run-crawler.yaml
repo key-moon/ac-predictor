@@ -57,7 +57,7 @@ jobs:
         run: |
           git config --global user.name ac-predictor
           git config --global user.email kymn0116+ac-predictor@gmail.com
-          echo '${{ secrets.ATCODER_PASSWORD }}' | ac-predictor-crawler login '${{ secrets.ATCODER_USERNAME }}'
+          ac-predictor-crawler login --session '${{ secrets.ATCODER_SESSION }}'
 
       - name: Run crawler
         run: |
