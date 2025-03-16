@@ -10,9 +10,7 @@ on:
         required: true
         type: string
     secrets:
-      ATCODER_USERNAME:
-        required: true
-      ATCODER_PASSWORD:
+      ATCODER_SESSION:
         required: true
       HEALTHCHECK_UUID:
         required: true
