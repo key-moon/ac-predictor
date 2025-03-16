@@ -13,7 +13,7 @@ def _initializer(parser: ArgumentParser):
 
 def _handler(res: Namespace):
   if res.session:
-    session = res.session
+    get_atcodersession().set_session(res.session)
     logger.info("Using provided session")
   else:
     if res.user_screen_name is None:
