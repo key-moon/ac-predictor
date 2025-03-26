@@ -1,6 +1,6 @@
 {
   "name": "ac-predictor",
-  "version": "2.0.8",
+  "version": "2.0.9",
   "author": "keymoon",
   "description": "コンテスト中にAtCoderのパフォーマンスを予測します",
   "typeRoots": [
