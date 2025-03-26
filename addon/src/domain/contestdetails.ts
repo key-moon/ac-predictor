@@ -28,9 +28,11 @@ export default class ContestDetails {
       throw new Error("unrated contest");
     }
 
+    // value is not relevant as it is never used
+    if (!this.ratedrange.contains(0)) return 800;
+
     if (this.ratedrange.end == 1199) return 800;
     if (this.ratedrange.end == 1999) return 800;
-    if (this.ratedrange.end == 2399) return 800; // value is not relevant as it is never used
 
     const DEFAULT_CHANGED_AT = new Date("2019-05-25"); // maybe wrong
     if (this.ratedrange.end == 2799) {
@@ -53,11 +55,6 @@ export default class ContestDetails {
     }
     
     if (4000 <= this.ratedrange.end) return Infinity;
-
-    if (this.ratedrange.end % 400 != 399) {
-      throw new Error("unknown contest type");
-    }
-
     return this.ratedrange.end + 1 + 400;
   }
 

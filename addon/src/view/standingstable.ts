@@ -115,7 +115,13 @@ function isFooter(row: HTMLElement) {
   return row.firstElementChild?.classList.contains("colspan");
 }
 async function modifyStandingsRow(row: HTMLElement, results: ResultDataProvider) {
-  let userScreenName: string | null = row.querySelector(".standings-username .username span")?.textContent ?? null;
+  const rankText = row.children[0].textContent;
+  const usernameSpan = row.querySelector(".standings-username .username span");
+  let userScreenName: string | null = usernameSpan?.textContent ?? null;
+  // unratedかつ順位が未表示ならば参加者でない、というヒューリスティック（お気に入り順位表でのエラー解消用）
+  if (usernameSpan?.className === "user-unrated" && rankText === "-") {
+    userScreenName = null;
+  }
   // TODO: この辺のロジックがここにあるの嫌だね……
   if (userScreenName !== null && row.querySelector(".standings-username .username img[src='//img.atcoder.jp/assets/icon/ghost.svg']")) {
     userScreenName = `ghost:${userScreenName}`;
