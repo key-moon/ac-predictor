@@ -9,16 +9,25 @@ export default class StandingsLoadingView {
     this.initHandler();
   }
   onLoad(hook: () => void): void {
-    this.hooks.push(hook);
+    if (this.loaded) {
+      hook();
+    } else {
+      this.hooks.push(hook);
+    }
   }
   private initHandler() {
-    new MutationObserver(() => {
+    const execute = () => {
       if (!this.loaded) {
         if (document.getElementById("standings-tbody") === null) return;
         this.loaded = true;
         this.hooks.forEach(f => f());
       }
-    }).observe(this.element, { attributes: true });    
+    };
+    if (this.element.style.display === "none") {
+      execute();
+    } else {
+      new MutationObserver(execute).observe(this.element, { attributes: true });
+    }
   }
 
   static Get() {
