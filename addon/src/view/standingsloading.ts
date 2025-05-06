@@ -1,33 +1,28 @@
 export default class StandingsLoadingView {
-  private loaded: boolean;
   private element: HTMLElement;
-  private hooks: (() => void)[];
+  private pendingHooks: (() => void)[];
   constructor(element: HTMLElement) {
-    this.loaded = false;
     this.element = element;
-    this.hooks = [];
-    this.initHandler();
+    this.pendingHooks = [];
+
+    new MutationObserver(() => this.resolveHooksIfPossible()).observe(this.element, { attributes: true });
   }
   onLoad(hook: () => void): void {
-    if (this.loaded) {
+    if (this.isStandingsLoaded()) {
       hook();
     } else {
-      this.hooks.push(hook);
+      this.pendingHooks.push(hook);
     }
   }
-  private initHandler() {
-    const execute = () => {
-      if (!this.loaded) {
-        if (document.getElementById("standings-tbody") === null) return;
-        this.loaded = true;
-        this.hooks.forEach(f => f());
-      }
-    };
-    if (this.element.style.display === "none") {
-      execute();
-    } else {
-      new MutationObserver(execute).observe(this.element, { attributes: true });
-    }
+  private resolveHooksIfPossible() {
+    if (this.pendingHooks.length === 0) return;
+    if (!this.isStandingsLoaded()) return;
+    const hooks = this.pendingHooks;
+    this.pendingHooks = [];
+    hooks.forEach(f => f());
+  };
+  private isStandingsLoaded() {
+    return this.element.style.display === "none";
   }
 
   static Get() {
