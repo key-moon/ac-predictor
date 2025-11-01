@@ -38,19 +38,19 @@ def _handler(res: Namespace):
   this_info = [contest for contest in contests if contest.contest_screen_name == contest_screen_name][0]
   histories: Mapping[str, List[int]] = {}
 
-  BOUND_PERFORMANCE = [1200 + 400, 2000 + 400, 2800 + 400]
   inaccurate_users = set()
 
   affective_contests = [contest for contest in contests if contest.contest_type == this_info.contest_type and contest.is_rated() and contest.start_time < this_info.start_time]
   logger.debug(f'{len(affective_contests)=}')
   missing_users = set([data["UserScreenName"] for data in standings["StandingsData"] if data["IsRated"] and data["UserScreenName"] not in aperfs])
   logger.debug(f'{len(missing_users)=}')
-  logger.info(f"gathering histories from results...")
+  logger.info("gathering histories from results...")
   for contest in tqdm(sorted(affective_contests, key=lambda contest: contest.start_time)):
     if res.use_results_cache:
       results = repo.get_results(contest.contest_screen_name)
     else:
       results = get_results(contest.contest_screen_name)
+    bound_performance = max(result.performance for result in results)
     for result in results:
       if not result.is_rated: continue
       if result.user_screen_name not in missing_users: continue
@@ -60,14 +60,14 @@ def _handler(res: Namespace):
         histories[result.user_screen_name].append(result.inner_performance)
       else:
         histories[result.user_screen_name].append(result.performance)
-        if result.performance in BOUND_PERFORMANCE:
+        if result.performance == bound_performance:
           inaccurate_users.add(result.user_screen_name)
 
   for user in inaccurate_users:
     del histories[user]
 
   missing_users.difference_update(histories.keys())
-  logger.info(f"gathering histories...")
+  logger.info("gathering histories...")
 
   history_required = []
   for standingsData in tqdm(standings["StandingsData"]):
