@@ -126,6 +126,15 @@ export default class StandingsPageController {
       this.isRatedMaps = standings.toIsRatedMaps(this.contestDetails.contestType);
       this.oldRatings = standings.toOldRatingMaps();
 
+      if (getConfig("compareComputations")) {
+        const results = await getResults(this.contestDetails.contestScreenName);
+        this.performanceProvider = basePerformanceProvider;
+        this.oldRatings = results.toPerformanceMaps();
+        
+        this.ratingProvider = { provider: { availableFor: (name) => basePerformanceProvider!.availableFor(name), getRating: async (name, _v) => basePerformanceProvider!.getPerformance(name) }, lazy: false };
+        return;
+      }
+
       if (this.contestDetails.contestType == "algorithm") {
         this.ratingProvider = { provider: new IncrementalAlgRatingProvider(standings.toOldRatingMaps(true), standings.toCompetitionMaps()), lazy: false }
       }

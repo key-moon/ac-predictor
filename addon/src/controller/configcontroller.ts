@@ -14,6 +14,7 @@ export default class ConfigController {
     if (isDebugMode()) {
       configView.addCheckbox("[DEBUG] enable debug mode", getConfig("isDebug"), null, val => setConfig("isDebug", val));
       configView.addCheckbox("[DEBUG] use results", getConfig("useResults"), null, val => setConfig("useResults", val));
+      configView.addCheckbox("[DEBUG] compare", getConfig("compareComputations"), null, val => setConfig("compareComputations", val));
     }
   }
 }

@@ -7,7 +7,8 @@ type Config = {
   hideDuringContest: boolean
   isDebug: boolean,
   hideUntilFixed: boolean,
-  useFinalResultOnVirtual: boolean
+  useFinalResultOnVirtual: boolean,
+  compareComputations: boolean
 };
 
 const defaultConfig: Config = {
@@ -15,7 +16,8 @@ const defaultConfig: Config = {
   hideDuringContest: false,
   isDebug: false,
   hideUntilFixed: false,
-  useFinalResultOnVirtual: false
+  useFinalResultOnVirtual: false,
+  compareComputations: false
 };
 
 function getConfigObj(): Config {
