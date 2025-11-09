@@ -50,7 +50,9 @@ def _handler(res: Namespace):
       results = repo.get_results(contest.contest_screen_name)
     else:
       results = get_results(contest.contest_screen_name)
-    bound_performance = max(result.performance for result in results)
+    bound_performance = max([result.performance for result in results] + [-1])
+    if bound_performance % 100 != 0:
+      bound_performance = None
     for result in results:
       if not result.is_rated: continue
       if result.user_screen_name not in missing_users: continue
