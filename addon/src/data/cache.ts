@@ -9,7 +9,7 @@ export default class Cache<T> {
   }
 
   public has(key: string) {
-    return this.cacheExpires.has(key) || Date.now() <= this.cacheExpires.get(key)!
+    return this.cacheExpires.has(key) && Date.now() <= this.cacheExpires.get(key)!
   }
 
   public set(key: string, content: T) {
