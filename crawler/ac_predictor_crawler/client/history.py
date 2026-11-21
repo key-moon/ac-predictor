@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 from datetime import datetime, timezone
 from typing import List, Literal
 from ac_predictor_crawler.logger import logger
@@ -17,10 +17,14 @@ class HistoryRecord:
   ContestNameEn: str
   EndTime: datetime
 
+_HISTORY_FIELDS = {field.name for field in fields(HistoryRecord)}
+
 def _hook(obj):
   if "IsRated" not in obj: return obj
   obj["EndTime"] = datetime.strptime(obj["EndTime"], "%Y-%m-%dT%H:%M:%S%z")
-  return HistoryRecord(**obj)
+  # AtCoder may add fields to the history API without notice (e.g. StartTime,
+  # Division). Ignore unknown fields instead of passing them to the dataclass.
+  return HistoryRecord(**{key: value for key, value in obj.items() if key in _HISTORY_FIELDS})
 
 def get_history(user_screen_name: str, contest_type: Literal["algorithm", "heuristic"]) -> List[HistoryRecord]:
   session = get_atcodersession()
